@@ -1,0 +1,54 @@
+\pdfoutput=1
+\pdfcompresslevel=9
+\pdfinfo
+{
+	/Author ()
+	/Title ()
+	/Subject ()
+	/Keywords ()
+}
+\documentclass[a4paper,onecolumn,oneside,12pt]{mwrep}
+
+\usepackage{times}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{setspace}
+\usepackage{graphicx} 
+
+\hyphenpenalty=10000		% nie dziel wyrazów zbyt często
+\clubpenalty=10000			% kara za sierotki
+\widowpenalty=10000			% nie pozostawiaj wdów
+\brokenpenalty=10000		% nie dziel wyrazów między stronami
+\exhyphenpenalty=999999		% nie dziel słów z myślnikiem
+\righthyphenmin=3			% dziel minimum 3 litery
+
+\tolerance=4500
+\pretolerance=250
+\hfuzz=1.5pt
+\hbadness=1450
+
+\sloppy						% umacnia pozycję prawego marginesu
+
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-5cm}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-5cm}
+\setlength{\oddsidemargin}{0cm}
+\setlength{\evensidemargin}{0cm}
+\topmargin -1.25cm
+\footskip 1.4cm
+
+\linespread{1.3}
+
+\includeonly{src/titlepage}
+
+\begin{document}
+
+\include{src/titlepage}
+
+\include{src/abstract}
+
+\include{src/introduction}
+
+\end{document}
