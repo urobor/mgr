@@ -79,6 +79,9 @@ def extractimages(description_files_directory, downloaded_vid_dir, img_root_dir)
             cap = cv2.VideoCapture(vid_path)
         else:
             raise Exception("File not found: " + vid_path)
+        
+        if not os.path.exists(img_root_dir):
+            os.makedirs(img_root_dir)
         img_dir = os.path.join(img_root_dir, vid_id)
         if(os.path.exists(img_dir)):
             print("DIR EXISTS")

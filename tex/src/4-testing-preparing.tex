@@ -459,4 +459,21 @@ Pierwsza próba zmniejszczenia nieudanych trafień polegała na zmianie
 parametru maxFalseAlarmRate podczas uczenia detektora. Wykonano pięć
 sesji uczenia detektora dla wartości: od domyślnej 0.5 do 0.1.
 
+\subsubsection{Podejście drugie - usuniecie zdeformowanych frontów}
+
+Podczas oznaczania frontów autobusów nastąpiła pawnego rodzaju
+nadgorliwość. Podczas wyboru klatek do późniejszego oznaczenia
+wystąpienia frontu klasyfikowano wszystkie wystąpienia autobusu
+czołem do kamery jako poprawne i~wartościowe. Podczas gdy autobus
+był ustawiony prostopadle do matrycy aparatu klatka taka była
+jak najbardziej poprawna i~zawarte w~niej informacje mogły
+z~powodzeniem być wykorzystane podczas uczenia detektora. Jednak
+gdy kąt między osią autobusu, a~płaszczyzną matrycy był mniejszy
+niż 45 stopni, zdjęcie nie niosło ze sobą informacji przydatnych
+w~procesie uczenia. Po pierwsze numer autobusu był już wtedy
+niewidoczny - informacja została utracona. Po drugie wprowadzone
+zostało zbędne zaburzenie w~wyglądzie szukanych obiektów,
+które mogłoby niekorzystnie wpłynąć na skuteczność wyszkolonych
+w~ten sposób detektorów.
+
 

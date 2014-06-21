@@ -2,13 +2,15 @@
 \pdfcompresslevel=9
 \pdfinfo
 {
-	/Author ()
-	/Title ()
-	/Subject ()
-	/Keywords ()
+    /Author ()
+    /Title ()
+    /Subject ()
+    /Keywords ()
 }
 \documentclass[a4paper,onecolumn,oneside,12pt]{mwrep}
 
+
+\usepackage{url}
 \usepackage{times}
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
@@ -16,22 +18,23 @@
 \usepackage{setspace}
 \usepackage{graphicx} 
 \usepackage{listings}
+\lstset{basicstyle=\footnotesize\ttfamily,columns=fullflexible}
 \usepackage{tikz} 
 \usepackage{pgfplots}
 
-\hyphenpenalty=10000		% nie dziel wyrazów zbyt często
-\clubpenalty=10000			% kara za sierotki
-\widowpenalty=10000			% nie pozostawiaj wdów
-\brokenpenalty=10000		% nie dziel wyrazów między stronami
-\exhyphenpenalty=999999		% nie dziel słów z myślnikiem
-\righthyphenmin=3			% dziel minimum 3 litery
+\hyphenpenalty=10000        % nie dziel wyrazów zbyt często
+\clubpenalty=10000          % kara za sierotki
+\widowpenalty=10000         % nie pozostawiaj wdów
+\brokenpenalty=10000        % nie dziel wyrazów między stronami
+\exhyphenpenalty=999999     % nie dziel słów z myślnikiem
+\righthyphenmin=3           % dziel minimum 3 litery
 
 \tolerance=4500
 \pretolerance=250
 \hfuzz=1.5pt
 \hbadness=1450
 
-\sloppy						% umacnia pozycję prawego marginesu
+\sloppy                     % umacnia pozycję prawego marginesu
 
 \setlength{\textwidth}{\paperwidth}
 \addtolength{\textwidth}{-5cm}
@@ -54,7 +57,13 @@
 
 \include{src/introduction}
 
+\include{src/2-methods-review}
+
 \include{src/3-setting-up-env}
 
 \include{src/4-testing-preparing}
+
+\bibliographystyle{plain}
+\bibliography{src/bibliography}
+
 \end{document}

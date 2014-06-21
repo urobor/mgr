@@ -20,6 +20,8 @@ def download(mark_files_dir, download_dir, yt_mark_mask='yt_marked.*\.csv'):
                     vid2itag[vid] = itag
                 print(len(vid2itag))
     print(downloading_message)
+    if not os.path.exists(download_dir):
+        os.makedirs(download_dir)
     os.chdir(download_dir)
     prefix = ['youtube-dl', '--id', '-q', '-f']
     for i, id in enumerate(vid2itag):

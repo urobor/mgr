@@ -1,0 +1,31 @@
+$ python autocascader.py -h
+usage: autocascader.py [-h] [-d] [--markframes] [--updatemarkedframes] [-e]
+                       [--markobjects] [--viewobjects]
+
+Tool for: 1.Downloading marked videos from YouTube. 2.Marking desired frames:
+bus front present (solaris) or background. 3.Extracting marked frames and
+saving them as images. 4.Marking objects in images and preparing opencv
+description file. 5.Making opencv vector files from marked sets. 6.Training
+haar cascade detector and saving it in xml file. 7.Testing haar cascade
+detector against training data.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --download        download all marked videos, marking files are in:
+                        "github/data/description_files/marked_for_download"
+  --markframes          mark frames to be: Front, Solaris front, Background or
+                        Nothing, press: Space - to pause display, F - to mark
+                        frame as any bus Front, S - to mark frame as Solaris
+                        bus front, B - to mark as Background, N - to Not mark
+                        at all (image won't be extracted)
+  --updatemarkedframes  if there wer to many images set to extract from video,
+                        i.e.: front instead of background or vice versa, etc.
+                        than one can remove extracted images. After that
+                        script with this flag must be run to update mark file
+                        - *.crlf representing marked frames to extract
+  -e, --extractimages   extracting images from downloaded videos according to
+                        "marked_frames_in_videos" description files
+  --markobjects         marking objects in images and store in opencv
+                        description file format
+  --viewobjects         viewing objects in images by displaying rectangles
+                        around them

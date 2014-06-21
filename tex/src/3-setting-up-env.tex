@@ -125,4 +125,36 @@ na temat: javascript, css, html, firefox: xul, addon-sdk, cfx.
 Kolejne narzędzia ,,pomocnicze'' implementowane będą z~większą ostrożnością i~po
 dłuższym przeanalizowaniu zagadnienia poddawanego automatyzacji.
 
+\section{Tworzenie zbioru wejściowego do narzędzia train\_cascade}
+
+Mając plik z~identyfikatorami filmów na serwisie YouTube wszystkie duże objętościowo
+dane potrzebne przy tworzeniu wsadu od narzędzia uczącego można było zostawić
+w~ich pierwotnym położeniu. Tworząc narzędzie wspomagające oznaczanie frontów
+wzbogacono je o~możliwość odtworzenia osiągniętego stanu w~oparciu o~pliki konfiguracyjne.
+Dodana funkcjonalność i~systematyczne wypychanie danych do zewnętrznego repozytorium
+umożliwiły niezakłuconą kontynuację prac po awarii i~utracie lokalnej kopii.
+
+Interfejsem narzędzia odpowiedzialnego za przygotowanie danych uczących był skrypt
+napisany w~języku python:
+
+\lstinputlisting{data/autocascader.txt}
+
+\subsubsection{Odtwarzanie środowiska po awarii}
+
+Pierwszym krokiem było pobranie plików wideo. W~tym celu należało wywołać skrypt
+z~parametrem -d.
+
+Po drobnych poprawkach (utworzeniu katalogu na pobrane pliki, którego nie było
+w~repozytorium) i~popbraniu wymaganych zależności proces poprawnie pobrał
+11 (jedenaście) zdefiniowanych w~pliku konfiguracyjnym pozycji.
+
+Ostatecznie wywołanie skryptu z~parametrem -e poprawnie wyłuskało klatki
+z~pobranych plików, które zostały zapisane w~postaci obrazów w~katalogach
+odpowiadających ich przeznaczeniu:
+
+\begin{itemize}
+\item front - pliki reprezentujące generyczne fronty autobusów,
+\item solaris - pliki reprezentujące fronty autobusów solaris (dla porównania),
+\item background - pliki tła - nie zawierające wystąpień żadnych frontów.
+\end{itemize}
 

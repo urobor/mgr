@@ -71,6 +71,9 @@ parser.add_argument('-e','--extractimages', action='store_true',
 parser.add_argument('--markobjects', action='store_true',
                     help='marking objects in images and store in opencv description file format')
 
+parser.add_argument('--deleteobjects', action='store_true',
+                    help='marking objects in images to be deleted from opencv description file by pressing d')
+
 parser.add_argument('--viewobjects', action='store_true',
                     help='viewing objects in images by displaying rectangles around them')
 
@@ -103,5 +106,8 @@ if(args.markobjects):
 if(args.viewobjects):
     print("\n==> VIEWING OBJECTS")
     viewobjects(images_dir,objects_mark_dir)
+if(args.deleteobjects):
+    print("\n==> DELETING OBJECTS")
+    viewobjects(images_dir,objects_mark_dir, True)
     
     
