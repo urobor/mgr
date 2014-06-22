@@ -3,6 +3,16 @@ import cv2
 import ConfigParser
 import glob
 import os
+import operator
+
+
+def getBusCoordinates(img, h):
+    height, width, depth = img.shape
+    small = cv2.resize(img, (width * h / height,h))
+    rectsDetected = cascade.detectMultiScale(small, scaleFactor=1.1, minNeighbors=1)
+    if(len(rectsDetected) > 0):
+        rectsDetected = (float(height)/float(h)*rectsDetected).astype(int)
+    return rectsDetected
 
 PREFIX_DIR = "/home/kuba"
 
@@ -35,7 +45,8 @@ def getRectsFromLine(line):
 results = open(os.path.join(test_dir, "all_15.txt"), "w")
 results.write("classifier number, pos matched, all pos, neg matched")
 
-for classifier_file in glob.glob(os.path.join(cascade_dir, "dev*")):
+for height in [600, 500, 400, 300, 200, 100]:
+    classifier_file = os.path.join(cascade_dir, "dev_09_lbp_all_posratio_999.xml")
     cascade = cv2.CascadeClassifier(classifier_file)
     number = os.path.basename(classifier_file).split("_")[1]
     print(number)
@@ -53,15 +64,15 @@ for classifier_file in glob.glob(os.path.join(cascade_dir, "dev*")):
     for path in path2rects:
         img = cv2.imread(os.path.join(OPENCV_DESCRIPTION_FILES,path))
         rectsGroundTruth = path2rects[path]
-        rectsDetected = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=1)
+        rectsDetected = getBusCoordinates(img, height)
             
         for rec in rectsDetected:
             found = False
             x1,y1,x2,y2 = rec[0],rec[1],rec[0]+rec[2],rec[1]+rec[3]
-            #cv2.rectangle(img, (x1,y1), (x2,y2), (0,0,255), thickness=6)
+            cv2.rectangle(img, (x1,y1), (x2,y2), (0,0,255), thickness=6)
             for rec_gt in rectsGroundTruth:
                 x1_gt,y1_gt,x2_gt,y2_gt = rec_gt[0],rec_gt[1],rec_gt[0]+rec_gt[2],rec_gt[1]+rec_gt[3]
-                #cv2.rectangle(img, (x1_gt,y1_gt), (x2_gt,y2_gt), (0,255,0), thickness=2)
+                cv2.rectangle(img, (x1_gt,y1_gt), (x2_gt,y2_gt), (0,255,0), thickness=2)
                 width_margin = rec[2]/4
                 height_margin = rec[3]/4
                 if(abs(x1 - x1_gt) < width_margin and
@@ -72,13 +83,13 @@ for classifier_file in glob.glob(os.path.join(cascade_dir, "dev*")):
                     found = True
             if(not found):
                 negativeMatchedCounter+=1
-        #cv2.imshow('image',img)
-        #k = cv2.waitKey(0)
-        #if k & 0xFF == ord('q'):
-        #    cv2.destroyAllWindows()
-        #    exit(0)
+        cv2.imshow('image',img)
+        k = cv2.waitKey(0)
+        if k & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
+            exit(0)
         
-    results.write(str(number) + "," + str(positiveMatchedCounter) + "," +
+    results.write(str(height) + " " + str(positiveMatchedCounter) + "," +
                   str(allPositiveCounter) + "," + str(negativeMatchedCounter))
     
 results.close()
