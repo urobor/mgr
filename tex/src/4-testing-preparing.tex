@@ -448,9 +448,12 @@ można uznać za ukończony.
     ylabel={$posotiveHits$},
     xlabel={$minHitRate$},
     minor y tick num=1,
+    legend style={at={(0.06,0.73)},anchor=north west}
 ]
 \addplot table {data/hitratio_fro.dat};
+\addlegendentry{wszystkie}
 \addplot table {data/hitratio_sol.dat};
+\addlegendentry{solaris}
 \end{axis}
 \end{tikzpicture}
 \end{center}
@@ -476,4 +479,85 @@ zostało zbędne zaburzenie w~wyglądzie szukanych obiektów,
 które mogłoby niekorzystnie wpłynąć na skuteczność wyszkolonych
 w~ten sposób detektorów.
 
+W~ramach drugiej iteracji poszukiwania optymalnego detektora
+usunięto wszystkie oznaczenia frontu posujące do opisu
+z~poprzedniego akapitu. Kilka takich przypadków można
+zaobserwować na zdjęciu poniżej.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/exp_removed_distorted_fronts}
+    \caption{Usunięte oznaczenia ze względu na zniekształcenia geometryczne}
+\end{figure}
+
+Jednak zanim przejdziemy do weryfikacji skuteczności poprawionego
+zbioru, przedstawione zostanie porównanie skuteczności już nauczonych
+detektorów. W~poprzednich podrozdziałach (bardzo chaotycznie) opisane
+zostały pierwsze próby utworzenia optymalnego detektora. W~ramach
+tych eksperymentów powstało 15 plików definiujących detektory, do utworzenia
+których użyto zmiennych parametrów. W~pierwszej iteracji zmianie podlegały
+parametry:
+
+\begin{itemize}
+\item featureType - HAAR(default), LBP, HOG,
+\item minHitRate - minimalna procentowa wartość pozytywnych wykryć (domyślnie 0.995),
+\item maxFalseAlarmRate - maksymalna procentowa wartość błędów (domyślnie 0.5),
+\item numNeg - liczba obrazów tła do wykorzystania.
+\end{itemize}
+
+Dodatkowo powstały dwa detektory LBP osobno dla frontów typu solaris i~dla
+całości zbioru (5690 wystąpień). Oto cała lista plików z~pierwszej iteracji:
+
+\begin{enumerate}
+\item dev\_01\_haar\_default.xml
+\item dev\_02\_lbp\_default.xml
+\item dev\_03\_hog\_default.xml
+\item dev\_04\_lbp\_solaris\_943.xml
+\item dev\_05\_lbp\_all\_5690.xml
+\item dev\_06\_lbp\_all\_posratio\_996.xml
+\item dev\_07\_lbp\_all\_posratio\_997.xml
+\item dev\_08\_lbp\_all\_posratio\_998.xml
+\item dev\_09\_lbp\_all\_posratio\_999.xml
+\item dev\_10\_lbp\_all\_posratio\_999\_maxfalse\_04.xml
+\item dev\_11\_lbp\_all\_posratio\_999\_maxfalse\_03.xml
+\item dev\_12\_lbp\_all\_posratio\_999\_maxfalse\_02.xml
+\item dev\_13\_lbp\_all\_posratio\_999\_maxfalse\_01.xml
+\item dev\_14\_lbp\_all\_posratio\_999\_numneg\_2000.xml
+\item dev\_15\_lbp\_all\_posratio\_999\_numneg\_4000.xml
+\end{enumerate}
+
+Pierwsze trzy pliki utworzone były na ograniczonym podzbiorze danych, gdyż
+nie wszystkie próbki były wtedy opisane.
+
+Procedura porównywania skuteczności operowała zbiorze obrazów
+reprezentujących wystąpienia frontów autobusów solaris połączonym
+z~ogólnym zbiorem ze wszystkimi typami autobusów. Poprawne
+wykrycie liczone było wtedy gdy współrzędne prostokątów wykrytego
+i~oznaczonego znajdowały się w~odległości nie większej niż 25\% odpowiadającego
+wymiaru prostokąta oznaczonego: dla odciętych i~rzędnych odpowiednio szerokość
+i~wysokość prostokąta. Do zliczania błędnych wykryć wykorzystano ten sam zbiór.
+Ze względu na ograniczenie czasowe zrezygnowano z~wykorzystania zbioru
+obrazów tła. Wyniki zaprezentowano na wykresie poniżej.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2},
+height=5cm,width=0.8\textwidth,
+legend style={at={(0.03,0.93)},anchor=north west}]
+\nextgroupplot
+\addplot table {data/15_detectors_comparison_positive_percentage.dat};
+
+\addlegendentry{Skutecznosc}
+
+\nextgroupplot
+\addplot table {data/15_detectors_comparison_negative_count.dat};
+\addlegendentry{Bledne trafienia}
+\end{groupplot}
+\end{tikzpicture}
+\end{center}
+
+Jak widać wyniki w~większości przypadków oscylowały w~granicach 90\%.
+W~odróżnieniu od poprzednich testów, te wykonane były na klatkach obrazu
+w~oryginalnej rozdzielczości (wysokość 720p. Kolejnym krokiem będzie znalezienie
+optymalnego czynnika skalującego. Innymi słowy jak bardzo można zmiejszyć
+obraz wejściowy aby utrzymać wyniki na zadowalającym poziomie.
