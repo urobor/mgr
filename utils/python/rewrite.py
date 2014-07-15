@@ -11,26 +11,26 @@ to_root = config.get('paths', 'script_to_root')
 # Objects
 objects_mark_dir = os.path.join(script_dir, to_root,
                                 config.get('paths', 'objects_mark_dir'))
-sol_path = os.path.join(objects_mark_dir, 'solaris.txt')
-fro_path = os.path.join(objects_mark_dir, 'front.txt')
-bac_path = os.path.join(objects_mark_dir, 'background.txt')
+sol_path = os.path.join(objects_mark_dir, 'solaris.txt.fix')
+fro_path = os.path.join(objects_mark_dir, 'front.txt.fix')
+bac_path = os.path.join(objects_mark_dir, 'background.txt.fix')
 sol = open(sol_path, 'w')
 fro = open(fro_path, 'w')
 bac = open(bac_path, 'w')
 for i, id_path in enumerate(glob.glob(os.path.join(objects_mark_dir, '*'))):
         
-    if(id_path.endswith("txt")):
+    if(id_path.endswith("txt.fix") or id_path.endswith(".txt")):
         continue
     print os.path.basename(id_path)
     for j, type_path in enumerate(glob.glob(os.path.join(id_path, '*'))):
         num = 0
         f = open(type_path, 'r')
         for k, line in enumerate(f):
-            if(type_path.endswith('solaris.txt')):
+            if(type_path.endswith('solaris.txt.fix')):
                 sol.write(line)
-            if(type_path.endswith('front.txt')):
+            if(type_path.endswith('front.txt.fix')):
                 fro.write(line)
-            if(type_path.endswith('background.txt')):
+            if(type_path.endswith('background.txt.fix')):
                 bac.write(line)
         f.close()
 fro.close()
