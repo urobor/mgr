@@ -9,14 +9,14 @@ import operator
 def getBusCoordinates(img, h):
     height, width, depth = img.shape
     small = cv2.resize(img, (width * h / height,h))
-    rectsDetected = cascade.detectMultiScale(small, scaleFactor=1.1, minNeighbors=1)
+    rectsDetected = cascade.detectMultiScale(small, scaleFactor=1.1, minNeighbors=1, minSize=(1,1))
     if(len(rectsDetected) > 0):
         rectsDetected = (float(height)/float(h)*rectsDetected).astype(int)
     return rectsDetected
 
 PREFIX_DIR = "/home/kuba"
 
-OPENCV_DESCRIPTION_FILES = os.path.join(PREFIX_DIR,"Magisterka/github/data/description_files/opencv")
+OPENCV_DESCRIPTION_FILES = os.path.join(PREFIX_DIR,"Magisterka/github/data/description_files/digits_opencv")
     
 cascade_dir = os.path.join(PREFIX_DIR, "Magisterka/github/data/description_files/classifiers")
 test_dir = os.path.join(PREFIX_DIR, "Magisterka/github/data/tests")
@@ -42,11 +42,11 @@ def getRectsFromLine(line):
         rects.append(rect)
     return path,rects
 
-results = open(os.path.join(test_dir, "all_15.txt"), "w")
-results.write("classifier number, pos matched, all pos, neg matched")
+results = open(os.path.join(test_dir, "digit_8.txt"), "w")
+results.write("pos matched, all pos, neg matched\n")
 
 #for height in [600, 500, 400, 300, 200, 100]:
-classifier_file = os.path.join(cascade_dir, "cascade.xml")
+classifier_file = os.path.join(cascade_dir, "dev_digit8_lbp_default_513_pos_500_neg.xml")
 cascade = cv2.CascadeClassifier(classifier_file)
 #number = os.path.basename(classifier_file).split("_")[1]
 #print(number)
@@ -54,15 +54,15 @@ positiveMatchedCounter = 0
 allPositiveCounter = 0
 negativeMatchedCounter = 0
 path2rects = {}
-positive = open(os.path.join(OPENCV_DESCRIPTION_FILES, "IHdigits/all.txt"))
-background = open(os.path.join(OPENCV_DESCRIPTION_FILES, "background.txt"))
+positive = open(os.path.join(OPENCV_DESCRIPTION_FILES, "8.txt"))
+#background = open(os.path.join(OPENCV_DESCRIPTION_FILES, "background.txt"))
 for line in positive:
     path,rectsFromLine = getRectsFromLine(line)
     path2rects[path] = rectsFromLine
     allPositiveCounter += len(rectsFromLine)
 
 for path in path2rects:
-    img = cv2.imread(os.path.join(OPENCV_DESCRIPTION_FILES, "IHdigits", path))
+    img = cv2.imread(os.path.join(OPENCV_DESCRIPTION_FILES, path))
     rectsGroundTruth = path2rects[path] 
     rectsDetected = getBusCoordinates(img, 600)
         
@@ -83,13 +83,14 @@ for path in path2rects:
                 found = True
         if(not found):
             negativeMatchedCounter+=1
+            display
     cv2.imshow('image',img)
     k = cv2.waitKey(0)
     if k & 0xFF == ord('q'):
         cv2.destroyAllWindows()
         exit(0)
     
-results.write(str(height) + " " + str(positiveMatchedCounter) + "," +
-              str(allPositiveCounter) + "," + str(negativeMatchedCounter))
+results.write(str(positiveMatchedCounter) + "," +
+              str(allPositiveCounter) + "," + str(negativeMatchedCounter) +"\n")
     
 results.close()
