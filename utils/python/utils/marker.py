@@ -126,28 +126,40 @@ def viewobjects(img_root_dir, objects_mark_dir, delete_bounding_box=False):
     for i,img_id_path in enumerate(glob.glob(os.path.join(objects_mark_dir, '*'))):
         for img_type_path in glob.glob(os.path.join(img_id_path, '*')):
             if img_type_path.endswith('background.txt'):
-                continue
-            print(img_type_path)
-            
-            f = open(img_type_path, 'r')
-            if delete_bounding_box:
-                f_updated = open(img_type_path+".fix", 'w')
-            
-            for line in f:
-                values = line.strip().split()
-                (img_path, number_of_rectangles), coordinates = values[0:2], values[2:]
-                image = cv2.imread(os.path.join(img_id_path,img_path))   
-                for i in range(int(number_of_rectangles)):
-                    x1 = int(coordinates[i*4])
-                    y1 = int(coordinates[i*4+1])
-                    x2 = int(coordinates[i*4]) + int(coordinates[i*4+2])
-                    y2 = int(coordinates[i*4+1]) + int(coordinates[i*4+3])
-                    cv2.rectangle(image,(x1,y1),(x2,y2),(127,127,255),1)       
-                cv2.imshow('image',image)
-                k = cv2.waitKey()
-                if delete_bounding_box:
-                    if k & 0xFF == ord('d'):
-                        pass
-                    else:
-                        f_updated.write(line);
-            f.close()
+                f = open(img_type_path, 'r')
+                for line in f:
+                    print(os.path.join(img_id_path,line))
+                    image = cv2.imread(os.path.join(img_id_path,line).strip())         
+                    cv2.imshow('image',image)
+                    k = cv2.waitKey()
+                    if delete_bounding_box:
+                        if k & 0xFF == ord('d'):
+                            
+            #    f_updated = open(img_type_path+".fix", 'w')
+                
+                
+                
+            #print(img_type_path)
+            #
+            #f = open(img_type_path, 'r')
+            #if delete_bounding_box:
+            #    f_updated = open(img_type_path+".fix", 'w')
+            #
+            #for line in f:
+            #    values = line.strip().split()
+            #    (img_path, number_of_rectangles), coordinates = values[0:2], values[2:]
+            #    image = cv2.imread(os.path.join(img_id_path,img_path))   
+            #    for i in range(int(number_of_rectangles)):
+            #        x1 = int(coordinates[i*4])
+            #        y1 = int(coordinates[i*4+1])
+            #        x2 = int(coordinates[i*4]) + int(coordinates[i*4+2])
+            #        y2 = int(coordinates[i*4+1]) + int(coordinates[i*4+3])
+            #        cv2.rectangle(image,(x1,y1),(x2,y2),(127,127,255),1)       
+            #    cv2.imshow('image',image)
+            #    k = cv2.waitKey()
+            #    if delete_bounding_box:
+            #        if k & 0xFF == ord('d'):
+            #            pass
+            #        else:
+            #            f_updated.write(line);
+                f.close()
