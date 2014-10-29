@@ -9,7 +9,7 @@ import operator
 def getBusCoordinates(img, h):
     height, width, depth = img.shape
     small = cv2.resize(img, (width * h / height,h))
-    rectsDetected = cascade.detectMultiScale(small, scaleFactor=1.1, minNeighbors=1, minSize=(1,1))
+    rectsDetected = cascade.detectMultiScale(small, scaleFactor=1.1, minNeighbors=5, minSize=(1,1))
     if(len(rectsDetected) > 0):
         rectsDetected = (float(height)/float(h)*rectsDetected).astype(int)
     return rectsDetected
@@ -46,7 +46,8 @@ results = open(os.path.join(test_dir, "digit_8.txt"), "w")
 results.write("pos matched, all pos, neg matched\n")
 
 #for height in [600, 500, 400, 300, 200, 100]:
-classifier_file = os.path.join(cascade_dir, "dev_digit8_lbp_default_513_pos_500_neg.xml")
+#for x in range(100, 299):
+classifier_file = os.path.join(cascade_dir, "dev_digit1_lbp_default_100_pos_100_neg.xml")
 cascade = cv2.CascadeClassifier(classifier_file)
 #number = os.path.basename(classifier_file).split("_")[1]
 #print(number)
@@ -54,7 +55,7 @@ positiveMatchedCounter = 0
 allPositiveCounter = 0
 negativeMatchedCounter = 0
 path2rects = {}
-positive = open(os.path.join(OPENCV_DESCRIPTION_FILES, "8.txt"))
+positive = open(os.path.join(OPENCV_DESCRIPTION_FILES, "1.txt"))
 #background = open(os.path.join(OPENCV_DESCRIPTION_FILES, "background.txt"))
 for line in positive:
     path,rectsFromLine = getRectsFromLine(line)
@@ -83,14 +84,13 @@ for path in path2rects:
                 found = True
         if(not found):
             negativeMatchedCounter+=1
-            display
     cv2.imshow('image',img)
     k = cv2.waitKey(0)
     if k & 0xFF == ord('q'):
         cv2.destroyAllWindows()
         exit(0)
     
-results.write(str(positiveMatchedCounter) + "," +
+results.write(str(x)+","+str(positiveMatchedCounter) + "," +
               str(allPositiveCounter) + "," + str(negativeMatchedCounter) +"\n")
     
 results.close()

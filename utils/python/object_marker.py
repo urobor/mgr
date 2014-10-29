@@ -6,7 +6,7 @@ import numpy as np
 TO_ROOT_DIR_SCRIPT = '../../..'
 TO_ROOT_DIR_DESCRIPTION_FILE = '../../..'
 IMG_ROOT_DIR = 'local/img'
-MARKED_FILE_PATH = 'github/data/description_files/digits_opencv/8.txt'
+MARKED_FILE_PATH = 'github/data/description_files/digits_opencv/1.txt'
 RATIO = 1.5
 
 bus_types = ('solaris', 'front')
@@ -75,7 +75,7 @@ if(os.path.isfile(os.path.join(TO_ROOT_DIR_SCRIPT,MARKED_FILE_PATH))):
 for image_set_dir in glob.glob(os.path.join(TO_ROOT_DIR_SCRIPT, IMG_ROOT_DIR, '*')):
     for bus_type in bus_types:
         for bus_front_image_type in glob.glob(os.path.join(image_set_dir, bus_type)):
-            for image_path in glob.glob(os.path.join(bus_front_image_type, '*')):
+            for image_path in sorted(glob.glob(os.path.join(bus_front_image_type, '*'))):
                 if marked_files.get(image_path):
                     continue
                 f = open(os.path.join(TO_ROOT_DIR_SCRIPT,MARKED_FILE_PATH), 'a')
