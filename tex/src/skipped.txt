@@ -1,0 +1,30 @@
+// USUNIETE ZE WSTEPU - ZBYT SZCZEGOLOWE
+
+Użytkownik - osoba niewidoma - stojący na przystanku autobusowym powinien
+być zwrócony twarzą do nadjeżdżających samochodów. Trzymając
+telefon tak aby kamera zbierała klatki obrazu
+z~najbliższych chodnikowi pasów ruchu (co najmniej z~zatoki autobusowej)
+użytkownik uruchamia aplikację. Następuje wejście aplikacji w~tryb
+wyszukiwania frontu. W~momencie odnalezienia frontu aplikacja
+przełącza się w~tryb odczytywania numeru sygnalizując o~tym użytkownika.
+Próba odczytania może się powieść lub nie dlatego aplikacja może
+zakończyć ten etap na wiele różnych sposobów:
+
+\begin{itemize}
+	\item numer został jednoznacznie odczytany - komunikat z~odczytanym 
+		numerem linii,
+	\item numer odczytany, lecz jest kilku prawdopodobnych kandydatów - 
+		komunikat mówiący o~niepewności odczytu zwracanych jest
+		kilka pierwszych najbardziej prawdopodobnych numerów,
+	\item odczyt błędny lub brak wyraźnych faworytów - komunikat
+		o~niemożliwości odczytania numeru,
+	\item niedostateczna liczba pobranych danych - komunikat 
+		o~prawdopodobnej utracie obiektu - wyjście frontu
+		poza kadr, zasłonięcie przez przeszkodę itp.
+\end{itemize}
+
+Po udanym lub nieudanym odczycie aplikacja przechodzi w~stan spoczynku,
+a~użytkownik ma możliwość - poprzez kliknięcie
+elementu w~odpowiednim menu - uruchomić
+ponownie tryb wyszukiwania frontu.
+

@@ -1,89 +1,163 @@
-\chapter{Przegląd metod detekcji i~identyfikacji obiektów w~obrazach}
+\chapter{Przegląd wybranych metod detekcji i~identyfikacji
+obiektów w~obrazach}
 
-W~tym rozdziale przedstawione zostały algorytmy detekcji (wykrywania,
-lokalizacji) obiektów w~obrazach, oraz ich identyfikacji (rozpoznawania).
-Wskazane zostaną obszary dobrze znane i~udokumentowane takie jak detekcja
-twarzy, do obsługi których istnieją ogólnodostępne implementacje
-rozwiązujące problem na zadowalającym poziomie. Z~drugiej strony
-przedstawione zostaną dziedziny w~zakresie których prowadzone są intensywne
-badania m.in. odczytywanie tekstu ze sceny, gdzie nie istnieje uniwersalne
-rozwiązanie.
+We wstępie zamieszczono krótki opis pojęć detekcji i~identyfikacji.
+Jednak ze względu na niejednoznaczności związane z~tymi terminami
+zaobserwowane w~literaturze,
+artykułach oraz dyskusjach na forach internetowych podjęto próbę
+precyzyjnego określenia czym są: detekcja oraz identyfikacja
+obiektów w~obrazach. Na potrzeby niniejszej pracy dyplomowej wprowadzone
+zostały następujące dwie definicje.
 
-Na potrzeby tego opracowania wprowadzone zostaną dwa terminy. Zgodnie
-z~tytułem rozdziału, będzie to detekcja obiektów, oraz identyfikacja
-obiektów. Pod pojęciem detekcji kryje się proces wykrywania obiektów
-pewnej klasy w~zadanym obrazie wejściowym. 
-Wynikiem działania algorytmu detekcji jest zazwyczaj lista
-współrzędnych określających położenie obiektu w~obrazie - prostokąty
-okalające. Dobrze zbadane dziedziny wykrywania obiektów to m.in. 
-wykrywanie twarzy, czy wykrywanie przechodniów. Do omawianej dziedziny
-zalicza się również lokalizacja tekstu w~scenie, gdzie podzbiorem
-tego zagadnienia jest wykrywanie i~lokalizacja numerów 
-- problem, którego rozwiązanie jest celem tejże pracy.
+Detekcja obiektów, innymi słowy wykrywanie lub lokalizacja,
+polega na określeniu czy i~gdzie obiekt danej klasy występuje w~obrazie.
+Jeżeli na obrazie widoczne są szukane obiekty,
+produktem procesu powinny być współrzędne wszystkich ich wystąpień.
+Przykładami tego typu działań są:
 
-Kolejnym zagadnieniem jest rozpoznawanie obiektów. Różnica między
-detekcją, a~identyfikacją na przykładzie twarzy wygląda następująco.
-Detektor twarzy lokalizuje wszystkie wystąpienia obiektów danej klasy
-w~scenie - może nie zwrócić nic, gdy fotografowana była na przykład martwa
-natura. ,,Identyfikator'' twarzy uruchamiany jest dla każdego wystąpienia
-twarzy w~scenie i~zwraca informację do kogo dana twarz należy.
-Identyfikacja lub inaczej rozpoznawanie obiektów jest zadaniem z~założenia
-bardziej złożonym, zarówno koncepcyjnie jak i~obliczeniowo.
-Przykładowe zastosowania algorytmów rozpoznawania obiektów to wspomniane
-już identyfikowanie osoby na podstawie twarzy, którego wariantem może
-być identyfikowanie osoby na podstawie siatkówki oka lub odcisku palca,
-w~których to przypadkach element wykrywania jest pominięty. 
-Pewną parafrazą
-rozpoznawania obiektów jest identyfikacja znaków w~algorytmach odczytywania
-tekstu (\textit{ang. OCR - Optical Character Recognition}).
+\begin{itemize}
+    \item wykrywanie twarzy,
+    \item detekcja przechodniów,
+    \item lokalizacja tekstu w~scenie itp.
+\end{itemize}
 
-Logiczny podział algorytmów i~ich implementacji jest zadaniem 
-wykraczającej poza zakres tego opracowania. Niektóre rozwiązania
-zaprojektowane do wykrywania po trywialnych modyfikacjach mogą służyć
+Identyfikacja (rozpoznawanie) obiektów polega na przypisaniu
+poszczególnym instancjom już wykrytych obiektów odpowiadających im
+etykiet. Dostarczone próbki w~założeniu powinny reprezentować
+obiekty badanej klasy, czyli analogicznie do zaprezentowanych
+przykładów z~dziedziny detekcji były by to: twarze,
+znaki drukowane lub (niewymienione wcześniej) odciski palców.
+Wynikiem tak zdefiniowanego działania powinny być nazwiska osób
+skojarzonych z~twarzami lub odciskami palców,
+czy w~przypadku znaków drukowanych odpowiadające im litery, cyfry
+itp.
+
+Idealnym podziałem z~punktu widzenia niniejszej pracy byłoby ścisłe
+rozdzielenie algorytmów na dwie kategorie:
+
+\begin{enumerate}
+    \item Algorytmy odpowiadające na pytanie czy i~ewentualnie gdzie
+        w~obrazie
+        znajdują się obiekty szukanej klasy (z~uwzględnieniem przesunięcia,
+        skalowania i~obrotu), na przykład twarze, znaki drogowe, znaki
+        drukowane, samochody, fronty samochodów czy fronty autobusów.
+    \item Algorytmy zwracające nazwę, typ lub identyfikator obiektu
+        dostarczonego w~postaci określonej wielkości fragmentu obrazu
+        w~ustalonej orientacji, na przykład przypisanie twarzy do
+        właścicieli, znaku do kodu czy samochodu do marki i~modelu.
+\end{enumerate}
+
+Istnieje wiele algorytmów i~implementacji ściśle pasujących do
+przedstawionych opisów. Są też jednak takie, które zawierają obie
+funkcjonalności, na przykład śledzenie (detekcja) twarzy należącej
+do konkretnej (identyfikacja) osoby. Niektóre rozwiązania zaprojektowane
+w~celu detekcji po trywialnych modyfikacjach mogą służyć
 do rozpoznawania wykrytych obiektów. Ostatecznie niektóre detektory
-w~efekcie ubocznym mogą służyć do identyfikacji znalezionych obiektów.
+w~efekcie ubocznym mogą z~powodzeniem identyfikować poszczególne
+instancje wykrywanych obiektów.
+
+W~kolejnych podrozdziałach
+przedstawiono najpopularniejsze algorytmy, implementacje
+oraz koncepcje z~dziedziny detekcji i~identyfikacji obiektów w~obrazach.
+Znaczna większość opisanych rozwiązań posiada gotową implementację
+w~darmowej bibliotece OpenCV \cite{wiki:opencv}, która powstała
+w~ramach projektu
+zapoczątkowanego
+w~1999 roku przez firmę Intel. W~2012 roku prace wznowiono
+a~utrzymanie oraz rozwój powierzono fundacji non-profit
+OpenCV.org. Biblioteka udostępniana jest wersjij
+stabilnej 2.4.10 z~października 2014 oraz rozwojowej
+3.0 BETA planowanej na maj 2014 (7 miesięcy opóźnienia).
+
+Ze względu na licencję BSD, świetną
+dokumentację, ciągły aktywny rozwój, implementację na wielu platformach,
+w~tym Windwos, Linux oraz Android, jest to pozycja niezastąpiona
+przy implementacji rozwiązań nie tylko z~dziedziny identyfikacji
+i~detekcji lecz widzenia komputerowego w~ogóle. Dodatkowo nacisk
+położony na przetwarzanie obrazów w~czasie rzeczywistym czyni z~biblioteki
+OpenCV idealnego kandydata do wykorzystania w~implementacji
+programu odczytującego numeru linii z~frontu nadjeżdżającego
+autobusu na urządzeniu mobilnym z~systemem Android.
 
 \section{Wykrywanie obiektów - detekcja}
 
-Na potrzeby pracy wprowadzony i~opisany został termin 
+Na potrzeby pracy wprowadzony i~opisany został termin
 ,,detekcji obiektów''. Na wejściu tak zdefiniowanego detektora
 jest obraz zawierający (lub nie) wystąpienia interesujących obiektów, gdzie
 wyjściem jest lista przyciętych obrazów reprezentujących wystąpienia tych
 obiektów (fizyczne kopie lub współrzędne). W~kolejnych podrozdziałach
 przedstawione zostały rozwiązania nawiązujące do powyższego opisu.
 
-\subsection{Kaskadowy Klasyfikator OpenCV}
+\subsection{Klasyfikator kaskadowy oparty na cechach Haara}
 
-Biblioteka OpenCV zawiera funkcje oraz całe środowisko do przygotowywania
-i~używania kaskadowych detektorów różnych typów. W~dokumentacji
+Struktura ramowa do wykrywania obiektów zaproponowana w~2001 roku, której
+autorami byli Paul Viola i Michael Jones była pierwszą tego
+rodzaju implementacją umożliwiającą wykrywanie obiektów w~czasie
+rzeczywistym przy jednoczesnym zachowaniu wysokiej skuteczności
+oferowanego rozwiązania. Algorytm został zaprojektowany z~myślą o~wykrywaniu
+twarzy w~obrazie, nie uwzględnione było natomiast ich rozpoznawanie.
+Główne jego zalety to m.in.:
+
+\begin{itemize}
+\item wysoka skuteczność - duży odsetek pozytywnych trafień brzy niewielkiej
+ilości błędów,
+\item wysoka wydajność - jak wspomniano we wstępie osiągnięto wyniki
+rzędu kilkunastu klatek na sekundę dla obrazów wielkości 0.1Mpix na sprzęcie
+klasy Pentium III,
+\item możliwość przygotowania detektora dla innych obiektów, nie tylko
+twarzy.
+\end{itemize}
+
+Co prawda rozwiązanie przewiduje proces przygotowywania detektorów
+do wykrywania zadanych obiektów jednak trwa on długo - do kilku godzin lub dni
+w~zależności od liczby próbek i~zadanych parametrów wejściowych. Dodatkowo
+wymaga bardzo dużej liczby oznaczonych wystąpień interesujących obiektów
+w~obrazach.
+Autorzy pierwotnego rozwiązania wykorzystali zbiór kilku tysięcy
+twarzy. Istnieją też opracowania w~których jest mowa o~kilkunastu lub nawet
+kilkudzeisięciu tysiącach próbek pozytywnych.
+
+Biblioteka OpenCV zawiera funkcje
+do wykrywania obiektów w~językach Java, Python i~C++, oraz zestaw
+programów pomocniczych
+do przygotowywania
+kaskadowych detektorów różnych typów. W~dokumentacji
 \cite{OCV:cascadeclassification}
 jest mowa o~dwuch opracowaniach \cite{DBLP:conf/cvpr/ViolaJ01,
 DBLP:conf/icip/LienhartM02} na których bazuje oferowana
-implementacja.
+implementacja. Dostarczone narzędzia umożliwiają przogotowanie
+detektorów opartych na cechach Haara, HOG oraz LBP (\textit{ang. Local Binary
+Pattern}). Zastosowanie ostatniego z~wymienionych zestawu cech umożliwia
+znaczne skrócenie czasu potrzebnego do przygotowania detektora.
+Co ważne z~punktu widzenia tejże pracy, tak przygotowany detektor
+charakteryzuje się też większą wydajnością, kosztem niewielkiego tylko spadku
+dokładności, co przy wykorzystaniu odpowiednio dużej liczby próbek
+podczas jego uczenia nie powinno mieć znaczenia.
 
 Podstawowa funkcjonalność dostarczana przez implementację została zawarta
-w~funkcji \verb|detectMultiScale|\cite{OCV:cascadeclassification}. 
+w~funkcji \verb|detectMultiScale|\cite{OCV:cascadeclassification}.
 Dla przekazanego obrazu (argument wywołania)
-zwracana jest kolekcja czworokątów okalających 
+zwracana jest kolekcja czworokątów okalających
 reprezentująca wystąpienia szukanego obiektu.
 
-Aby jednak skorzystać ze~wspomnianej funkcji trzeba przygotować plik
-definiujący klasyfikator. Jest to proces żmudny o~tyle, iż wymaga 
-relatywnie
+Aby jednak skorzystać
+ze~wspomnianej funkcji trzeba przygotować plik
+definiujący klasyfikator. Jest to proces żmudny o~tyle, iż wymaga
 dużej liczby oznaczonych wystąpień szukanych obiektów. Należy dostarczyć
 tym dłuższą listę im większe zróżnicowanie w~obiektach reprezentujących
-daną klasę. Prekursorzy rozwiązania - panowie Viola i Jones - mówią
-o~danych wejściowych idących w~dziesiątki tysięcy. Internetowe źródła
-mówią ilości pozytywnych przypadków rzędu 5 do 7 tysięcy
-\cite{WEB:ocvnaotoshiseo}, przy czym
-negatywne przypadki (obrazy nie zawierające wystąpienia szukanych obiektów)
-powinny stanowić nieco ponad lub przynajmniej połowę tego zbioru.
+daną klasę. Jak już wspomniano liczba oznaczonych próbek powinna wynosić
+co najmniej kilka tysięcy w~przypadku twarzy lub obiektów o~porównywalnej
+rożnorodności. Przy czym zbiór obrazów tła (obrazy nie zawierające wystąpienia
+szukanych obiektów)
+powinien być równy co do ilości liczbie oznaczonych obiektów
+lecz nie mniejszy niż ich połowa.
 
-Kolejnym czynnikiem jest czas potrzebny na wyszkolenie detektor,
-czyli przygotowanie pliku. Pierwotna metoda oparta na cechach Haara
+Kolejnym czynnikiem jest czas potrzebny na przygotowanie detektora.
+Pierwotna metoda oparta na cechach Haara
 jest najbardziej intensywna obliczeniowo, a~cały proces uczenia
 może trwać do kilku dni. Rozwiązania oparte na innych cechach - LBP
-(\textit{ang. Local Binary Pattern}) - trwają stosunkowo krócej, lecz
+(\textit{ang. Local Binary Pattern}) - ze względu na wykorzystanie
+liczb całkowitych zamiast zmiennoprzecinowych trwają stosunkowo krócej, lecz
 nadal czas wykonania liczony jest w~godzinach.
 
 Samo wyszukiwanie obiektów oparte jest na oknie przesuwnym
@@ -95,10 +169,10 @@ wykrycia obrotu, gdyż krawędzie okna są zawsze równoległe z~krawędziami
 obrazu. Zaletą jest niewielka złożoność obliczeniowa, która pozwala
 na wykrywanie i~lokalizowanie obiektów w~czasie rzeczywistym.
 
-\subsection{Cechy 2D - Framework biblioteki OpenCV}
+\subsection{Cechy 2D - struktura ramowa biblioteki OpenCV}
 
-Biblioteka OpenCV poza wspomnianym detektorem udostępnia też cały
-framework do operacji na cechach: ich wyliczanie, opisywanie 
+Biblioteka OpenCV poza wspomnianym detektorem udostępnia
+strukturę ramową do operacji na cechach: ich wyliczanie, opisywanie
 i~dopasowywanie \cite{OCV:feture2dframework}.
 Tutaj w~odróżnieniu od detektora kaskadowego, zestaw cech
 jest wyliczany dla każdego obrazu osobno i~jest to proces dużo bardziej
@@ -106,7 +180,7 @@ intensywny obliczeniowo niż w~poprzednim przypadku. Dodatkowo
 funkcjonalność detekcji obiektów jest raczej efektem ubocznym,
 a~ze względu na jednostkowy charaktery wyszukiwanych obiektów rozwiązanie
 bardziej nadaje się do weryfikacji i~rozpoznawania obiektów niż do
-detekcji i~lokalizacji obiektów pewnej klasy. Przykład zastosowania 
+detekcji i~lokalizacji obiektów pewnej klasy. Przykład zastosowania
 zaprezentowano poniżej - rysunek \ref{fig:rev_features2d_detection}.
 
 \begin{figure}[h!]
@@ -116,6 +190,28 @@ zaprezentowano poniżej - rysunek \ref{fig:rev_features2d_detection}.
   \label{fig:rev_features2d_detection}
 \end{figure}
 
+Powyższy przykład pokazuje jak trudno zachować podział na wykrywanie
+i~rozpoznawanie. Rysunek \ref{fig:rev_features2d_detection}
+przedstawia przykład, gdzie wykrycie obiektu jest równoznaczne
+z~jego rozpoznaniem.
+Algorytm wylicza bowiem zestaw cech dla konkretnej okładki, po czym dla każdego
+obrazu (w~przypadku pracy w~czasie rzeczywistym) wyliczany
+jest dużo większy zestaw cech klatki. Jeżeli znaleziony zostanie
+odpowiednio duży podzbiór cech podobnych na obu obrazach to wiadomo,
+że obiek znajduje się w~kadrze.
+Dodatkowo, na podstawie ułożenia pasujących cech, możliwe jest
+wyznaczenie jego zniekształcenia geometrycznego. W~kontekście wprowadzonego
+podziału jest to raczej przykład lokalizacji poszczególnych instancji danej
+klasy obiektów niż wykrywanie obiektów klasy w~ogóle.
+Poważnym
+ograniczeniem jest wymóg posiadania dużej ilości szczegółów przez poszukiwany
+obiekt, a~także wysoka rozdzielczość klatek w~obrębie których odbywa się
+poszukiwanie. Złożoność obliczeniowa, a~co zatym idzie, czas przeszukiwania
+poszczególnych klatek sprawiają, że metoda ta jest mało atrakcyjna w~kontekście
+postawionego zadania.
+
+Biblioteka OpenCV w~omawianym jej fragmencie posiada znacznie
+większą niż wspomniana funkcjonalność.
 Ze względu na mnogość zaimplementowanych algorytmów - których opis
 wykracza poza zakres tego opracowania - istnieje ogromna ilość
 zastosowań wspomnianego frameworka. Jednym z~nich jest na przykład
@@ -124,19 +220,12 @@ reprezentujących tekst w~scenach naturalnych. W~tym celu
 można wykorzystać implementację algorytmu MSER - (\textit{ang. Most
 Stable Extreme Regions}) \cite{OCV:MSER}.
 
-\subsection{Open Track-Learn-Detect}
+\subsection{Open TLD - detekcja i~identyfikacja}
 
-Ciekawostką w~dziedzinie detekcji obiektów jest algorytm opracowany przez
-pana Zdenka Kalala \cite{DBLP:journals/pami/KalalMM12}.
-Ograniczeniem jest potrzeba pierwszego oznaczenia wystąpienia interesującego
-obiektu w~sekwencji obrazów tak aby algorytm mógł podjąć śledzenie.
-Etap śledzenie jest połączony z~uczeniem detektora, który służy do wznowienia
-śledzenia gdy obiekt zniknie z~kadru.
-
-Dostępna jest implementacja w~języku C/C++ oraz MatLabie. W~trakcie
-pisania tego tekstu pojawiła się druga wersja algorytmu niosąca
-za sobą duże usprawnienia w~dziedzinie wydajności. Co zaprezentowano
-na wykresie poniżej.
+Kelejnym algorytmem łączącym w~sobie funkcje wykrywania
+i~rozpoznawania obiektów jest algorytm opracowany przez
+Zdenka Kalala \cite{DBLP:journals/pami/KalalMM12} - TLD (\textit{ang.
+Track Learn Detect}).
 
 \begin{figure}[h!]
     \centering
@@ -144,12 +233,35 @@ na wykresie poniżej.
     \caption{Porównanie skuteczności i wydajności biblioteki OpenTLD w wersjach 1 i 2}
 \end{figure}
 
-Istnieje przypuszczenie, że pozostawienie algorytmu w~trybie uczenia
+Głównym zadaniem jakie rozwiązuje omawiany algorytm jest śledzenie obiektów.
+Pewnym ograniczeniem jest potrzeba pierwszego oznaczenia interesującego
+obiektu w~sekwencji obrazów tak aby możliwe było podjęcie pracy.
+W~trakcie śledzenia tak oznaczonego obiektu odbywa się uczenie (doskonalenie)
+detektora. O~ile sam etap śledzenia nie wykorzystuje detektora, to jest on
+niezwykle istotny przy wznowieniu śledzenia po zniknięciu obiektu z~kadru.
+Algorytm charakteryzuje się wysoką wydajnośćią i~zadziwiającą skutecznością.
+Niestety wyniki naocznych eksperymentów i~zamieszczonych przez autorów filmów
+demonstracyjnych wydają się być zbyt mało wiarygodne, szczególnie jeżeli
+chodzi o~niezawodność.
+
+Kolejną kwestią jest obecność gotowych implementacji.
+Dostępna jest co prawda implementacja w~języku C/C++ oraz MatLabie. W~trakcie
+pisania tego tekstu pojawiła się też druga wersja algorytmu niosąca
+za sobą duże usprawnienia w~dziedzinie wydajności, co zaprezentowano
+na wykresie poniżej.
+
+Niestety brak implementacji w~pakiecie OpenCV lub
+innej gotowej wersji dostępnej na system Android jest kolejnym
+argumentem przeciwko wykorzystywaniu TLD jako elementu
+programu odczytującego numer autobusu na urządzeniu z~systemem Android.
+Wymagająca analiza i~naniesienie
+niezbędnych modyfikacji
+choć kształcące mogą nie przyczynić się do osiągnięcia zamierzonego celu.
+
+Istnieje także przypuszczenie, że pozostawienie algorytmu w~trybie uczenia
 może powodować powolny spadek wydajności ze względu na rosnącą liczbę
 pozytywnych i~negatywnych obiektów w~bazie. Jest to jednak teza wymagająca
-przeprowadzenia rzetelnych testów. Kolejnym utrudnieniem jest brak
-prznaszalnej implementacji - dostępna jest tylko biblioteka skompilowana
-dla systemu Windows.
+przeprowadzenia rzetelnych testów.
 
 \section{Rozpoznawanie obiektów - identyfikacja}
 
@@ -189,7 +301,7 @@ i~wybór odpowiedniej metody ku temu pozostaje w~gestii programisty.
 Niestety może to być dowolna metoda. Można użyć deskryptorów cech
 SIFT, SURF, BRIEF itp. W~skrajnie laboratoryjnych warunkach, tak
 jak w~odczytywaniu znaków czarno-białych można porównywać poszczególne
-piksele i~obliczać w~prost różnicę między obrazami. Jeżeli jednak tekst 
+piksele i~obliczać w~prost różnicę między obrazami. Jeżeli jednak tekst
 jest ulokowany w~tak zwanej scenie naturalnej -
 szyld, reklama, bilbord itp. - różnice w~czcionkach, refleksy
 i~zniekształcenia uniemożliwiają wykorzystanie tak trywialnej metody.
@@ -211,7 +323,7 @@ z~dotąd omawianych.
 \end{figure}
 
 O~skali złożoności problemu może świadczyć fakt, iż
-opracowany przez Google algorytm wymaga wspomagania w~postaci 
+opracowany przez Google algorytm wymaga wspomagania w~postaci
 ręcznej interwencji
 operatorów. Przeglądając zasoby internetu napotkana została captcha
 z~obrazkiem przypominającym numer domu, co może świadczyć, że stuprocentowa
