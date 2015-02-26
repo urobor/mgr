@@ -1,43 +1,67 @@
 \chapter{Przygotowanie środowiska - automatyzacja}
 
 Rozpoznanie numeru autobusu, ze względu na niewielką moc obliczeniową
-urządzeń mobilnych, wymagało zastosowania algorytmu składającego się
-z~co najmniej kilku kroków. Kolejne stopnie kaskady uszeregowane były
-w~taki sposób, aby operując na dużych zbiorach danych - np.: pełne 
-klatki z~kamery w~wysokich rozdzielczościach - używać algorytmów o~możliwie
-najniższej złożoności obliczeniowej celem zawężenia pola poszukiwań.
-Postępująca segmentacja obrazu miała umożliwić rozpoznanie
-numeru autobusu w~czasie rzeczywistym, nie zależnie od klasy urządzenia.
+urządzeń mobilnych, wymaga zastosowania segmentacji obrazu 
+(najlepiej kilkustopniowej), czyli preselekcji obszarów potencjalnie
+interesujących: fronty autobusów w~scenie, numery autobusów
+we frontach itd. Poszczególne podprocesy powinny być
+uszeregowane w~ten sposób, aby dane wejściowe - klatki obrazu - 
+w~pierwszej kolejności były przetwarzane przez algorytmy o~najmniejszej
+złożoności obliczeniowej. Dzięki temu
+bardziej złożone i~intensywne obliczeniowo algorytmy będą operowały 
+na mniejszych zbiorach danych, przez co czas przetwarzania ulegnie
+skróceniu, a~otrzymane wyniki będą bardziej adekwatne.
 
-Biorąc pod uwagę powyższe wymagania pierwszym krokiem
-algorytmu była segmentacja obrazu poprzez wykorzystanie kaskadowego
-detektora cech HAAR-a, LBP lub HOG.
-Ze względu na różnice pomiędzy tymi detektorami pierwszym
-doświadczeniem wykonanym na potrzeby tego opracowania było porównanie
-ich wydajności i~dokładności. 
+Przykładowa sekwencja mogłaby wyglądać
+w~sposób następujący:
 
-Sam proces uczenia detektorów był przedsięwzięciem bardzo żmudnym.
-Dodatkowo wymagał dużych zbiorów danych uczących oraz zbioru testowego.
-W~następnych podrozdziałach przedstawione zostały narzędzia, których
+\begin{enumerate}
+    \item Przeszukiwanie klatki pod kątem wystąpienia frontu autobusu -
+        wstępna segmentacja.
+    \item Identyfikacja marki i~modelu (opcjonalne).
+    \item Przeszukiwanie fragmentu reprezentującego front autobusu
+        pod kątem numeru linii.
+    \item Odczyt numeru z~odnalezionego fragmentu obrazu.
+\end{enumerate}
+
+Postępująca segmentacja obrazu powinna umożliwić rozpoznanie
+numeru autobusu w~czasie rzeczywistym, niezależnie od klasy urządzenia.
+
+Biorąc pod uwagę powyższe wymagania
+w~ramach niniejszej pracy dyplomowej powinien powstać algorytm 
+składający się co najmniej z~trzech niezależnych elementów. 
+Każdy ze wspomnianych procesów musi zostać odpowiednio skonfigurowany
+i~dostosowany do tego konkretnego zadania. Jedną z~najważniejszych, 
+a~zarazem najtrudniejszych rzeczy jest osiągnięcie kompromisu 
+między skutecznością, a wydajnością, do czego niezbędne są 
+zautomatyzowane testy.
+
+Do wstępnej segmentacji - lokalizacji frontu autobusu - najodpowiedniejszym
+wydaje się być kaskadowy detektor dostępny w~bibliotece OpenCV. 
+Wybór ten niesie za sobą konieczność przeprowadzeniu procesu uczenia
+detektorów. Jest to bardzo czasochłonne przedsięwzięcie, 
+wymaga dużych zbiorów danych uczących, zbioru testowego, a~wykonanie
+jednego przebiegu programu może trwać nawet do kilkunastu godzin. 
+W~następnych podrozdziałach 
+przedstawione zostały narzędzia, których
 zadaniem miała być maksymalna automatyzacja i~optymalizacja procesu uczenia
 oraz weryfikacji zarówno skuteczności jak i~wydajności uzyskanych wersji
-detektorów.
-
-Oczywiście w~dalszych podrozdziałach opisano kolejne robocze
+detektorów. W~dalszych podrozdziałach opisano kolejne
 kroki algorytmu, a~także narzędzia służące w~ich przygotowaniu oraz 
 weryfikacji.
 
 Celem tego rozdziału było więc udokumentowanie prób przeprowadzonych
 na drodze do osiągnięcia jak najbardziej zoptymalizowanego 
 i~zautomatyzowanego procesu przygotowywania oraz testowania detektorów,
-a~także innych elementów docelowego systemu.
+oraz innych elementów docelowego systemu.
 
 \section{Wspomaganie pobierania filmów z serwisu YouTube}
 
-Pewnego rodzaju rozgrzewką było przygotowanie wtyczki do przeglądarki 
-Firefox ułatwiającej pobieranie i wstępne katalogowanie filmów
+Prace nad automatyzacją procesów rozpoczęto z~wielkim rozmachem.
+Chęć poznawania nowych technologii, narzędzi i bibliotek
+przyćmiła nieco zdrowy rozsądek. Jako pierwsza powstała wtyczka
+do programu Firefox ułatwiającej pobieranie i wstępne katalogowanie filmów
 udostępnianych za pośrednictwem serwisu YouTube.
-
 Założenia oraz oczekiwania funkcjonalne wobec omawianego narzędzia były 
 następujące:
 
@@ -49,7 +73,7 @@ następujące:
         \item film nie został pobrany w~żadnej wersji.
     \end{itemize}
     \item Możliwość pobrania wybranej wersji filmu w~odległości maksymalnie
-        dwuch kliknięć licząc od poziomu przeglądania filmów w~serwisie,
+        dwóch kliknięć licząc od poziomu przeglądania filmów w~serwisie,
     \item Tworzenie pliku CSV (\textit{ang. Comma Separated Value})
         z~danymi pobranych filmów, celem identyfikacji już pobranych
         pozycji. Plik powinien być tak skonstruowany aby można go było
@@ -58,70 +82,46 @@ następujące:
         początku.
 \end{enumerate}
 
-\subsection{Pierwsza wersja wtyczki - prezentacja stanu oglądanego filmu}
-
-Przedstawienie stanu aktualnie oglądanego filmu odbywa się poprzez
-kolor dodatkowej ikony wkomponowanej w~lewe pionowe menu, zaraz obok
-wyświetlanego filmu.
+Powstały dwie wersje wtyczki. Pierwsza wkomponowana w~stronę portalu
+jak na rysunku \ref{fig:firefoxplugin1}, oraz druga, 
+ze względu na problemy 
+z~interakcją z~interfejsem serwisu, umieszczona w~GUI samej przeglądarki.
 
 \begin{figure}[h!]
     \caption{Przycisk rozwijanego menu, oraz wskaźnik stanu}
     \centering
     \includegraphics[width=0.9\textwidth]{img/env_yt_dwn_indicator}
+    \label{fig:firefoxplugin1}
 \end{figure}
 
-Kolor czerwony wskazuje, że oglądany film nie został jeszcze pobrany.
-Ikona z~pustą strzałką w~środku w~kolorze zielonym sygnalizuje obecność
-oglądanej pozycji w~wyżej wymienionym pliku rozdzielanym przecinkami
-(pkt. 3).
-
-Postępy w~pracach nad pierwszą wersją wtyczki doprowadziły do wypełnienia
-założeń funkcjonalnych przez ostatnią wersję programu. Koncepcja wkomponowania
-menu w~treść strony, oraz funkcjonalność pobierania filmów okazały się
-na tyle problematyczne i~trudno zarządzalne, że powstała druga wersja programu
-o~znacznie ograniczonej funkcjonalności.
-
-\subsection{Druga wersja wtyczki - omówienie funkcjonalności}
-
-Funkcjonalność drugiej wersji programu została ograniczona do minimum. Faktycznie
-ograniczała się ona do oznaczania wybranego filmu wraz z~jego wersją, oraz
-eksportu tak utworzonych wpisów do pliku - id filmu oraz numer identyfikacyjny wersji.
-
-Przepływ sterowania dla drugiej wersji programu został przedstawiony na poniższym
-diagramie. Funkcja implementująca pokazany algorytm była wywoływana za każdym razem
-gdy zmieni się wartość url-a w~aktywnej karcie przeglądarki lub kliknięty został
-któryś z~przycisków w stanach ,,żółtym'' lub ,,zielonym''.
+Funkcjonalność drugiej wersji programu została drastycznie zmniejszona.
+Ograniczała się do możliwości oznaczania wybranego filmu 
+wraz z~jego wersją, oraz
+eksportu tak utworzonych wpisów do pliku.
+Przepływ sterowania dla drugiej wersji programu został przedstawiony
+na diagramie \ref{fig:firefoxpluginflow}.
 
 \begin{figure}[h!]
     \caption{Algorytm aktualizacji stanu wtyczki w wersji drugiej}
     \centering
     \includegraphics[width=0.9\textwidth]{img/env_yt_marker}
+    \label{fig:firefoxpluginflow}
 \end{figure}
 
-Niestety pierwszy program ,,pomocniczy'' okazał się narzędziem nie adekwatnym
-(zbyt skomplikowanym i~pracochłonnym) do postawionego mu zadania. Okazało się, że
-filmów zawierających fronty autobusów jest znacznie mniej niż mogło by się wydawać.
-
-Po znalezieniu 14 pozycji zawartość serwisu (w~kontekście frontów
-autobusów) nagle się
-wyczerpała. Ostatecznie wielotygodniowe (dokładnie dwu) prace nad wtyczką do programu 
-Firefox zaowocowały bazą czternastu pozycji w~formie pliku CSV zawierającego dwie
-kolumny:
-
-\begin{itemize}
-    \item id filmu, np.: 75Dz6s7S-Tg;
-    \item itag reprezentujący wybraną wersję, np.: 136
-\end{itemize}
-
-W~naszym przypadku wszystkie filmy zostały ,,oznaczone'' w~wersji 136, czyli
-zawierającej tylko obraz, oraz będącej w~rozdzielczośći HD (720p).
-
-Ostatecznie owoc pracy przedstawiony jest poniżej.
-
-\lstinputlisting{../data/description_files/marked_for_download/yt_marked_01.csv}
-
-Co niestety o~wiele szybciej, prościej, wydajniej, taniej i~krótko mówiąc lepiej można
-by wykonać bez implementowania żadnych narzędzi. Jedyne co pozostało to zdobyta wiedza
+Niestety pierwszy program ,,pomocniczy'' okazał się narzędziem nie
+adekwatnym
+(zbyt skomplikowanym i~pracochłonnym) do postawionego mu zadania. 
+Okazało się, że
+filmów zawierających fronty autobusów jest znacznie mniej niż mogło 
+by się wydawać. Po znalezieniu 14 pozycji zawartość serwisu 
+(w~kontekście frontów autobusów) nagle się
+wyczerpała. Ostatecznie wielotygodniowe (dokładnie dwu) prace nad 
+wtyczką do programu 
+Firefox zaowocowały bazą czternastu pozycji w~formie pliku CSV,
+co oczywiście o~wiele szybciej, prościej, wydajniej, taniej i~krótko 
+mówiąc lepiej można
+było wykonać bez implementowania żadnych narzędzi. 
+Jedyne co pozostało to zdobyta wiedza
 na temat: javascript, css, html, firefox: xul, addon-sdk, cfx. 
 
 Kolejne narzędzia ,,pomocnicze'' implementowane były z~większą 
@@ -134,7 +134,7 @@ Mając plik z~identyfikatorami filmów na serwisie YouTube wszystkie duże obję
 dane potrzebne przy tworzeniu wsadu od narzędzia uczącego można było zostawić
 w~ich pierwotnym położeniu. Tworząc narzędzie wspomagające oznaczanie frontów
 wzbogacono je o~możliwość odtworzenia osiągniętego stanu w~oparciu o~pliki konfiguracyjne.
-Dodana funkcjonalność i~systematyczne wypychanie danych do zewnętrznego repozytorium
+Dodana funkcjonalność i~systematyczne archiwizowanie danych do zewnętrznego repozytorium
 umożliwiły niezakłóconą kontynuację prac po awarii i~utracie lokalnej kopii.
 
 Interfejsem narzędzia odpowiedzialnego za przygotowanie danych uczących był skrypt
@@ -142,34 +142,32 @@ napisany w~języku python:
 
 \lstinputlisting{data/autocascader.txt}
 
-\subsubsection{Odtwarzanie środowiska po awarii}
+Skrypt podobnie jak uprzednio opisana wtyczka był napisany 
+nieco zbyt wcześnie. W~tym przypadku jednak nakład pracy jaki 
+można było zautomatyzować był znacznie większy. Oznaczonych zostało 
+bowiem kilka tysięcy klatek reprezentujących fronty autobusów
+(w tym kilkaset frontów autobusów Solaris Urbino), oraz kilka tysięcy
+obrazów tła. 
 
-Pierwszym krokiem było pobranie plików wideo. W~tym celu należało wywołać skrypt
-z~parametrem \verb|-d|.
+Po wyeksportowaniu plików roboczych na serwery serwisu GitHub
+nadarzyła się okazja do przetestowania omawianego skryptu.
+Podczas przenoszenia danych - wyłuskanych 
+zdjęć z~podziałem na fronty, solarisy i~tła, nastąpiła awaria dysku
+twardego. Posiadając jedynie pliki wskazujące klatki oraz plik 
+z~danymi filmów udało się odtworzyć wszystkie wyłuskane i~oznaczone
+zdjęcia. Po drobnych poprawkach w~skrypcie zaoszczędzono kilka wieczorów
+poświęconych na przeglądanie i~wybieranie zdjęć.
 
-Po drobnych poprawkach (utworzeniu katalogu na pobrane pliki, którego nie było
-w~repozytorium) i~pobraniu wymaganych zależności proces poprawnie pobrał
-11 (jedenaście) zdefiniowanych w~pliku konfiguracyjnym pozycji.
-
-Ostatecznie wywołanie skryptu z~parametrem \verb|-e| poprawnie wyłuskało klatki
-z~pobranych plików, które zostały zapisane w~postaci obrazów w~katalogach
-odpowiadających ich przeznaczeniu:
-
-\begin{itemize}
-\item front - pliki reprezentujące generyczne fronty autobusów,
-\item solaris - pliki reprezentujące fronty autobusów Solaris (dla porównania),
-\item background - pliki tła - nie zawierające wystąpień żadnych frontów.
-\end{itemize}
-
-
-\section{Pozostałe narzędzia}
+\section{Automatyzacja procesu uczenia i~weryfikacji skuteczności
+    detektorów kaskadowych - problemy pierwszej iteracji}
 
 W~miarę jak prace nad algorytmem i~implementacją postępowały, powstawały
 coraz to nowe narzędzia pomocnicze, których mnogość i~prostota nie
 pozwalały na zamieszczenie ich szczegółowego opisu. 
 
-Problem którego nie udało się zautomatyzować to weryfikacja skuteczności
-całego algorytmu oraz poszczególnych jego części składowych. Pierwszą
+Problem którego nie udało się zautomatyzować 
+w~ramach pierwszej iteracji to weryfikacja skuteczności
+całego algorytmu oraz poszczególnych jego elementów. Pierwszą
 próbą weryfikacji skuteczności było prymitywne porównywanie współrzędnych
 wykrytego fragmentu z~tak zwaną \textit{,,ground truth''} - oznaczonymi
 wystąpieniami szukanych obiektów, wykonanymi na potrzeby uczenia 
@@ -183,33 +181,98 @@ się jednak zupełnie nieadekwatne do postawionego zadania.
     weryfikacji skuteczności}
     \centering
     \includegraphics[width=0.9\textwidth]{img/env_benchmark_fail_1}
+    \label{fig:autoverificationfail}
 \end{figure}
 
-Zastosowana metoda przemycała (jako pozytywne) wyniki zupełnie
-bezwartościowe z~punktu widzenia postawionego problemu, którym było
-odczytanie numeru nadjeżdżającego autobusu. Na rysunku 
-powyżej jest przykład - zaznaczony na czerwono - wykrycia zaliczonego
+Stosując przedstawianą metodę otrzymywano 
+duży odsetek mocno nieprecyzyjnych oznaczeń
+zaliczonych jako pozytywne. Niestety
+z~punktu widzenia postawionego problemu -
+odczytania numeru nadjeżdżającego autobusu - 
+było to niedopuszczalne. Na rysunku 
+\ref{fig:autoverificationfail} przedstawiono przykład - 
+zaznaczony na czerwono - wykrycia zaliczonego
 jako pozytywne, które uniemożliwia odczytanie numeru z~powodu obcięcia
 jego górnej części.
 
 Dodatkowym utrudnieniem była ostateczna forma zbioru wykorzystanego 
 do uczenia detektorów. Pierwsze podejście do problemu nauki 
 detektorów wykorzystywało pełne klatki zawierające interesujący obiekt
-plus plik tekstowy wskazujący współrzędne czworokąta okalającego.
-Ogólny odsetek wykryć na takim zbiorze był zadowalający. Niestety
-ostatecznie zrezygnowano z~przechowywania pełnych klatek na rzecz
+oraz plik tekstowy wskazujący współrzędne czworokąta okalającego.
+Ogólny odsetek wykryć na takim zbiorze był zadowalający. 
+Ostatecznie zrezygnowano z~przechowywania pełnych klatek na rzecz
 wycinków reprezentujących wyłącznie instancje szukanych obiektów.
 Było to spowodowane ograniczeniem przestrzeni dyskowej. Zbiór pełnych
-klatek zajmował 32 GB, gdzie te same dane - fronty autobusów - po
-przycięciu zajmowały nieco ponad 2 GB przestrzeni dyskowej.
+klatek zajmował 32 GB, kiedy te same dane - fronty autobusów - po
+przycięciu zajmowały nieco ponad 2 GB.
 
-Niestety taka forma przechowywania danych spowodowała sfałszowanie 
-wyników automatycznego weryfikatora skuteczności. Co było jedną
-z~wielu przyczyn całkowitego zaniechania syntetycznych testów skuteczności.
+Niestety taka forma przechowywania danych 
+- przycięte obrazy, reprezentujące fronty autobusów - spowodowała zafałszowanie 
+wyników procesu automatycznej weryfikacji skuteczności.
+Weryfikator uruchomiony na przyciętych obrazach wykazał
+drastyczny spadek skuteczności tych samych detektorów w~stosunku
+do wyników uzyskanych na poprzednim zbiorze testowym (pełne klatki
+z~plikiem zawierającym współrzędne).
+Rzetelna weryfikacja skuteczności była możliwa jedynie po ponownym przygotowaniu
+zbioru testowego co było główną przyczyną 
+całkowitego zaniechania automatycznych testów skuteczności
+w~ramach pierwszej iteracji.
 
-W~momencie pisania tego tekstu ukończony był już pierwszy
-działający prototyp kompletnej aplikacji na urządzeniu mobilnym
-z~systemem android. Niestety wszystkie testy wykonywane były
-w~sposób empiryczny, manualny i~mocno subiektywny. Co za tym idzie,
-liczba próbek - wykorzystanych danych testowych - była bardzo niewielkich
-rozmiarów.
+
+Za główny cel, postawiono jak najszybsze uruchomienie
+aplikacji na urządzeniu. Mając działający prototyp, czyli
+pewność, że aplikacja da się uruchomić, działa w~czasie zbliżonym
+do rzeczywistego i~zwraca wyniki wskazujące na możliwość
+osiągnięcia zadowalającej skuteczności można było spokojnie 
+powrócić do weryfikacji i~późniejszego poprawiania
+poszczególnych elementów systemu.
+
+\section{Automatyczna weryfikacja detektorów - podejście drugie}
+
+Pierwotny problem związany z~brakiem wystarczająco dużej liczby
+obrazów reprezentujących fronty autobusów różnych typów został
+rozwiązany dzięki zasobom udostępnianym za pośrednictwem serwisu
+internetowego: \verb|http://www.phototrans.eu|.
+
+Z~wykorzystaniem prostego skryptu napisanego w~języku Python pobrany
+został próbny zbiór zdjęć reprezentujących pojazdy komunikacji
+zbiorowej. Organizacja serwisu umożliwiła zastosowanie
+podziału zbioru ze względu na numer linii, niestety
+w~skład każdego zbioru wchodziły zarówno autobusy miejskie, dalekobieżne
+jaki i~tramwaje. Ostatecznie pobrano 528 zestawów zdjęć reprezentujących
+poszczególne linie, oraz zawierających średnio 40 zdjęć każdy, co
+w~sumie dało 19367 obrazów, które trzeba było poddać weryfikacji.
+
+W~celu weryfikacji detektorów frontów autobusów wybranych zostało 2000
+zdjęć zawierających przody autobusów posiadających:
+
+\begin{itemize}
+    \item wyświetlacz diodowy z~numerem i~nazwą kierunku,
+    \item numer linii w~lewym górnym rogu frontu.
+\end{itemize}.
+
+Ograniczenia wynikały ze względu na tendencje do wykrywania 
+tego typu frontów przez przygotowane detektory, oraz
+potrzebę uproszczenia przy wyszukiwaniu numeru linii w~znalezionym
+froncie autobusu. Jednocześnie
+był to zbiór na tyle obszerny, że tak przygotowany prototyp aplikacji byłby
+w~pełni funkcjonalny w~wielu miastach (na przykład w~Warszawie - gdzie
+wszystkie aktualnie wykorzystywane autobusy spełniają oba powyższe
+ograniczenia).
+
+Kolejnym narzędziem był skrypt przygotowujący zestaw wybranych 2000 zdjęć,
+tak aby można było je wykorzystać w~procesie zarówno weryfikacji jak 
+i~optymalizacji detektorów. Uruchomienie skryptu polegało na wyświetleniu
+każdego ze zdjęć z~możliwością oznaczenia czworokąta okalającego front
+(wykorzystano w~tym celu bibliotekę OpenCV). Dodatkowym ograniczeniem
+było maksymalnie jedno wystąpienie frontu w~danym obrazie, co 
+pozwalało na późniejsze wykorzystanie zbioru w~procesie
+poszukiwania optymalnego współczynnika skalującego. Tak wprowadzone
+dane umieszczane były w~nazwie każdego z~plików w~formie:
+\verb|staranazwa-x_y_szerokosc_wysokosc.jpg|.
+
+Proces weryfikacji przebiegał podobnie jak poprzednio. Rejestrowane były
+poprawne oraz niepoprawne wykrycia, a~także ich brak. Ze względu na
+większą dokładność pierwszego prototypowego detektora, margines
+błędu zmniejszono z~1/4 wysokości i~szerokości na ich 1/5.
+W~następnym rozdziale podjęto próbę systematyzacji otrzymanych wyników.
