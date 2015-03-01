@@ -1,16 +1,19 @@
 \chapter{Porównanie metod detekcji - eksperymenty}
 
 Podczas eksperymentowania z~różnymi algorytmami i~metodami detekcji,
-rozpoznawania obiektów, oraz obróbki obrazów powstało wiele implementacji
-najbardziej obiecujących rozwiązań. Wiele z~nich od razu nie dawało 
-zadowalających rezultatów, inne były zupełnie niezwiązane z~zagadnieniem,
+rozpoznawania obiektów oraz obróbki obrazów powstało
+oraz zostało wstępnie przetestowanych wiele implementacji
+najbardziej obiecujących rozwiązań. Wiele z~nich już w~trakcie
+pierwszych testów prezentowały skuteczność na niezadowalającym
+poziomie. Inne były zupełnie niezwiązane z~zagadnieniem,
 a~jeszcze inne zostały popełnione aby zachować pozory użyteczności 
 i~przydatności rozwiązania omawianego problemu w~codziennym życiu.
 
 W~tym rozdziale przedstawione i~pokrótce opisane zostały kroki podjęte
 w~celu znalezienia najbardziej optymalnego rozwiązania postawionego 
 problemu. 
-W~pierwszej kolejności przedstawiono kilka ślepych uliczek, które 
+W~pierwszej kolejności przedstawiono kilka prób, które ze względu
+na niezadowalające wyniki lub trudności w~implementacji
 nie zostały uwzględnione w~rozwiązaniu końcowym. W~kolejnym podrozdziale
 pokazano szereg prób weryfikacji skuteczności i~optymalizacji 
 poszczególnych kroków ostatecznego algorytmu. W~podsumowaniu uwzględniono
@@ -18,7 +21,7 @@ częściowo przypadkowo zidentyfikowane właściwości zastosowanych
 narzędzi oraz implementacji, a także wpływ tychże odkryć na ostateczny
 kształt finalnego rozwiązania.
 
-\section{Eksperymenty nieudane}
+\section{Algorytmy i~narzędzia nie wykorzystane w~rozwiązaniu końcowym}
 
 W~tym podrozdziale przedstawione zostały próby, których wykonanie
 skutkowało jedynie zwiększeniem świadomości na temat zagadnienia.
@@ -30,7 +33,8 @@ Pozostałe przyczyny to m.in. niedostosowanie rozważanego rozwiązania
 do omawianego problemu. Ostatecznie zbyt duży nakład pracy, która
 byłaby wymagana do dostosowania potencjalnej implementacji do
 stawianych wymagań, np.: optymalizacja wysokiej złożoności obliczeniowej
-lub przepisanie złożonego algorytmu na język JAVA (środowisko android)
+lub przepisanie złożonego algorytmu na język JAVA
+(w~celu uruchomienia na urządzeniu z~systemem Android)
 jeżeli istniały tylko implementacje w~innych językach.
 
 \subsection{Biblioteka OpenTLD}
@@ -42,17 +46,19 @@ czy nawet implementacji w~C++ mogło by stanowić zakres pracy
 mniejszego kalibru (inżynierskiej) lub projektu zespołowego.
 Pomimo to podjęto próbę kontrolną mającą na celu sprawdzenie
 skuteczności i~przydatności wspomnianego rozwiązania we wstępnej 
-segmentacji - pierwszy krok proponowanej kaskady.
+segmentacji - detekcji frontu autobusu - 
+pierwszy krok proponowanej kaskady.
 
 \begin{figure}[h!]
     \caption{Niestabilność i niedokładność rezultatów uzyskanych przy
     użyciu biblioteki OpenTLD}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_open_tld_fail}
+    \label{fig:opentld_bus_front_fail}
 \end{figure}
 
 Skuteczność wykrywania frontów autobusów (potwierdzona 
-niestety jedynie organoleptycznie) była więcej niż zadowalająca.
+niestety jedynie w~sposób naoczny) była więcej niż zadowalająca.
 Liczba trafień uzyskanych z~pojedynczego wstępnego zaznaczenia frontu
 była niemal stu procentowa. Niestety dokładność wykrytych obiektów
 była poniżej oczekiwanej. Standardowo zdarzały się problemy
@@ -61,7 +67,8 @@ brak możliwości ingerencji w~proces uczenia detektora oraz jego
 duże tendencje do ,,pływania'' skutkowały nieraz wynikami pozytywnymi
 typu: lewy dolny róg frontu do 1/2 wysokości i~szerokości. 
 
-Na rysunku powyżej można zaobserwować zupełne zgubienie obiektu 
+Na rysunku \ref{fig:opentld_bus_front_fail} można zaobserwować 
+zupełne zgubienie obiektu 
 śledzonego - 
 front autobusu - na rzecz słupa. Wynik tego eksperymentu oraz
 zaobserwowany spadek wydajności - ilość obsłużonych klatek na sekundę - 
@@ -71,10 +78,12 @@ wykorzystana do procesu uczenia detektora)
 wpłynęły na decyzję zaprzestania dalszych testów biblioteki OpenTLD.
 Ostatecznie dla jednej sesji,
 nagrania długości około 5 minut, wydajność potrafiła spaść z~poziomu
-początkowych 20 fps do nawet 2 klatek na sekundę. Poprawa tego stanu 
-rzeczy była by co najmniej nie na miejscu. Szczególnie, że Pan 
+początkowych 20 klatek na sekundę do nawet 2 klatek na sekundę.
+Poprawa tego stanu 
+rzeczy byłaby co najmniej nie na miejscu. Szczególnie, że Pan 
 Zdenek Kalal wydał drugą wersję biblioteki TLD (tym razem już nie 
-open), której jednym z~usprawnień był właśnie znaczny wzrost wydajności
+open), której jednym z~głównych usprawnień był właśnie znaczny 
+wzrost wydajności
 \cite{WEB:kalaltld2}.
 
 \subsection{Wykrywanie linii krawężnika zatoki autobusowej}
@@ -101,35 +110,43 @@ zatoki autobusowej.
     \caption{Wykrywacz linii krawędzi zatoki autobusowej}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_bus_lane_edge_detector}
+    \label{fig:bus_lane_edge_detection}
 \end{figure}
 
-Powyższy rysunek przedstawia wynik eksperymentalnej wersji programu do
+Rysunek \ref{fig:bus_lane_edge_detection} przedstawia wynik 
+eksperymentalnej wersji programu do
 wykrywania krawędzi zatoki autobusowej. W~implementacji użyty
 został prosty ,,Canny edge detector''. Zakładając, że osoba stojąca
 na przystanku jest skierowana twarzą (kamerą) do nadjeżdżającego autobusu,
 linia wyznaczona przez krawężnik zatoki powinna zaczynać się w~połowie
-wysokości klatki (obraz na powyższym rysunku przedstawia dolną jej dolną
+wysokości klatki (obraz na powyższym rysunku przedstawia jej dolną
 połowę) bardziej z~lewej strony - niebieski prostokąt. Koniec linii
 powinien znajdować się na dole klatki bardziej z~prawej strony - czerwony
 prostokąt.
 
-Zrezygnowano z~tego pomysłu ze względu na zbyt dużą ilość głupawych
+Zrezygnowano z~tego pomysłu ze względu na zbyt dużą ilość 
+specyficznych
 ograniczeń geometrycznych i~niezamierzoną dyskryminację pasażerów
 których zatoki przystankowe nie mają krawężników. Ostatnim argumentem
-na niekorzyść (gdyby kogoś poprzednie argumenty nie przekonały), 
+na niekorzyść, 
 byli inni pasażerowie stojący na przystanku, którzy najzwyczajniej
 zasłaniali krawężnik na przystanku czyniąc metodę tę bezużyteczną.
 
 Na tym etapie podjęta została decyzja, że wstępna segmentacja
 zostanie wykonana przy użyciu kaskadowego detektora cech (HAAR, HOG, LBP)
-pomysłu panów Violi i~Jonesa.
+opisana w~artykule, które autorami byli panowie Viola i~Jones.
 
 \subsection{Progowanie HSV}
 
-Równoległym pomysłem do kaskadowego detektora było progowanie HSV 
-w~celu wyodrębnienia wyświetlacza z~numerem linii. Tutaj pojawiło
-się niepokojące założenie, że odcień numeru będzie zbliżony do
-pomarańczowego. 
+Równoległym pomysłem do kaskadowego detektora było 
+wykorzystanie progowania obrazu w~dziedzinie HSV (\textit{
+ang. Hue Saturation Value})
+w~celu wyodrębnienia wyświetlacza z~numerem linii. 
+Kolejne niepokojące założenie, które poczyniono
+na wstępnym etapie prac dotyczyło koloru numeru linii autobusowej.
+Przyjęto, że odcień numeru będzie (w~znacznej ilości przypadków) 
+zbliżony do pomarańczowego - z~możliwością rozszerzenia o~kolor
+zielony. 
 
 \begin{figure}[h!]
     \caption{Segmentacja numeru metodą progowania HSV}
@@ -156,7 +173,7 @@ znacznie mniejszą skuteczność uniwersalnego detektora, który był
 wyszkolony przy użyciu frontów z~tabliczkami i~tych z~wyświetlaczami, 
 o~czym szerzej w~jednym z~następnych podrozdziałów.
 
-\subsection{Tesseract}
+\subsection{Gotowy silnik OCR - Tesseract}
 
 Pierwsza próba z~narzędziem Tesseract okazała się bardzo obiecująca.
 Ręcznie wycięty fragment reprezentujący numer 140 został podany 
@@ -166,22 +183,23 @@ jako argument wywołania komendy \verb|tesseract|:
 
 Parametr \verb|-psm 8| określał metodę segmentacji obrazu jako ,,jedno
 słowo''. Obraz wejściowy \verb|nuber.png| został zaprezentowany
-na rusunku poniżej. Wynik jaki otrzymano dla powyższego doświadczenia
+na rysunku \ref{fig:sample_tesseract_input}. Wynik jaki otrzymano dla 
+powyższego doświadczenia
 był wzorowy - w~pliku wynikowym \verb|out.txt| pojawił
-się ciąg znaków: 140.
+się oczekiwany ciąg znaków (140).
 
 \begin{figure}[h!]
     \caption{Pierwszy numer testowy - prawidłowo odczytany}
     \centering
     \includegraphics[width=0.25\textwidth]{img/exp_number_01}
+    \label{fig:sample_tesseract_input}
 \end{figure}
 
 Szereg kolejnych doświadczeń przyniósł jednak rozczarowanie. 
 Wiele dobrze widocznych numerów w~stosunkowo wysokiej rozdzielczości 
-nie została odczytana w~ogóle (ciąg znaków zerowej długości). Zdarzały 
+nie zostało odczytanych w~ogóle (ciąg znaków zerowej długości). Zdarzały 
 się nawet przypadki kiedy trzycyfrowy numer został rozszyfrowany jako
 kilka wielocyfrowych liczb (ciąg ze spacjami).
-
 
 \begin{table}[h!]
   \centering
@@ -233,7 +251,7 @@ rozwiązaniu wykonano dwie krótkie serie próbne, których wyniki
 zamieszczono w~tabelkach poniżej.
 
 Pierwsza seria próbna pokazuje, że rozwiązanie oparte na narzędziu
-tesseract ma duży potencjał i~wysokie prawdopodobieństwo powodzenia.
+Tesseract ma duży potencjał i~wysokie prawdopodobieństwo powodzenia.
 Jednak aby zobrazować problemy jakie niesie ze sobą to podejście
 wykonano dwie kolejne, celowo nieudane próby.
 
@@ -273,14 +291,14 @@ wykonano dwie kolejne, celowo nieudane próby.
   \caption{Wyniki drugiej serii testowej tesseract}\label{tbl:tess_02}
 \end{table}
 
-W~drugiej serii przedstawiono zależność skuteczności tesseracta od 
+W~drugiej serii przedstawiono zależność skuteczności Tesseracta od 
 rozdzielczości obrazu, gdzie czwarty obraz został zinterpretowany
 jako kropka. Poziom dokładności jest w~tym przypadku na poziomie
 jak najbardziej akceptowalnym. Trudno nawet spodziewać się lepszego
 wyniku.
 
 Największe wątpliwości
-co do wykorzystania tesseracta w~rozwiązaniu docelowym zostały zobrazowane
+co do wykorzystania Tesseracta w~rozwiązaniu docelowym zostały zobrazowane
 przez wyniki trzeciej serii testowej. Tutaj zniekształcenia spowodowane
 refleksami pojawiającymi się na szybie osłaniającej wyświetlacz
 zupełnie uniemożliwiły skuteczne odczytanie numeru.
@@ -348,16 +366,16 @@ widoczne są poszczególne diody - ostatni obraz z~serii trzeciej.
 Rozwiązaniem tego problemu byłoby zastosowanie adaptacyjnego filtru
 Gaussa lub operacji morfologicznych, np.: otwarcia + zamknięcia.
 Opór przed tego typu zabiegami spowodowany brakiem narzędzi 
-do mierzenia skuteczności zaowocował pominięciem narzędzi tesseract
+do mierzenia skuteczności zaowocował pominięciem narzędzi Tesseract
 w~rozwiązaniu końcowym. Tym nie mniej jest to metoda z~największym
 potencjałem spośród omawianych do tej pory ,,ślepych uliczek''. 
 Fakt, że w~trzech powyższych próbach dwie z~nich dały wynik pozytywny
 i~to bez wcześniejszej konfiguracji narzędzia (nauka dodatkowych
 krojów czcionek itp.) świadczy, że można z~powodzeniem próbować
 usprawnić proponowane w~tym opracowaniu rozwiązanie poprzez 
-podmianę ostatniego (trzeciego) kroku kaskady w~oparciu o~bibliotekę
-tesseract. Tym bardziej, że wspomniana biblioteka posiada gotową
-implementację działającą na systemie android.
+podmianę ostatniego (czwartego) kroku kaskady w~oparciu o~narzędzie
+Tesseract. Tym bardziej, że wspomniany program posiada gotową
+implementację działającą na systemie Android.
 
 \subsection{MSER - lokalizacja numeru}
 
@@ -370,9 +388,11 @@ do określania położenia numeru.
     \caption{Pierwszy numer testowy - prawidłowo odczytany}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_mser_concerns}
+    \label{fig:mser_example_results}
 \end{figure}
 
-Poglądowe rezultaty zostały zaprezentowane na rysunku poniżej. 
+Poglądowe rezultaty zostały zaprezentowane na rysunku
+\ref{fig:mser_example_results}.
 Niestety w~zależności od rozdzielczości zmieniała się podatność
 numeru na wykrycie. Dla niewielkich rozdzielczości numer był rozpoznawany
 jedynie jako całość, gdzie ograniczeniem geometrycznym wykorzystanym
@@ -388,6 +408,7 @@ prostokąt) dla jedynki do 2x3 (również prostokąt ustawiony pionowo) dla
 pozostałych cyfr.
 
 Zbyt duża liczba czynników wpływających na skuteczność:
+
 \begin{itemize}
     \item krój czcionki: wysokie, wąskie,
     \item inne ograniczenia geometryczne dla zmiennej ilości cyfr
@@ -402,31 +423,41 @@ spowodowały, że pominięto tę metodę w~rozwiązaniu końcowym.
 Tym nie mniej jest to druga (po narzędziu tesseract) metoda, której
 wyniki były na tyle obiecujące, że przemyślana implementacja
 mogłaby z~powodzeniem zastąpić ostatecznie wykorzystany kaskadowy
-detektor haara (lub jak kto woli pomysłu panów Violi i Jonesa).
+detektor oparty na cechach Haara.
 
 
-\section{Eksperymenty częściowo udane}
+\section{Eksperymentu częściowo udane - pierwsza iteracja}
 
 W~podrozdziale tym przedstawione i~omówione zostały doświadczenia
 związane z~algorytmami, narzędziami i~bibliotekami wykorzystanymi
-w~ostatecznym programie. Pierwsze opisy powstawały równolegle
-do toczących się prac więc są raczej nieporadnym sprawozdaniem
-niż rzetelną analizą za co serdecznie przepraszam.
+w~ostatecznym programie
+(pierwszej wersji testowej). Opis powstawał równolegle
+do toczących się prac więc wykazuje pewne cechy sprawozdania
+lub relacji na bieżąco.
+Prezentacja oraz dokładna analiza wyników powstała w~drugiej
+iteracji, kiedy to godowy był już działający prototyp.
+Druga tura miała na celu rzetelną weryfikację skuteczności
+i~wydajności drugiej wersji programu (tzw. wersji beta).
 
-Dodatkowo wprowadzony został logiczny podział na pięć etapów:
+W~ramach pierwszej iteracji
+wprowadzony został logiczny podział na pięć etapów:
 
 \begin{enumerate}
-    \item Przygotowanie zbioru uczącego, który miał być jednocześnie
-        zbiorem testowym. Pierwsza wersja przygotowanego zbioru
-        faktycznie mogła posłużyć za zbiór testowy. Składał się
-        bowiem z~pełnych klatek w~których oznaczone były wystąpienia
-        frontów - osobny plik tekstowy ze współrzędnymi. Ostateczna
-        wersja przechowywanych danych ograniczała się do wycinków
-        zawierających tylko szukane obiekty - oszczędność przestrzeni
-        dyskowej. Co w~pewnym stopniu fałszowało wyniki. Funkcja
+    \item Przygotowanie zbioru uczącego (który miał być jednocześnie
+        zbiorem testowym). Początkowo przyjęta forma przechowywania danych
+        - pełne klatki w~których oznaczone były wystąpienia
+        frontów oraz osobny plik tekstowy ze współrzędnymi -
+        pozwalała na wykorzystanie zbioru uczącego również
+        w~procesach testowych. 
+        Próba ograniczenia miejsca zajmowanego przez zbiór -
+        przechowywanie wycinków
+        zawierających tylko szukane obiekty - 
+        uniemożliwiło wykorzystanie zbioru uczącego podczas 
+        testów. Funkcja
         gorzej radziła sobie z~wyszukiwaniem obiektów, które nie
-        zawierały dostatecznego marginesu, najlepiej o~szerokości
-        zbliżonej do rozmiarów samego obiektu.
+        zawierały dostatecznego marginesu wokół obiektów.
+        Był to jeden z~powodów przeprowadzenia drugiej iteracji
+        w~procesie przygotowywania programu końcowego.
     \item Wstępna segmentacja - wyszukiwanie frontu autobusu, wraz
         z~dodatkową analizą wpływu zadanych parametrów na skuteczność
         szkolonego detektora.
@@ -436,6 +467,13 @@ Dodatkowo wprowadzony został logiczny podział na pięć etapów:
         w~celu zawężenia obszaru poszukiwań w~procesie dopasowywania 
         wzorca (\textit{ang. Template Matching}), który to proces
         jest najbardziej intensywny obliczeniowo z~użytych.
+        W~drugiej wersji krok ten rozbito na dwa:
+        \begin{itemize}
+            \item wyszukiwanie cyfr we fragmencie reprezentującym numer
+                za pomocą pojedynczego detektora dla wszystkich cyfr,
+            \item rozpoznawanie zidentyfikowanych fragmentów na
+                podstawie wektora cech podanego na klasyfikator SVM.
+        \end{itemize}
     \item Krótkie testy związane ze skutecznością i~zasadnością
         wykorzystania metody \textit{Template Matching} w~celu weryfikacji
         potencjalnych obszarów reprezentujących cyfry.
@@ -461,27 +499,26 @@ skutecznego programu do odczytywania numerów nadjeżdżających autobusów.
 \subsection{Zbiór danych uczących i testowych}
 
 Dane wykorzystane do procesu uczenia detektorów frontów autobusów
-składają się z~dwóch części.
-
-Pierwszą partią danych ucząco-testowych było 11 zestawów obrazów
+składały się z~dwóch części.
+Pierwszą partią danych było 11 zestawów obrazów
 przygotowanych z~uprzednio pobranych filmów z~serwisu YouTube.
 Każdy zestaw składał się z co najmniej dwóch zbiorów. Obrazów 
-reprezentujących oznaczone fronty autobusów oraz obrazów tła
-(ang. background). Opcjonalnym zbiorem był zestaw oznaczonych 
+reprezentujących oznaczone fronty autobusów oraz obrazów tła. 
+Opcjonalnym zbiorem był zestaw oznaczonych 
 frontów autobusów typu Solaris. Osobny zestaw frontów miał na celu
 porównanie skuteczności detektorów przygotowanych tylko przy pomocy
 pojedynczego typu obiektu oraz tych do przygotowania których użyto
 obiektów znacząco od siebie różnych.
 
-Drugi zestaw to obrazy pobrane z~serwisu \verb|http://www.phototrans.eu/|.
-Zbiór ten zawiera 9067 kwadratowych wycinków różnych rozmiarów
+Drugi zestaw (oznaczony ponownie w~ramach drugiej iteracji) 
+to obrazy pobrane z~serwisu \verb|http://www.phototrans.eu/|.
+Zbiór ten zawierał 9067 kwadratowych wycinków różnych rozmiarów
 przedstawiających wyłącznie fronty autobusów. Ze względu na mnogość
 typów i~nieusystematyzowanie zbioru jego szczegółowy opis nie będzie
 zamieszczony. Ze względu na specyfikę skryptu pobierającego zdjęcia
 z~serwisu zostały ułożone zgodnie z~kolejnością linii autobusowych.
 Kolejność jest pseudo alfabetyczna, gdzie w~pierwszej kolejności
-są numery jednocyfrowe, potem kolejno dwu i~trzycyfrowe. Poza tym 
-nie ma żadnej systematyczności.
+są numery jednocyfrowe, potem kolejno dwu i~trzycyfrowe.
 
 Poniżej zamieszczono szczegółowy opis części pierwszej zbioru.
 Podział na autobusy Solaris i Inne okazał się nietrafiony. 
@@ -500,12 +537,12 @@ W~zbiorze znalazły się następujące typy autobusów:
 \end{itemize}
 Współrzędne w~nawiasach określają pozycję modelu autobusu na rysunku
 \ref{fig:jJ9ixBfVR5k_types}.
-Jaden z modeli autobusów Man został wyposażony w zielony wyświetlacz numeru.
-Jet to bardzo trudny przypadek w kontekście rozpoznawania numeru.
+Jeden z modeli autobusów Man został wyposażony w zielony wyświetlacz numeru.
+Jest to bardzo trudny przypadek w kontekście rozpoznawania numeru.
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[width=0.9\textwidth]{img/exp_trainig_data_jJ9}
+    \includegraphics[width=0.8\textwidth]{img/exp_trainig_data_jJ9}
     \caption{Typy autobusów zawarte w zbiorze jJ9ixBfVR5k}
     \label{fig:jJ9ixBfVR5k_types}
 \end{figure}
@@ -522,8 +559,6 @@ Liczebność zebranych próbek została przedstawiona w~tabelce nr.
     \caption{Liczebność zbioru jJ9ixBfVR5k}
     \label{tab:jJ9ixBfVR5k_count}
 \end{table}
-
-\newpage
 
 \subsubsection{Zbiór vYqZ4-tH4M0}
 
@@ -583,7 +618,7 @@ wgłębieniem w~centralnej jej części (Lion's City).
 
 \subsubsection{Zbiór aO71uxrP9B0}
 
-W~zbiorze miejsce znalazły zaledwie dwa modele autobusu Volvo plus 
+W~zbiorze miejsce znalazły zaledwie dwa modele autobusu Volvo oraz
 występujący już wcześniej Mercedes Citaro.
 
 \begin{figure}[!h]
@@ -666,9 +701,9 @@ solaris - różne kształty maski.
 
 \subsubsection{Zbiór BJZLDmYMFvo}
 
-Zbiór zawiera jedynie dwa modele autobusu Man, jednego
-Jelcza i Solarisa. Jedyna uwaga może tyczyć trudności w~odczytywaniu
-numeru z~autobusu man/jelcz z~wyświetlaczem w~kolorze zielonym. O~ile
+Zbiór zawiera jedynie dwa modele autobusu Man, oraz autobusy marek
+Jelcz i Solaris. Jedyna uwaga może tyczyć trudności w~odczytywaniu
+numeru z~autobusu man/jelcz z~wyświetlaczem w~kolorze zielonym. Jeżeli tylko
 warunki oświetleniowe są dobre - jak na rysunku \ref{fig:BJZLDmYMFvo_types}
 - widoczność, a~co za tym idzie rozpoznawalność numeru powinna być na 
 zadowalającym poziomie.
@@ -681,7 +716,7 @@ zadowalającym poziomie.
 \end{figure}
 
 Zbiór ten posiada drugą co do wielkości 
-liczbę obrazów tła w~pierwszej części. 
+liczbę obrazów tła (w~pierwszej iteracji). 
 
 \begin{table}[!h]
     \centering
@@ -719,7 +754,7 @@ główną wartością dodaną są obrazy reprezentujące tło.
 \subsubsection{Zbiór 8wdvLn40CTk}
 
 Najmniejszy zbiór w~kontekście różnorodności zawartych modeli. Z~drugiej
-strony ogromna ilość obrazów tła i~całkiem sporo oznaczonych ujęć.
+strony ogromna ilość obrazów tła oraz relatywnie dużo oznaczonych ujęć.
 
 \begin{figure}[!h]
     \centering
@@ -788,8 +823,11 @@ Autosan.
 
 Ostatecznie po złączeniu wszystkich zaprezentowanych zbiorów powstały
 dwa końcowe (będące jednocześnie punktem wyjścia do dalszych testów):
-- zbiór wszystkich oznaczonych frontów (różne + solarisy) - 5781 sztuk,
-- zbiór oznaczonych frontów autobusów typu Solaris - 955 sztuk.
+\begin{itemize}
+    \item zbiór wszystkich oznaczonych frontów (różne + solarisy) 
+        - 5781 sztuk,
+    \item zbiór oznaczonych frontów autobusów typu Solaris - 955 sztuk.
+\end{itemize}
 
 Osobny zbiór zawierający tylko fronty typu Solaris miał na celu
 sprawdzenie czy mnogość pozytywnych kształtów nie wpływa na skuteczność
@@ -808,7 +846,7 @@ oraz efektywność trenowanego detektora.
 \subsubsection{Porównanie detektorów HAAR, LBP i HOG}
 
 Pierwsza iteracja uczenia detektorów miała na celu przetestowanie
-opcji jakie można zadać narzędziu uczącemu - \verb|opencv_traincascade|.
+opcji jakie można zadać narzędziu uczącemu \verb|opencv_traincascade|.
 
 Za zbiór testowy posłużył zestaw oznaczonych zdjęć oraz zdjęć tła
 przygotowany dla filmu o id jJ9ixBfVR5k (charakterystyka zbioru
@@ -834,29 +872,33 @@ otrzymano następujące wyniki:
 \begin{table}[!h]
 \centering
 \begin{tabular}{r|c|c|c|l}
-    & HAAR         & LBP        & HOG              &       \\
+        & HAAR         & LBP        & HOG         & Wszystkie wystąpienia  \\
     \hline
-Solaris & 151  (43\%)  & 81  (23\%) & 61 (17\%)        & /346  \\
-Różne   & 1051 (35\%)  & 748 (25\%) & 712 (24\%)       & /2925 \\
-Tło     & 635  (11\%)  & 386 (6\%)  & 447 (7\%)        & /5588 \\
+Solaris & 151  (43\%)  & 81  (23\%) & 61 (17\%)   & 346  \\
+Różne   & 1051 (35\%)  & 748 (25\%) & 712 (24\%)  & 2925 \\
+Tło     & 635  (11\%)  & 386 (6\%)  & 447 (7\%)   & 5588 \\
 \end{tabular}
-\caption{Porównanie skuteczności detektorów typu HAAR, LBP i HOG.}
+\caption{Porównanie skuteczności detektorów typu HAAR, LBP i HOG.
+Liczba poprawnie wykrytych frontów w~porównaniu do wszystkich opisanych
+wystąpień.}
 \label{tab:haar_lbp_hog_comparison}
 \end{table}
 
-Jako, że nie wszystkie jeszcze próbki były opisane, stąd zaniżona wartość
-w~ostatniej kolumnie. Łatwo jednak zaobserwować trend dokładności
+Zaniżona wartość w~ostatniej wynikała z~faktu,
+że nie wszystkie wyłuskane próbki były w~momencie wykonania testu opisane.
+Łatwo jednak zaobserwować trend dokładności
 tychże detektorów.
 
+Kolejnym kryterium był czas uczenia detektorów.
 O ile skuteczność detektora w~funkcji czasu potrzebnego na jego 
 wyszkolenie dla detektorów cech HAAR-a i~LBP był skorelowany i~sensowny,
 to w~przypadku cech HOG było już nieco inaczej.
 Detektor oparty o~cechy HAAR-a potrzebował
-zdecydowanie więcej czasu na proces trenowania co miało przełożenie 
+zdecydowanie więcej czasu na wytrenowanie co miało przełożenie 
 na jego skuteczność. LBP natomiast okazał się nieco mniej skuteczny
 lecz jego szkolenie trwało krócej o~rząd wielkości.
 Cechy HOG w~tym zestawieniu okazały się mało interesującym kandydatem
-- skuteczność gorsza niż LBP przy czasie szkolenie o~wiele dłuższym.
+- skuteczność była gorsza niż LBP przy czasie szkolenie o~wiele dłuższym.
 
 Czasy uczenia dla poszczególnych detektorów wyglądały następująco:
 \begin{itemize}
@@ -865,24 +907,31 @@ Czasy uczenia dla poszczególnych detektorów wyglądały następująco:
     \item LBP - 40 min
 \end{itemize}
 
-\subsubsection{Porównanie detektorów - Solaris i frontów różnych}
+\subsubsection{Porównanie detektorów - Solaris i~frontów różnych}
 
-Wbrew obawom detektor wyszkolony przy użyciu wszystkich frontów radził
-sobie znacznie lepiej w~wykrywaniu frontów autobusów Solaris niż ten
+Wbrew obawom detektor wyszkolony przy użyciu wszystkich 
+rodzajów frontów 
+wykazywał znacznie większą skuteczność podczas wykrywaniu 
+frontów autobusów Solaris niż ten
 wyszkolony z~użyciem tylko tego rodzaju frontów. Wyniki dla ustawień
-domyślnych dla detektorów typu LBP przedstawiono w tabelce nr 
-\ref{tab:sol_vs_all}.
+domyślnych oraz detektora typu LBP przedstawiono w tabelce nr 
+\ref{tab:sol_vs_all}. Znacznie większa skuteczność detektora
+generycznego spowodowana jest zapewne przez efekt skali
+gdzie detektor frontów różnych typów (w tym marki Solaris) 
+był wyszkolony na kilkukrotnie większej liczbie próbek.
 
 \begin{table}[!h]
     \centering
     \begin{tabular}{r|c|c|l}
-            & Solaris(detektor) & Wszystkie typy (detektor) &           \\
-            \hline
-wszystkie   & 175 (3\%)         & 3466 (71\%)               & 4836      \\
-solaris     & 609 (63\%)        & 854 (89\%)                & 955       \\
-błędy       & 289 (1\%)         & 56088 (310\%)             & 18048     \\
+          & Solaris    & Fronty różne   & Wszystkie wystąpienia (obrazy) \\
+          \hline
+wszystkie & 175 (3\%)  & 3466 (71\%)    & 4836      \\
+solaris   & 609 (63\%) & 854 (89\%)     & 955       \\
+błędy     & 289 (1\%)  & 56088 (310\%)  & 18048     \\
     \end{tabular}
-    \caption{Skuteczność detektorów wyszkolonych tylko dla typów solaris kontra tych wyszkolonych dla wszystkich typów frontów}
+    \caption{Skuteczność detektorów wyszkolonych tylko dla typów
+    solaris w porównaniu do tych wyszkolonych dla wszystkich typów frontów
+    (kolumny Solaris oraz Fronty różne)}
     \label{tab:sol_vs_all}
 \end{table}
 
@@ -892,45 +941,66 @@ próby poradzenia sobie z~tym problemem.
 
 \subsubsection{Parametry minHitRate i~maxFalseAlarmRate}
 
+W~celu przetestowania wpływu poszczególnych parametrów wejściowych
+narzędzia do uczenia detektorów wykonano kilka sesji uczących 
+przy zmiennych wartościach tychże parametrów. Pierwsza próba dotyczyła
+parametrów:
+\begin{itemize}
+    \item minHitRate,
+    \item maxFalseAlarmRate.
+\end{itemize}
+odpowiedzialnych za skuteczność wykrywania żądanych obiektów,
+oraz podatność na błędne wykrycia.
+
 Niestety wraz ze zwiększaniem parametru \verb|minHitRate|
 znacząco zwiększała
-się liczba błędnych trafień. Poniższe wykresy przedstawiają znaczny wzrost
-błędnych wyników oraz znacznie wolniejszy przyrost pozytywnych 
-rezultatów.
+się liczba błędnych trafień. Po wykonaniu pięciu sesji
+uczących dla wartości parametru od 0.995 do 0.999 zaobserwowano 
+ogromny wzrost błędnych trafień od odpowiednio 56 tysięcy
+do 124 tysięcy (wykres \ref{chart:hitratio_fal}).
+
+\begin{figure}[h!]
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-    title=Błędne trafienia,
-    ylabel={$falseAlarmHits$},
+    ylabel={$Bledne\ trafienia$},
     xlabel={$minHitRate$},
     minor y tick num=1,
+    width=\textwidth*0.6, height=5cm
 ]
-\addplot table {data/hitratio_fal.dat};
+\addplot [only marks, color=red] table {data/hitratio_fal.dat};
 \end{axis}
 \end{tikzpicture}
 \end{center}
+\caption{Zwiększenie liczby błędnych trafień przy zmianie parametru minHitRate}
+\label{chart:hitratio_fal}
+\end{figure}
 
-Sądząc po poniższym wykresie, poziom 80\% był jak najbardziej do
-osiągnięcia. Po dodatkowym zmniejszeniu liczby fałszywych alarmów 
-do akceptowalnych wartości (<20\%) detektor w~wersji deweloperskiej 
-można było uznać za ukończony.
+W~stosunku do wielkiej liczby błędnych trafień procentowa skuteczność
+wykrywania frontów autobusów rosła raczej w~sposób umiarkowany.
 
+
+\begin{figure}[h!]
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-    title=Pozytywne trafienia,
-    ylabel={$posotiveHits$},
+    ylabel={$Pozytywne\ trafienia$},
     xlabel={$minHitRate$},
     minor y tick num=1,
-    legend style={at={(0.06,0.73)},anchor=north west}
+    yticklabel=\pgfmathprintnumber{\tick}\,\%,
+    legend style={at={(0.06,0.73)},anchor=north west},
+    width=\textwidth*0.6, height=6cm
 ]
-\addplot table {data/hitratio_fro.dat};
+\addplot [only marks, color=green] table {data/hitratio_fro.dat};
 \addlegendentry{wszystkie}
-\addplot table {data/hitratio_sol.dat};
+\addplot [only marks, color=blue] table {data/hitratio_sol.dat};
 \addlegendentry{solaris}
 \end{axis}
 \end{tikzpicture}
 \end{center}
+\caption{Zwiększenie liczby pozytywnych trafień przy zmianie parametru minHitRate}
+\label{chart:hitratio_fro_sol}
+\end{figure}
 
 Pierwsza próba zmniejszenia nieudanych trafień polegała na zmianie 
 parametru \verb|maxFalseAlarmRate| podczas uczenia detektora. 
@@ -940,9 +1010,11 @@ sesji uczenia detektora dla wartości: od domyślnej 0.5 do 0.1.
 Ostatecznie przy ilości próbek pozytywnych i~negatywnych 
 na poziomie 5000 opisywane wyżej parametry nie miały już prawie w~cale
 znaczenia. Przy domyślnych wartościach skuteczność detektora była 
-zadowalająca.
+zadowalająca. Bardziej szczegółowe informacje dotyczące skuteczności
+przygotowywanych detektorów w~funkcji użytych parametrów
+przedstawiono w~podrozdziale dotyczącym drugiej iteracji.
 
-\subsubsection{Podejście drugie - usuniecie zdeformowanych frontów}
+\subsubsection{Usuniecie zdeformowanych frontów}
 
 Podczas oznaczania frontów autobusów nastąpiła pewnego rodzaju
 nadgorliwość. Podczas wyboru klatek do późniejszego oznaczenia
@@ -959,24 +1031,22 @@ zostało zbędne zaburzenie w~wyglądzie szukanych obiektów,
 które mogłoby niekorzystnie wpłynąć na skuteczność wyszkolonych
 w~ten sposób detektorów.
 
-W~ramach drugiej iteracji poszukiwania optymalnego detektora
+W~ramach poszukiwania optymalnego detektora
 usunięto wszystkie oznaczenia frontu pasujące do opisu
 z~poprzedniego akapitu. Kilka takich przypadków można
-zaobserwować na zdjęciu poniżej.
+zaobserwować na zdjęciu \ref{fig:deformation_samples}.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{img/exp_removed_distorted_fronts}
     \caption{Usunięte oznaczenia ze względu na zniekształcenia geometryczne}
+    \label{fig:deformation_samples}
 \end{figure}
 
-Jednak zanim przejdziemy do weryfikacji skuteczności poprawionego
-zbioru, przedstawione zostanie porównanie skuteczności już nauczonych
-detektorów. W~poprzednich podrozdziałach (bardzo chaotycznie) opisane
-zostały pierwsze próby utworzenia optymalnego detektora. W~ramach
-tych eksperymentów powstało 15 plików definiujących detektory, do utworzenia
+Podsumowując, w~ramach
+eksperymentów powstało 15 plików definiujących detektory, do utworzenia
 których użyto zmiennych parametrów. W~pierwszej iteracji zmianie podlegały
-parametry:
+wartości:
 
 \begin{itemize}
 \item featureType - HAAR(default), LBP, HOG,
@@ -986,25 +1056,38 @@ parametry:
 \end{itemize}
 
 Dodatkowo powstały dwa detektory LBP osobno dla frontów typu solaris i~dla
-całości zbioru (5690 wystąpień). Oto cała lista plików z~pierwszej iteracji:
+całości zbioru (5690 wystąpień). 
 
-\begin{enumerate}
-\item dev\_01\_haar\_default.xml
-\item dev\_02\_lbp\_default.xml
-\item dev\_03\_hog\_default.xml
-\item dev\_04\_lbp\_solaris\_943.xml
-\item dev\_05\_lbp\_all\_5690.xml
-\item dev\_06\_lbp\_all\_posratio\_996.xml
-\item dev\_07\_lbp\_all\_posratio\_997.xml
-\item dev\_08\_lbp\_all\_posratio\_998.xml
-\item dev\_09\_lbp\_all\_posratio\_999.xml
-\item dev\_10\_lbp\_all\_posratio\_999\_maxfalse\_04.xml
-\item dev\_11\_lbp\_all\_posratio\_999\_maxfalse\_03.xml
-\item dev\_12\_lbp\_all\_posratio\_999\_maxfalse\_02.xml
-\item dev\_13\_lbp\_all\_posratio\_999\_maxfalse\_01.xml
-\item dev\_14\_lbp\_all\_posratio\_999\_numneg\_2000.xml
-\item dev\_15\_lbp\_all\_posratio\_999\_numneg\_4000.xml
-\end{enumerate}
+W~tabeli \ref{tab:it1detectorlist} przedstawiono użyte wartości
+wymienionych parametrów dla wszystkich 15 detektorów.
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{r|c|c|c|c|c|c|l}
+Lp.       & Typ cech & minHitRate & maxFAR & numNeg & numPos & \%ok & błędy\\
+          \hline
+01        & haar     & 0.995      & 0.5       & 1000 & 2000 & 28\% &  994 \\
+02        & hog      & 0.995      & 0.5       & 1000 & 2000 & 19\% &  773 \\
+03        & lbp      & 0.995      & 0.5       & 1000 & 2000 & 25\% &  1738 \\
+04        & lbp      & 0.995      & 0.5       & 1000 & 943  & 17\% &  143 \\
+05        & lbp      & 0.995      & 0.5       & 1000 & 5960 & 91\% &  48028 \\
+06        & lbp      & 0.996      & 0.5       & 1000 & 5960 & 93\% &  67711 \\
+07        & lbp      & 0.997      & 0.5       & 1000 & 5960 & 93\% &  79566 \\
+08        & lbp      & 0.998      & 0.5       & 1000 & 5960 & 94\% &  104771 \\
+09        & lbp      & 0.999      & 0.5       & 1000 & 5960 & 95\% &  116456 \\
+10        & lbp      & 0.999      & 0.4       & 1000 & 5960 & 94\% &  41187 \\
+11        & lbp      & 0.999      & 0.3       & 1000 & 5960 & 90\% &  11148 \\
+12        & lbp      & 0.999      & 0.2       & 1000 & 5960 & 80\% &  1694 \\
+13        & lbp      & 0.999      & 0.1       & 1000 & 5960 & 71\% &  298 \\
+14        & lbp      & 0.999      & 0.5       & 2000 & 5960 & 92\% &  21358 \\
+15        & lbp      & 0.999      & 0.5       & 4000 & 5960 & 85\% &  2922 \\
+    \end{tabular}                                                            
+    \caption{Skuteczność detektorów wyszkolonych 
+        dla różnych wartości parametrów narzędzia traincascade
+        (pozycja 04 została wyszkolona dla frontów typu solaris)
+    }
+    \label{tab:it1detectorlist}
+\end{table}
 
 Pierwsze trzy pliki utworzone były na ograniczonym podzbiorze danych, gdyż
 nie wszystkie próbki były wtedy opisane.
@@ -1017,31 +1100,39 @@ i~oznaczonego znajdowały się w~odległości nie większej niż 25\% odpowiadaj
 wymiaru prostokąta oznaczonego: dla odciętych i~rzędnych odpowiednio szerokość
 i~wysokość prostokąta. Do zliczania błędnych wykryć wykorzystano ten sam zbiór.
 Ze względu na ograniczenie czasowe zrezygnowano z~wykorzystania zbioru
-obrazów tła. Wyniki zaprezentowano na wykresie poniżej.
+obrazów tła. Wyniki zaprezentowano w~tabeli \ref{tab:it1detectorlist} oraz
+na wykresie \ref{fig:it1detectorlist}.
 
+\begin{figure}
 \begin{center}
 \begin{tikzpicture}
 \begin{groupplot}[group style={group size=1 by 2},
 height=5cm,width=0.8\textwidth,
 legend style={at={(0.03,0.93)},anchor=north west}]
 \nextgroupplot
-\addplot table {data/15_detectors_comparison_positive_percentage.dat};
+\addplot [only marks, color=blue] table {data/15_detectors_comparison_positive_percentage.dat};
 
 \addlegendentry{Skutecznosc}
 
 \nextgroupplot
-\addplot table {data/15_detectors_comparison_negative_count.dat};
+\addplot [only marks, color=red] table {data/15_detectors_comparison_negative_count.dat};
 \addlegendentry{Bledne trafienia}
 \end{groupplot}
 \end{tikzpicture}
 \end{center}
+\caption{Zależność skuteczność i~błędnych trafień dla poszczególnych detektorów}
+\label{fig:it1detectorlist}
+\end{figure}
 
 Jak widać wyniki w~większości przypadków oscylowały w~granicach 90\%.
 W~odróżnieniu od poprzednich testów, te wykonane były na klatkach obrazu
 w~oryginalnej rozdzielczości (wysokość 720p). 
 Kolejnym krokiem było znalezienie
 optymalnego czynnika skalującego. Innymi słowy jak bardzo można zmniejszyć
-obraz wejściowy aby utrzymać wyniki na zadowalającym poziomie.
+obraz wejściowy aby utrzymać wyniki na zadowalającym poziomie
+(lub jak okazało się po przeprowadzeniu pierwszych eksperymentów,
+poprawić skuteczność w~porównaniu do skuteczności detektora uruchomionego
+dla obrazu w~rozmiarze oryginalnym).
 
 \subsubsection{Skalowanie obrazu wejściowego - podsumowanie}
 
@@ -1065,34 +1156,23 @@ programu wykorzystano następujące parametry:
 
 Krok pierwszy kaskady - zawężenie poszukiwań numeru do obszaru frontu
 (tymczasowo lewego-górnego fragmentu frontu) - był na tyle skuteczny,
-że dalsze usprawnienia tego elementu nie były wymagane. Zasadnym jest
+że dalsze usprawnienia tego elementu nie były wymagane. Zasadnym było
 natomiast przygotowanie zestawu testowego i~automatyczne 
-przetestowanie skuteczności rozwiązania na zbiorze nawet 100 ręcznie
-oznaczonych frontów.
+przetestowanie skuteczności rozwiązania co uczynione 
+zostało w~ramach drugiej iteracji.
 
-Proces przygotowywania zbiorów uczących detektory był
-na wpół zautomatyzowany. Pierwsze sto wystąpień oznaczone było ręcznie.
-Następnie dla 100 wystąpień uczony był detektor, który wykorzystywano
-do testowego oznaczania frontów w~kolejnej iteracji. Gdy detektor 
-poprawnie oznaczył wystąpienie obiektu próbkę taką pomijano. Oznaczano
-tylko niepoprawnie oznaczone fronty lub brak oznaczeń. Z~drugiej
-strony błędne oznaczenia - fałszywe alarmy - powodowały umieszczenie
-próbki w~zbiorze obrazów tła. W~ten sposób naocznie zaobserwowano 
-tendencje jakie przejawiał szkolony detektor. Umożliwiało to też
-korygowanie błędnych zachowań - na przykład ucinanie numerów (górnej
-krawędzi autobusu). Co dało niemal perfekcyjne rezultaty. Mankamentem
-tego rozwiązania jest to, że teraz trudno zmierzyć jego skuteczność.
-
-W~procesie szkolenia detektora frontów w~opisany powyżej sposób
+W~procesie półautomatycznego uczenia i~oznaczania
+próbek
 zaobserwowano jeden szczególny trend, który faworyzował pewne
-szczególne cechy frontów z~wyświetlaczem. Podczas ostatniej iteracji
+szczególne cechy frontów z~wyświetlaczem. Podczas ostatniego przebiegu
 (do 5000 pozytywnych oznaczeń) zaobserwowano, że detektor
 chętnie identyfikuje fronty z~diodowym wyświetlaczem zajmującym 
 całą górną część frontu. Przy tak dużej liczbie oznaczeń
 cechą szczególną okazał się właśnie ów wyświetlacz. Cecha ta była
 na tyle istotna, że oznaczane były również fragmenty boków autobusów
 z~wyświetlaczem bocznym, czy fragmenty frontów, na których wyświetlacz
-nie zajmował całej długości górnej krawędzi (obrazek poniżej).
+nie zajmował całej długości górnej krawędzi - rysunek
+\ref{fig:frontdetectormorph}.
 
 \begin{figure}[!h]
     \centering
@@ -1125,9 +1205,9 @@ to dla zbyt dużej liczby - w~szczególności obrazów tła proces potrafił
 utknąć na danym etap na dobę.
 
 Element ten był najsłabiej przetestowany i~wymagał usprawnienia 
-w~pierwszej kolejności. Pewną formą pójścia na łatwiznę było
+w~pierwszej kolejności. Pewnym uproszczeniem było
 ograniczenie obszaru przeszukiwania do lewego górnego rogu wykrytego
-frontu jak na rysunku poniżej.
+frontu jak na rysunku \ref{fig:frontupperleft}.
 
 \begin{figure}[!h]
     \centering
@@ -1136,7 +1216,7 @@ frontu jak na rysunku poniżej.
     \label{fig:frontupperleft}
 \end{figure}
 
-Możliwą alternatywą dla tego kroku jest omawiana już koncepcja
+Możliwą alternatywą dla tego kroku była omawiana już koncepcja
 oparta na detektorze MSER.
 
 \subsection{Detektory cyfr}
@@ -1169,12 +1249,12 @@ od 10 do 200. Wyniki w~postaci ilości wykrytych poprawnie wystąpień cyfry
 height=5cm,width=0.8\textwidth,
 legend style={at={(0.03,0.93)},anchor=north west}]
 \nextgroupplot
-\addplot table {data/digit_8_pos_10-200_neg_100_hit_ratio.dat};
+\addplot [only marks, color=blue] table {data/digit_8_pos_10-200_neg_100_hit_ratio.dat};
 
 \addlegendentry{Poprawne trafienia}
 
 \nextgroupplot
-\addplot table {data/digit_8-pos_10-200_neg_100_false_alarm_count.dat};
+\addplot [only marks, color=red] table {data/digit_8-pos_10-200_neg_100_false_alarm_count.dat};
 \addlegendentry{Bledne trafienia}
 \end{groupplot}
 \end{tikzpicture}
@@ -1182,7 +1262,7 @@ legend style={at={(0.03,0.93)},anchor=north west}]
 
 Pierwsze przekroczenie liczby 10 tysięcy błędnych wykryć odnotowano dla
 liczby pozytywnych próbek równej 124. Pierwszym (prawdopodobnie przedwczesnym)
-wnioskiem jest to, iż prawdopodobnie liczba obrazów tła powinna być
+wnioskiem jest to, iż liczba obrazów tła powinna być
 większa bądź równa liczbie próbek pozytywnych.
 
 \begin{center}
@@ -1191,12 +1271,12 @@ większa bądź równa liczbie próbek pozytywnych.
 height=5cm,width=0.8\textwidth,
 legend style={at={(0.03,0.93)},anchor=north west}]
 \nextgroupplot
-\addplot table {data/digit_8_pos_100-300_neg_200_hit_ratio.dat};
+\addplot [only marks, color=blue] table {data/digit_8_pos_100-300_neg_200_hit_ratio.dat};
 
 \addlegendentry{Poprawne trafienia}
 
 \nextgroupplot
-\addplot table {data/digit_8-pos_100-300_neg_200_false_alarm_count.dat};
+\addplot [only marks, color=red] table {data/digit_8-pos_100-300_neg_200_false_alarm_count.dat};
 \addlegendentry{Bledne trafienia}
 \end{groupplot}
 \end{tikzpicture}
@@ -1248,8 +1328,15 @@ fragmentu zawierającego cyfrę do określonej wysokości, zbędne
 było dopasowywanie wzorca w~różnych rozmiarach gdyż szukane cyfry
 były zbliżonej wielkości. 
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/exp_templates_used}
+    \caption{Wykorzystane wzorce}
+    \label{fig:used_templates}
+\end{figure}
+
 Ostatecznie w~rozwiązaniu końcowym wykorzystano wzorce zaprezentowane
-na rysunku poniżej.
+na rysunku \ref{fig:used_templates}.
 Przedstawione wzorce dopasowywane były bez uprzednich modyfikacji,
 czego skutkiem była możliwość weryfikacji tylko jasnych cyfr
 na ciemnym tle. Widać też, że niektóre cyfry były reprezentowane
@@ -1258,19 +1345,12 @@ a~konkretnie liniami autobusowymi jakie posłużyły w~celu
 przeprowadzenia eksperymentów. Były to linie 188 oraz 523 (przystanek
 Metro Politechnika 01). 
 
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.95\textwidth]{img/exp_templates_used}
-    \caption{Wykorzystane wzorce}
-    \label{fig:used_templates}
-\end{figure}
-
 Ostatecznie niewielkim nakładem pracy można usprawnić ten etap
 algorytmu poprzez dodawanie plików z~wzorcami. Przy uwzględnieniu 
 konwencji nazewniczej program bez modyfikacji automatycznie
-pobierze dodane pliki.
+pobierał dodane pliki.
 
-\section{Próby całego rozwiązania - podsumowanie}
+\section{Próby pierwszej wersji algorytmu - podsumowanie pierwszej iteracji}
 
 Po przeprowadzeniu procedury szkolącej dla czterech detektorów
 zaprojektowany został prosty algorytm wykrywania i~odczytywania numerów.
@@ -1292,7 +1372,7 @@ Algorytm składał się z~trzech etapów:
         cyfry 1 oraz 8.
 \end{enumerate}
 
-Pierwszym produktem ubocznym opisanego doświadczenia był rysunek
+Produktem ubocznym opisanego doświadczenia był rysunek
 przedstawiający rozdzielczość wykrytego numeru w~zależności
 od odległości filmowanego autobusu - rysunek \ref{fig:dist2res}.
 
@@ -1306,14 +1386,12 @@ od odległości filmowanego autobusu - rysunek \ref{fig:dist2res}.
 Pierwszej próby dokonano dla autobusu Solaris linii 188. Odbyła się
 ona na przystanku ,,Metro Politechnika 01'' w~kierunku ulicy
 Marszałkowskiej.
-
-Podczas wykonanej próby pierwsze wykrycie dla detektora
+Podczas wykonanej próby wykrycie dla detektora
 odpowiedzialnego za lokalizację frontu autobusu odnotowano około dziesięć
 metrów przed pierwszym zarejestrowanym wykryciem fragmentu
 przedstawiającego numer linii. Niestety z tej odległości numer był
 zupełnie nieczytelny. Rozdzielczość obrazu nie pozwalała na odczytanie
 numeru nawet przez człowieka.
-
 Lokalizacja fragmentu przedstawiającego numer nastąpiła gdy autobus
 znajdował się w~odległości około 50m od obserwatora. Niestety
 rozdzielczość na tym etapie nie pozwalała na zastosowanie jakiejkolwiek
@@ -1326,8 +1404,7 @@ Ostatecznie z~zarejestrowanej sekwencji wideo wyłuskano 127 obrazów
 reprezentujących front autobusu. Na trzech z~nich nie zlokalizowano
 numeru. 
 
-\subsubsection{Ostateczna architektura rozwiązania 
-- dwa przebiegi testowe}
+\subsubsection{Pierwsza wersja architektury rozwiązania}
 
 Wysokopoziomowa architektura proponowanego rozwiązania była złożona 
 z~trzech etapów:
@@ -1379,14 +1456,13 @@ w~prezentowanym przykładzie wynik składał by się z~cyfr 7, 8 oraz 0.
 Które to zero zostało wyeliminowane ze względu na zbyt bliskie położenie
 względem wykrytej cyfry 8 z~wyższym wynikiem.
 
-Tyle jeżeli chodzi o~teorię. Aby przetestować algorytm w~praktyce
+Aby przetestować algorytm w~praktyce
 popełniono pierwsza implementację testową w~języku programowania
 python z~wykorzystaniem biblioteki OpenCV w wersji 2.4.9.
-
-Jedyny test jaki wykonano był raczej potwierdzeniem, że faktycznie
-rozwiązanie to może się sprawdzić. Pierwsze rezultaty uzyskane bez
-dopasowywania żadnych parametrów wyglądały mniej więcej jak poniższym 
-rysunku.
+Jedyny test jaki wykonano był raczej potwierdzeniem, że
+rozwiązanie to może zadziałać, jednak nie wykonano testów
+weryfikujących skuteczność automatu. Pierwsze rezultaty
+pracy z~programem zaprezentowano na rysunku \ref{fig:finaltest}.
 
 \begin{figure}[!h]
     \centering
@@ -1403,6 +1479,4 @@ Jak już wspomniano był to ostatni test przed implementacją
 docelową. Jedyną zmierzoną wartością był czas potrzebny na wykrycie
 frontu oraz odczytanie numeru. Na komputerze stacjonarnym z~procesorem
 Intel i5 wynosił on około 100 ms na wyszukanie frontu oraz 150 ms na
-odczytanie numeru. Były to wartości mocno przybliżone
-tym nie mniej zapewniające wystarczający poziom pewności, że można 
-będzie uruchomić to rozwiązanie na telefonie. 
+odczytanie numeru. 
