@@ -50,10 +50,10 @@ segmentacji - detekcji frontu autobusu -
 pierwszy krok proponowanej kaskady.
 
 \begin{figure}[h!]
-    \caption{Niestabilność i niedokładność rezultatów uzyskanych przy
-    użyciu biblioteki OpenTLD}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_open_tld_fail}
+    \caption{Niestabilność i niedokładność rezultatów uzyskanych przy
+    użyciu biblioteki OpenTLD}
     \label{fig:opentld_bus_front_fail}
 \end{figure}
 
@@ -107,9 +107,9 @@ widoczną linią (krawędzią) jest linia wyznaczona przez krawężnik
 zatoki autobusowej.
 
 \begin{figure}[h!]
-    \caption{Wykrywacz linii krawędzi zatoki autobusowej}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_bus_lane_edge_detector}
+    \caption{Wykrywacz linii krawędzi zatoki autobusowej}
     \label{fig:bus_lane_edge_detection}
 \end{figure}
 
@@ -149,9 +149,9 @@ zbliżony do pomarańczowego - z~możliwością rozszerzenia o~kolor
 zielony. 
 
 \begin{figure}[h!]
-    \caption{Segmentacja numeru metodą progowania HSV}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_hsv_threshold_number_detector}
+    \caption{Segmentacja numeru metodą progowania HSV}
 \end{figure}
 
 Po wykryciu potencjalnego numeru należałoby uruchomić drugi stopień
@@ -189,9 +189,9 @@ był wzorowy - w~pliku wynikowym \verb|out.txt| pojawił
 się oczekiwany ciąg znaków (140).
 
 \begin{figure}[h!]
-    \caption{Pierwszy numer testowy - prawidłowo odczytany}
     \centering
     \includegraphics[width=0.25\textwidth]{img/exp_number_01}
+    \caption{Pierwszy numer testowy - prawidłowo odczytany}
     \label{fig:sample_tesseract_input}
 \end{figure}
 
@@ -385,9 +385,9 @@ wykorzystanie algorytmu MSER (\textit{ang. Most Stable Extreme Regions})
 do określania położenia numeru.
 
 \begin{figure}[h!]
-    \caption{Pierwszy numer testowy - prawidłowo odczytany}
     \centering
     \includegraphics[width=0.9\textwidth]{img/exp_mser_concerns}
+    \caption{Pierwszy numer testowy - prawidłowo odczytany}
     \label{fig:mser_example_results}
 \end{figure}
 
@@ -1480,3 +1480,341 @@ docelową. Jedyną zmierzoną wartością był czas potrzebny na wykrycie
 frontu oraz odczytanie numeru. Na komputerze stacjonarnym z~procesorem
 Intel i5 wynosił on około 100 ms na wyszukanie frontu oraz 150 ms na
 odczytanie numeru. 
+
+
+\section{Druga wersja algorytmu - wyniki testów porównawczych}
+
+Po wykonaniu pierwszej implementacji programu oraz 
+uruchomieniu go na urządzeniu podjęto decyzję o~ponownym 
+wyszkoleniu i~przetestowaniu poszczególnych elementów systemu.
+Ze względu na brak narzędzi testowych jedyne co wiadomo 
+na temat pierwszej wersji to czas jaki jest potrzebny
+na wykrycie i~odczytanie numeru.
+Nie została ustalona skuteczność poszczególnych
+elementów oraz całego systemu.
+
+W~tym podrozdziale opisane zostały użyte parametry oraz proces
+jaki został wykonany do ich ustalenia. Do uczenia detektorów
+i~ich testowania wykorzystano zdjęcia pobrane z~serwisu:
+\verb|www.phototrans.eu|.
+
+
+\subsection{Detektor numeru}
+
+Wykonano szereg przebiegów testowych dla zmiennych parametrów zarówno
+podczas uczenia jak i~testowania. Wszystkie detektory uczone były
+z~wykorzystaniem cech LBP. Pierwszym zestawem zmiennych parametrów
+była ilość pozytywnych i~negatywnych próbek wykorzystanych w procesie
+uczenia. Wyniki zaprezentowano w~tabeli 
+\ref{tab:final_number_detector_numposneg}.
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c|c}
+        Próbki pozytywne & Obrazy tła & Skuteczność & Błędne trafienia
+        \\ \hline
+        1000 & 1000 & 88\% & 3860 \\
+        1500 & 1500 & 90\% & 5003 \\
+        2000 & 2000 & 86\% & 1034 \\
+        2500 & 2500 & 86\% & 1149 \\
+        2800 & 2800 & 89\% & 1186 \\
+    \end{tabular}
+    \caption{Skuteczność detektora oraz liczba błędnych trafień
+    w~zależności od liczby próbek pozytywnych i~obrazów tła
+wykorzystanych w~procesie uczenia}
+    \label{tab:final_number_detector_numposneg}
+\end{table}
+
+Dalej posługiwano się detektorem wyszkolonym dla 2800 próbek pozytywnych
+oraz takiej samej ilości obrazów tła. Kolejne testy ze~zmiennymi
+parametrami
+wykonywane były podczas procesu testowania detektorów. 
+Przestrzeń poszukiwań, czyli czworokąt foremny reprezentujący
+front autobusu przeskalowywano do zadanej wysokości i~szerokości.
+Wyniki tych eksperymentów zaprezentowano w~tabeli 
+\ref{tab:final_number_detector_resize}.
+W~dalszych próbach używano przeskalowanego frontu do wymiarów
+285 na 285 pikseli. Dzięki takiemu przeskalowaniu zwiększyła
+się o~dziesięć procent skuteczność detektora. Uzyskano też
+mniejszą liczbę błędnych trafień (ze 1186 do 968).
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Wysokość & Skuteczność & Błędne trafienia
+        \\ \hline
+        300 & 96\% & 1241 \\
+        295 & 96\% & 1118 \\
+        290 & 96\% & 1111 \\
+        285 & 96\% & >> 968 <<\\
+        280 & 96\% & 876 \\
+        275 & 95\% & 821 \\
+        270 & 95\% & 747 \\
+        265 & 94\% & 663 \\
+        260 & 94\% & 560 \\
+        255 & 93\% & 504 \\
+        250 & 92\% & 453 \\
+    \end{tabular}
+    \caption{Skuteczność detektora oraz liczba błędnych trafień
+    w~zależności od wysokości obrazu wejściowego}
+    \label{tab:final_number_detector_resize}
+\end{table}
+
+Kolejnym testowanym parametrem był maksymalny rozmiar okna przesuwnego.
+Wprowadzenie ograniczenia pozwoliło nieznacznie zmniejszyć
+liczbę błędnych trafień. Zgodnie z~tabelą
+\ref{tab:final_number_detector_maxsize} ograniczono 
+błędne trafienia z~968 do 945. Co dziwne, dla rosnącej 
+wartości maksymalnej szerokości okna, wartość błędnych
+trafień rosła ponad tą, którą osiągnięto bez żadnego
+ograniczenia. W~dalszych doświadczeniach maksymalną szerokość
+okna ustawiono na poziomie 60 pikseli.
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Maksymalna szerokość & Skuteczność & Błędne trafienia
+        \\ \hline
+        50 & 92\% & 837 \\
+        55 & 96\% & 933 \\
+        60 & 96\% & >> 945 << \\
+        65 & 96\% & 968 \\
+        75 & 96\% & 988 \\
+        80 & 96\% & 1003 \\
+    \end{tabular}
+    \caption{Skuteczność detektora oraz liczba błędnych trafień
+    w~zależności od maksymalnej szerokości okna przesuwnego}
+    \label{tab:final_number_detector_maxsize}
+\end{table}
+
+Przetestowano też minimalny rozmiar okna przesuwnego.
+Zgodnie z~tabelą \ref{tab:final_number_detector_minsize} ograniczono 
+minimalną szerokość okna do 45 pikseli. 
+Nie zmniejszyło to ilości błędnych wykryć.
+Jednak dwuprocentowy spadek skuteczności 
+świadczył, że ograniczenie wpływa na poprawnie wykryte numery
+na co też nie można było sobie pozwolić.
+W~dalszych doświadczeniach minimalną szerokość
+okna ustawiono na poziomie 45 pikseli.
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Minimalna szerokość & Skuteczność & Błędne trafienia
+        \\ \hline
+        44 & 96\% & >> 945 << \\
+        48 & 94\% & 551 \\
+        52 & 88\% & 235 \\
+    \end{tabular}
+    \caption{Skuteczność detektora oraz liczba błędnych trafień
+    w~zależności od minimalnej szerokości okna przesuwnego}
+    \label{tab:final_number_detector_minsize}
+\end{table}
+
+Ostatecznie wprowadzając ograniczenie geometryczne:
+\verb|x < 85| i \verb|y < 55| gdzie \verb|x| i \verb|y| to współrzędne
+lewego górnego rogu okna przesuwnego, otrzymano detektor
+o~następujących właściwościach:
+
+\begin{itemize}
+    \item skuteczność 2946/3099 (prawie 95\%),
+    \item ilość błędnych oznaczeń 146.
+\end{itemize}
+
+\subsection{Detektor frontu}
+
+Po wypracowaniu optymalnych parametrów dla detektora numeru,
+taką samą procedurę wykonano ponownie w~celu określenia
+optymalnych parametrów dla detektora frontów autobusów 
+z~numerem prezentowanym przez wyświetlacz diodowy.
+
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ylabel={$Trafienia$},
+    xlabel={$Wysokosc\ obrazu$},
+    minor y tick num=1,
+    legend style={at={(0.60,0.40)},anchor=north west},
+    width=\textwidth*0.6, height=6cm
+]
+\addplot [only marks, color=blue] table {data/front2hitra.dat};
+\addlegendentry{skuteczność}
+\addplot [only marks, color=red] table {data/front2false.dat};
+\addlegendentry{ilość błędów}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\caption{Skuteczność w procentach oraz liczba błędnych trafień
+w~zależności od wysokości obrazu wejściowego}
+\label{chart:img_height2hitratio}
+\end{figure}
+
+Wysokość obrazu ustawiono na 300 pikseli. Dla~tej wartość
+detektor posiadał:
+\begin{itemize}
+    \item skuteczność: 96\% (1829/1903),
+    \item ilość błędnych trafień: 42.
+\end{itemize}
+
+Co prawda najlepszy wynik - 98\% (1862/1903) - osiągnięto dla wysokości
+równej 450 pikseli, jednak trzykrotnie większa liczba błędnych
+trafień oraz półtora raza większy obraz do przeszukania
+przyczyniły się do pozostania przy wysokości obrazu 
+wejściowego na poziomie 300 pikseli.
+
+Wykonując kilka kolejnych serii testowych ustalono ograniczenia
+rozmiaru okna przesuwnego tak aby nie było ono mniejsze niż 50
+(spadek poprawnych wykryć z 1829 do 1818, oraz negatywnych 
+z 42 do 29). W~przypadku instalacji aplikacji na niektórych 
+urządzeniach
+ze względu na niewielką rozdzielczość wbudowanych aparatów
+można tę wartość jeszcze zwiększyć (możliwe że nawet dwukrotnie,
+do 1/3 wysokości obrazu wejściowego). Maksymalny rozmiar
+okna ustawiono na 250 pikseli.
+Nie miało to wpływu na skuteczność ani~ilość błędnych
+trafień. Autobus wypełniający klatkę obrazu też nie jest 
+pożądany, ze względu na wysoki poziom zniekształceń geometrycznych
+uniemożliwiających odczyt, spowodowanych fizyczną bliskością
+czoła autobusu od soczewki aparatu.
+
+\begin{figure}[h!]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    ylabel={$Trafienia$},
+    xlabel={$Wspolczynnik\ skalujacy$},
+    minor y tick num=1,
+    legend style={at={(0.65,0.95)},anchor=north west},
+    width=\textwidth*0.6, height=6cm
+]
+\addplot [only marks, color=blue] table {data/frosca2hitra.dat};
+\addlegendentry{skuteczność}
+\addplot [only marks, color=red] table {data/frosca2false.dat};
+\addlegendentry{ilość błędów}
+\addplot [only marks, color=black] table {data/frosca2effi.dat};
+\addlegendentry{czas}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\caption{Skuteczność w procentach, liczba błędnych trafień
+    oraz czas wykonania w~sekundach na 1903 przeskalowanych obrazów
+w~zależności od współczynnika skalującego}
+\label{chart:img_scale2hitratio}
+\end{figure}
+
+Po analizie wykresu \ref{chart:img_scale2hitratio}
+pozostawiono współczynnik skalujący na 
+domyślnym poziomie (wartość 1.1), posiadając
+jednak informację, że w~razie problemów z~mocą obliczeniową
+bez większego uszczerbku na skuteczności można będzie przestawić
+go na 1.2 zyskując w~ten sposób kilka milisekund
+(na procesorze Intel i5 dokładnie 7 ms).
+
+\subsection{Detektor cyfr}
+
+Eksperymentując z~detektorem cyfr i~jego parametrami wywołania
+osiągnięto zaskakujący wynik. Metodą prób i~błędów ostatecznie
+ustawiono parametry zgodnie z~listą:
+\begin{itemize}
+    \item wysokość obrazu wejściowego (numeru): 70 pikseli,
+    \item parametr skalujący: 1.36,
+    \item minimalna i~maksymalna wielkość okna: bez ograniczeń,
+    \item minimalna liczba sąsiadów: 1.
+\end{itemize}
+Dla powyższych parametrów otrzymano skuteczność na poziomie 98,76\%
+lecz niezwykle dużą liczbę błędnych trafień, ponad cztery tysiące
+(4036).
+
+Niestety ze względu na niewielki rozmiar obrazu wejściowego
+(70 pikseli wysokości) automatyczny pomiar skuteczności
+zwracał bardzo niedokładne wyniki. W~dalszych testach
+zaniechano pomiaru skuteczności detektora cyfr na rzecz testów
+całego rozwiązania. W~następnym (ostatnim) podrozdziale przedstawiono
+porównanie skuteczności pierwotnego rozwiązania z~pierwszej iteracji
+oraz wersje z~wprowadzonymi usprawnieniami.
+
+\subsection{Testy całego algorytmu}
+
+Po przygotowaniu zbioru 1903 obrazów zawierających fronty autobusów
+z~wyświetlaczem led przystąpiono do automatycznej weryfikacji 
+skuteczności pierwotnego algorytmu zaimplementowanego na urządzeniu
+w~ramach pierwszej iteracji.
+Pliki z~frontami autobusów posiadały numer linii w~nawie pliki. 
+Na tej podstawie automat weryfikował wynik otrzymany od narzędzia
+poddawanego testom.
+
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Wykryte fronty  & Wykryte numeru & Poprawne odczyty \\ \hline
+        1119 & 1016 & 551
+    \end{tabular}
+    \caption{Ilość wykrytych frontów, numerów i ogólnych poprawnych 
+    odczytów pierwszej wersji algorytmu}
+    \label{tab:first_version_results}
+\end{table}
+
+Wyniki zamieszczone w~tabeli \ref{tab:first_version_results}
+reprezentują ilość poprawnych odczytów na próbce testowej
+liczącej 1903 fronty autobusów. Końcowa skuteczność
+pierwszej wersji algorytmu jest więc na poziomie 29\%.
+
+Wykorzystując parametry detektora frontów uzyskane w~drugiej
+iteracji uzyskano znacznie lepsze wyniki zaprezentowane w~tabeli
+\ref{tab:second_version_results}.
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Wykryte fronty  & Wykryte numeru & Poprawne odczyty \\ \hline
+        1820 & 1609 & 845
+    \end{tabular}
+    \caption{Ilość wykrytych frontów, numerów i ogólnych poprawnych 
+    odczytów drugiej wersji algorytmu (detektor frontów)}
+    \label{tab:second_version_results}
+\end{table}
+
+Ogólna skuteczność wzrosła do 44\%. Jest to nadal kiepski wynik.
+Co jest tu jednak niezwykle ważne to to, że 
+poprzez poprawę jednego elementu
+poprawiono ogólną skuteczność o~15\%.
+
+Poprzez podmianę detektora numerów, na ten wytrenowany 
+podczas drugiej iteracji otrzymano rezultaty widoczne
+w~tabeli \ref{tab:upset_second_version_number_detector}.
+
+\begin{table}[!h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Wykryte fronty  & Wykryte numeru & Poprawne odczyty \\ \hline
+        1820 & 1517 & 764 
+    \end{tabular}
+    \caption{Ilość wykrytych frontów, numerów i ogólnych poprawnych 
+    odczytów drugiej wersji algorytmu (detektor frontów)}
+    \label{tab:upset_second_version_number_detector}
+\end{table}
+
+Pomimo wysokiej skuteczności w~teście syntetycznym
+detektor numerów z~drugiej iteracji miał gorszą skuteczność
+niż pierwszy prototyp. Otrzymano też dużo gorszy wynik
+ogólny, bo skuteczność całego rozwiązania spadła do
+40\%.
+
+Ostatni przykład, czyli gorszy wynik dla teoretycznie 
+lepszego detektora świetnie pokazuje jak ważny jest zbiór
+danych, jego jakość i~co najważniejsze liczność. 
+W~celu rzetelnego przebadania skuteczności zbiór danych 
+rzędu kilku tysięcy to zbyt mało. Szczególnie gdy część 
+z~tych danych służyła też jako zbiór uczący.
+W~przypadku tak skomplikowanych obiektów wymagane są 
+dane liczone w~dziesiątkach o~ile nie setkach tysięcy.
+Przykładem może być publiczny zbiór danych SVHN.
+
+Na tym etapie wstrzymano się od dalszej optymalizacji. 
+Proponowane rozwiązanie wymaga jeszcze dużo pracy nad 
+doskonaleniem poszczególnych jego elementów.
+Jest jednak wielce prawdopodobne, że po dopracowaniu 
+wszystkich kroków skuteczność będzie więcej niż zadowalająca.

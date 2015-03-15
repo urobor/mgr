@@ -14,16 +14,13 @@ o~uruchomienia na komputerze stacjonarnym od tych pisanych na telefon.
 Druga wersja programu została wzbogacona o~komentarz głosowy
 podczas jego działania. Wprowadzona została wielowątkowość, 
 która powinna zwiększyć wydajność aplikacji uruchomionej na 
-urządzeniu z~wieloma rdzeniami procesora. Podjęto też próbę
-doboru optymalnych parametrów funkcji \verb|detectMultiscale| 
-(służącej do wykrywania obiektów), takich jak minimalna oraz
-maksymalna wielkość obiektu, współczynnik skalujący czy minimalna
-liczba sąsiadów. Wprowadzona została minimalna funkcjonalność przepływu
+urządzeniu z~wieloma rdzeniami procesora.
+Wprowadzona została minimalna funkcjonalność przepływu
 sterowania aplikacją. Wprowadzone zostały dwa tryby wyszukiwania
 i~tryb spoczynku. Jest to pierwsza wersja demonstracyjna, którą
 bez dodatkowych modyfikacji można użyć do testów w~terenie.
 
-\section{Pierwsza wersja programu - dwa urządzenia}
+\section{Pierwsza wersja programu - implementacja na dwuch urządzeniach}
 
 Pierwszą wersję programu uruchomiono na dwóch urządzeniach:
 
@@ -35,22 +32,24 @@ Pierwszą wersję programu uruchomiono na dwóch urządzeniach:
 Na urządzeniu HTC osiągnięto wydajność rzędu 4-6 klatek na sekundę
 w~trybie wyszukiwania frontu. Odnalezienie frontu i~przejście 
 w~tryb odczytu numeru powodowało spadek częstotliwości odświeżania
-do 0.76 klatki na sekundę (rysunek poniżej).
+do 0.76 klatki na sekundę (rysunek \ref{fig:imp_htc_v1}).
 
 \begin{figure}[h!]
-    \caption{Wyniki pierwszej wersji programu na urządzeniu HTC}
     \centering
     \includegraphics[width=0.9\textwidth]{img/imp_htc_v1}
+    \caption{Wyniki pierwszej wersji programu na urządzeniu HTC}
+    \label{fig:imp_htc_v1}
 \end{figure}
 
 Na urządzeniu SONY osiągnięto wydajność rzędu 6-8 klatek na sekundę
 w~trybie wyszukiwania frontu. Odczyt numeru był na poziomie 0.97
-klatki na sekundę (rysunek poniżej).
+klatki na sekundę (rysunek \ref{fig:imp_sony_v1}).
 
 \begin{figure}[h!]
-    \caption{Wyniki pierwszej wersji programu na urządzeniu SONY}
     \centering
     \includegraphics[width=0.9\textwidth]{img/imp_sony_v1}
+    \caption{Wyniki pierwszej wersji programu na urządzeniu SONY}
+    \label{fig:imp_sony_v1}
 \end{figure}
 
 Jak widać oba urządzenia są podobnej klasy. Ze względu na brak
@@ -119,7 +118,7 @@ były komunikaty w~języku angielski opisujące następujące stany:
 
 Zaimplementowany
 mechanizm wielowątkowości zakładał istnienie trzech kolejek FIFO,
-do których wkładano wyniki poszczególnych etapów algorytmu.
+w~których umieszczano wyniki poszczególnych etapów algorytmu.
 Po uruchomieniu aplikacja znajdowała się w~stanie spoczynku (idle)
 i~dopiero po kliknięciu przycisku w~menu - Start/Stop - mogła
 zostać wprowadzona w~stan wyszukiwania frontu w~scenie.
@@ -141,7 +140,7 @@ jednak gdy kolejka z~pełnymi klatkami była pusta, czy uległa właśnie
 wyczerpaniu, wątek wprowadzany był w~stan spoczynku i~sprawdzał co
 100 ms czy kolejka ma elementy. W~podobny mechanizm wyposażony był
 trzeci wątek. Tu z~kolei wejściowa kolejka zawierała fronty autobusów
-na wyjściu natomiast populowana była kolejka z~obrazami zawierającymi
+na wyjściu natomiast uzupełniania była kolejka z~obrazami zawierającymi
 jedynie numer linii.
 
 Ostatni wątek - najbardziej intensywny obliczeniowo - pobierał obrazy
@@ -163,13 +162,13 @@ ze statycznego zdjęcia wyświetlanego na ekranie monitora.
 Zdjęcie przedstawiało autobus Neoplan linii 188 jak na rysunku poniżej.
 
 \begin{figure}[h!]
-    \caption{Obraz testowy ostatecznej wersji programu}
     \centering
     \includegraphics[width=0.9\textwidth]{img/imp_final_test_img}
+    \caption{Obraz testowy ostatecznej wersji programu}
 \end{figure}
 
-Dla przedstawionego zdjęcia otrzymano następujące wyniki - tabelka
-poniżej.
+Dla przedstawionego zdjęcia otrzymano wyniki zaprezentowane
+w~tabeli \ref{tab:imp_lab_final_test_result}.
 
 \begin{table}[!h]
     \centering

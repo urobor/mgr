@@ -14,14 +14,14 @@ correct_hits = 0
 wrong_hits = 0
 
 PRECISSION = 3.0
-FRONT_HEIGHT = 300
+FRONT_HEIGHT = 285
 
 def detect_scaled(image, cascade, front_height,
         max_width, min_width, min_neighbors):
     resized = cv2.resize(image, (front_height, front_height))
     rectsDetected = cascade.detectMultiScale(resized,
-        scaleFactor=1.1, minNeighbors=min_neighbors, 
-        minSize=(min_width,min_width), 
+        scaleFactor=1.04, minNeighbors=min_neighbors, 
+        minSize=(min_width,1), 
         maxSize=(max_width,max_width))
     height, width, depth = image.shape
     resized_height, resized_width, depth = resized.shape
@@ -47,9 +47,7 @@ for x in range(1, 10):
         sys.stdout.flush()
         image = cv2.imread(image_path)
         rectsDetected = detect_scaled(image, cascade, FRONT_HEIGHT, 
-            int(float(FRONT_HEIGHT)/float(4)), 
-            int(float(FRONT_HEIGHT)/float(10)),
-            x)
+            55, 45, x)
 
         for rec in ground_truth_list:
             x1,y1,x2,y2 = rec[0],rec[1],rec[0]+rec[2],rec[1]+rec[3]

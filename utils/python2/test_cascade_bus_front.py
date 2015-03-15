@@ -5,7 +5,7 @@ from os import rename,path
 
 cv2.namedWindow('image')
 
-classifier_file = '/home/kuba/Magisterka/dropbox/opencv/detector/dev_number_1500_pos_1500_neg_n2_bt_DAB.xml'
+classifier_file = '/home/kuba/Magisterka/dropbox/opencv/detector/dev_front_5000_pos_5000_neg.xml'
 cascade = cv2.CascadeClassifier(classifier_file)
 
 all_occurences = 0
@@ -53,11 +53,11 @@ for image_path in sorted(glob.glob('/home/kuba/Magisterka/local/img/test/front/f
         x1d,y1d,x2d,y2d = gt_rec[0],gt_rec[1],gt_rec[0]+gt_rec[2],gt_rec[1]+gt_rec[3]
         cv2.rectangle(image, (x1d,y1d), (x2d,y2d), (0,0,255), thickness=2)
 
-    cv2.imshow('image', image)
-    k = cv2.waitKey()
+    #cv2.imshow('image', image)
+    #k = cv2.waitKey()
 
-    if k & 0xFF == ord('q'):
-        break
+    #if k & 0xFF == ord('q'):
+    #    break
 
     print "Correct: " + str(correct_hits) + "/" + str(all_occurences) + \
           " FAILS: " + str(wrong_hits)

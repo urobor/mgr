@@ -24,14 +24,15 @@ mogą być uruchomione równolegle celem zwiększenia szybkości wykonywania:
 \end{enumerate}
 
 Detektor frontów podczas pisania tego tekstu prezentował skuteczność
-na więcej niż zadowalającym poziomie. Do pełnej weryfikacji 
-wymagane byłoby przygotowanie środowiska umożliwiającego przeprowadzenie
-w~pełni automatycznych testów.
-
+na więcej niż zadowalającym poziomie.
 Detektor numeru musiał zostać wspomożony ograniczeniem obszaru wyszukiwania
-do lewego górnego rogu odnalezionego frontu autobusu. Niestety 
-jest to najsłabszy element i~wymaga usprawnień w~pierwszej
-kolejności o~ile nie wymiany na zupełnie inne rozwiązanie.
+do lewego górnego rogu odnalezionego frontu autobusu.
+Jest to element którego istnienie, oraz próba przetestowania
+wykazała jak istotna jest liczność zbiorów uczących i~testowych.
+Wykorzystując uczenie maszynowe w~celu lokalizacji i~odczytywania
+tekstu z~tak zwanej sceny naturalnej wymaganym jest posiadania
+zbiorów danych liczących dziesiątki, a~nawet setki tysięcy 
+przykładów.
 
 Detektory poszczególnych cyfr wprowadzone zostały w~celu ograniczenia
 złożoności obliczeniowej podczas dopasowywania wzorców. Ich skuteczność
@@ -51,25 +52,28 @@ wiedzy na temat zagadnienia i~architektury końcowej programu.
 
 Rzetelne testy wydajności i~dokładności należało wykonać na końcu
 gdy wiadomo było już jakie algorytmy, narzędzia i~biblioteki zostaną
-zastosowane w~rozwiązaniu docelowym. Niestety z~tego powodu
-brak jakichkolwiek statystycznych danych na temat skuteczności
-bądź wydajności. Dostępne są jedynie jednostkowe wyniki uzyskane po
-przeprowadzeniu manualnych testów programu uruchomionego na telefonie.
-Wyniki dostarczone w~ten sposób wykazały, że narzędzie działa,
-w~ponad połowie przypadków zwraca poprawny wynik, a~sama aplikacja
-wymaga jeszcze ogromnego nakładu pracy. Czy to na usunięcie błędów,
-poprawienie skuteczności, wydajności, czy przygotowanie 
-wspomnianego już środowiska testowego. Jak wiadomo bez możliwości
-przeprowadzenia pomiaru trudno sprawdzić czy coś zostało 
-poprawione czy wręcz przeciwnie.
+zastosowane w~rozwiązaniu docelowym. 
+
+W~celu rozwiązania tego problemu wykonano drugie podejście,
+głównie skupiając się na przygotowaniu zestawów danych testowych
+i~narzędzi do automatycznej weryfikacji skuteczności.
+Podczas drugiej próby, przez wykorzystanie dwóch zestawów
+testowych, zidentyfikowano problem zbyt małej ilości próbek w~nich
+zwartych. Przeprowadzono udaną optymalizację,
+i~weryfikację drugiej wersji detektora
+numerów na jednym zestawie testowym (3000 próbek). Po czym okazało się, że na
+innym zestawie (1903 próbki) pierwsza wersja wykazuje się większą 
+skutecznością. 
 
 \section{Dalsze prace}
 
 Pierwszym krokiem w~celu przygotowania aplikacji na poziomie 
 skuteczności, niezawodności i~użyteczności pozwalającym na 
-wydanie komercyjne jest przygotowanie środowiska testowego. 
-Swoisty lab miałby służyć nie tylko testom statystycznym ale 
-umożliwiać również odtwarzanie błędów zgłaszanych przez użytkowników.
+wydanie komercyjne jest przygotowanie środowiska testowego.
+Posiadanie kilkudziesięciu tysięcy oznaczonych i~opisanych
+próbek wydaje się być sensowym punktem wyjścia.
+Jest to niezbędne w~celu rzetelnej weryfikacji wprowadzanych 
+usprawnień.
 
 Możliwe są zmiany w~implementacji niosące za sobą większą funkcjonalność.
 Może to być na przykład wykrywanie innych typów frontów niż 
@@ -81,12 +85,12 @@ autobusów, gdzie oba te fragmenty zawierają numer linii.
 Usprawnieniem i~pewnego rodzaju ułatwieniem odczuty byłoby zawężenia
 możliwych do odczytania numerów do zbioru z~konkretnego przystanku. 
 Współrzędne przystanków wraz z~listą numerów byłyby umieszczane 
-w~centralnej bazie. Aplikacja mogła by natomiast pobierać aktualne 
+w~centralnej bazie. Aplikacja mogła by pobierać aktualne 
 współrzędne z~urządzenia GPS zainstalowanego w~telefonie i~na ich podstawie
 ograniczać możliwy do odczytania zbiór do pobranej listy numerów.
 
 Poprawę działania algorytmu można również osiągnąć wykorzystując 
-lepszy aparat telefoniczny. Zawierający lepszej jakości kamerę oraz
+lepszy telefon, zawierający lepszej jakości kamerę oraz
 większą moc obliczeniową. Na rynku dostępne są już urządzenia
 wyposażone w~procesory ośmiordzeniowe z~kamerami umożliwiającymi 
 nagrywanie filmów w~rozdzielczości 4K.
@@ -115,9 +119,10 @@ był by przy pomocy osobnych komunikatów głosowych.
 Jak widać możliwości rozbudowywania proponowanego narzędzia są niemal
 nieskończone. Jedynym kryterium jakie powinno obowiązywać przy
 doborze funkcji do zakodowania jest ich przydatność dla użytkowników 
-końcowych. To oni tak na prawdę są największymi beneficjentami 
+końcowych. To oni tak na prawdę powinni być największymi beneficjentami 
 potencjalnego systemu i~bez konsultacji z~przynajmniej jedną osobą
-niewidomą nie ma sensu rozpoczynać kolejnej przygody.
+niewidomą nie ma wręcz sensu wdrażać rozwiązania, które mogą 
+okazać się zupełnie nieprzydatne.
 
 Największą
 wartością dodaną tego opracowania jest stwierdzenie możliwości odczytania
@@ -126,14 +131,14 @@ Osiągnięcie poziomu niezawodności pozwalającego osobie niewidomej
 na swobodne poruszanie się i~korzystanie z~transportu miejskiego jest
 realne lecz wymaga ogromnego nakładu pracy. Pytaniem nad którym 
 trzeba się poważnie zastanowić jest sens istnienia takiego programu.
-W~obecnym momencie bowiem, nie istnieją jeszcze autobusy bezzałogowe. 
-Bardziej prawdopodobnym jest więc tylko, 
-brak innych ludzi na przystanku, z~którymi osoba niewidoma mogłaby się
-skonsultować. Problem pojawia się więc tylko gdy potencjalny użytkownik,
-znajduje się na przystanku ,,na żądanie'', a~bok
-nie ma nikogo, kto mógłby zatrzymać nadjeżdżający autobus. W~takim
-przypadku dużym ułatwieniem dla użytkownika byłoby narzędzie
-które zasygnalizuje wystąpienie nadjeżdżającego autobusu.
-Bez konieczności odczuty numeru linii. Po zatrzymaniu
-zawsze można zapytać kierowcy o~tenże numer. Chyba, że on 
-z~koli jest\ldots głuchoniemy.
+Technologie typu OCR są zawodne, a~w~środowisku nie laboratoryjnym
+zależą od wielu czynników zewnętrznych: oświetlenia, zniekształceń,
+odblasków, przeszkód i~wielu innych. Pierwsze systemy 
+OCR wykorzystywano m.in. do odczytywania danych z~kart kredytowych.
+Jednak zaraz po pojawieniu się pasków magnetycznych zrezygnowano
+z~technologii OCR na rzecz bardziej niezawodnych 
+czytników magnetycznych. Z~drugiej strony zaletą OCR jest zerowy
+koszt dodatkowej infrastruktury oraz elastyczność rozwiązania.
+Dodatkowo prace naukowców na zbiorze SVHN pokazują, że 
+dziedzina przetwarzania obrazów w~połączeniu z~sieciami neuronowymi
+może mieć przed sobą jeszcze wiele znaczących osiągnięć.

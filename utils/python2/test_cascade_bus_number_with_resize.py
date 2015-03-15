@@ -14,7 +14,7 @@ correct_hits = 0
 wrong_hits = 0
 
 PRECISSION = 3.0
-FRONT_HEIGHT = 275
+FRONT_HEIGHT = 300
 
 def detect_scaled(image, cascade, front_height):
     resized = cv2.resize(image, (front_height, front_height))
@@ -30,7 +30,7 @@ def detect_scaled(image, cascade, front_height):
     multiply = float(height) / float(resized_height)
     return map(lambda x: np.int16(x*multiply), rectsDetected) 
 
-for x in range(FRONT_HEIGHT, 100, -10): 
+for x in range(FRONT_HEIGHT, 100, -5): 
     correct_hits = wrong_hits = all_occurences = 0
     for image_path in sorted(glob.glob('/home/kuba/Magisterka/local/img/test/number/number_detector/*')):
 
