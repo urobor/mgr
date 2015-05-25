@@ -426,21 +426,23 @@ mogłaby z~powodzeniem zastąpić ostatecznie wykorzystany kaskadowy
 detektor oparty na cechach Haara.
 
 
-\section{Eksperymentu częściowo udane - pierwsza iteracja}
+\section{Testy narzędzi i~algorytmów wykorzystanych w~rozwiązaniu 
+	końcowym}
 
 W~podrozdziale tym przedstawione i~omówione zostały doświadczenia
 związane z~algorytmami, narzędziami i~bibliotekami wykorzystanymi
-w~ostatecznym programie
-(pierwszej wersji testowej). Opis powstawał równolegle
-do toczących się prac więc wykazuje pewne cechy sprawozdania
+w~ostatecznym programie. Opis powstawał równolegle
+do toczących się prac więc może wykazywać pewne cechy sprawozdania
 lub relacji na bieżąco.
-Prezentacja oraz dokładna analiza wyników powstała w~drugiej
-iteracji, kiedy to godowy był już działający prototyp.
+Prezentacja oraz dokładna analiza wyników powstała w~ramach
+drugiego podejścia, kiedy to gotowy był już działający prototyp programu.
 Druga tura miała na celu rzetelną weryfikację skuteczności
-i~wydajności drugiej wersji programu (tzw. wersji beta).
+i~wydajności przygotowanego rozwiązania.
+Celem pierwszego przebiegu była jak najszybsza implementacja
+działającego programu na urządzeniu mobilnym z~systemem Android.
 
-W~ramach pierwszej iteracji
-wprowadzony został logiczny podział na pięć etapów:
+Zarówno w~pierwszej jak i~drugiej iteracji postępowano
+zgodnie z~poniższym planem:
 
 \begin{enumerate}
     \item Przygotowanie zbioru uczącego (który miał być jednocześnie
@@ -457,23 +459,21 @@ wprowadzony został logiczny podział na pięć etapów:
         gorzej radziła sobie z~wyszukiwaniem obiektów, które nie
         zawierały dostatecznego marginesu wokół obiektów.
         Był to jeden z~powodów przeprowadzenia drugiej iteracji
-        w~procesie przygotowywania programu końcowego.
+        w~procesie przygotowywania programu końcowego. Trzeci (ostatni)
+        zbiór wykorzystany do testów przygotowany był podobnie 
+        jak pierwszy i~składał się z~całych zdjęć z~dodatkowymi
+        danymi odnośnie tego gdzie w~zdjęciu znajduje się interesujący
+        nas obiekt.
     \item Wstępna segmentacja - wyszukiwanie frontu autobusu, wraz
         z~dodatkową analizą wpływu zadanych parametrów na skuteczność
         szkolonego detektora.
     \item Wyłuskanie fragmentu obrazu zawierającego wyłącznie numer -
-        kaskadowy detektor wykrywający numery.
-    \item Dziesięć detektorów wykrywających cyfry i~ich wykorzystanie
+        kaskadowy detektor numerów uruchamiany dla zdjęcia 
+        reprezentującego front autobusu.
+    \item Dziesięć detektorów wykrywających cyfry
         w~celu zawężenia obszaru poszukiwań w~procesie dopasowywania 
         wzorca (\textit{ang. Template Matching}), który to proces
-        jest najbardziej intensywny obliczeniowo z~użytych.
-        W~drugiej wersji krok ten rozbito na dwa:
-        \begin{itemize}
-            \item wyszukiwanie cyfr we fragmencie reprezentującym numer
-                za pomocą pojedynczego detektora dla wszystkich cyfr,
-            \item rozpoznawanie zidentyfikowanych fragmentów na
-                podstawie wektora cech podanego na klasyfikator SVM.
-        \end{itemize}
+        był najbardziej intensywny obliczeniowo z~dotychczasowo omawianych.
     \item Krótkie testy związane ze skutecznością i~zasadnością
         wykorzystania metody \textit{Template Matching} w~celu weryfikacji
         potencjalnych obszarów reprezentujących cyfry.
@@ -486,372 +486,127 @@ najbardziej optymalnych parametrów do wykorzystania podczas procesu
 uczenia detektora narzędziem z~pakietu OpenCV: \verb|train_cascade|.
 
 O~ile skuteczność znajdowania frontów autobusów - wstępna segmentacja - 
-jest kluczowa dla poprawnego funkcjonowania projektowanego programu 
-i~zasadnym jest jej rzetelne przetestowanie to skuteczność pozostałych
-etapów - ze względu na zastosowane ograniczenia - nie jest już tak
-istotna (o~czym więcej w~następnym rozdziale). Pewnym usprawiedliwieniem
-i~w~pewnym sensie powodem nie przetestowania wszystkich parametrów
-wejściowych narzędzia do szkolenia detektorów był czas ich szkolenia 
+była kluczowa dla poprawnego funkcjonowania projektowanego programu 
+i~zasadnym było jej rzetelne przetestowanie to skuteczność pozostałych
+etapów - ze względu na zastosowane ograniczenia - nie była już tak
+istotna (o~czym więcej w~następnym rozdziale). Głównym powodem nie przetestowania wszystkich parametrów
+wejściowych narzędzia do przygotowywania detektorów był długi czas 
+trwania procesu
 - od jednej do kilkunastu godzin, dla detektora cech LBP. Ostatecznie
 celem nie była analiza samych narzędzi a~opracowanie i~implementacja
 skutecznego programu do odczytywania numerów nadjeżdżających autobusów.
 
-\subsection{Zbiór danych uczących i testowych}
+\subsection{Zbiory danych uczących i testowych}
 
-Dane wykorzystane do procesu uczenia detektorów frontów autobusów
-składały się z~dwóch części.
-Pierwszą partią danych było 11 zestawów obrazów
+Jak już wspomniano, dane wykorzystane do procesu uczenia detektorów frontów autobusów były przygotowane w~trzech podejściach.
+Pierwszy zbiór składał się z~11 zestawów obrazów
 przygotowanych z~uprzednio pobranych filmów z~serwisu YouTube.
-Każdy zestaw składał się z co najmniej dwóch zbiorów. Obrazów 
-reprezentujących oznaczone fronty autobusów oraz obrazów tła. 
+Każdy zestaw składał się z co najmniej dwóch zbiorów - obrazów 
+reprezentujących oznaczone fronty autobusów, oraz obrazów tła. 
 Opcjonalnym zbiorem był zestaw oznaczonych 
 frontów autobusów typu Solaris. Osobny zestaw frontów miał na celu
 porównanie skuteczności detektorów przygotowanych tylko przy pomocy
-pojedynczego typu obiektu oraz tych do przygotowania których użyto
-obiektów znacząco od siebie różnych.
-
-Drugi zestaw (oznaczony ponownie w~ramach drugiej iteracji) 
-to obrazy pobrane z~serwisu \verb|http://www.phototrans.eu/|.
-Zbiór ten zawierał 9067 kwadratowych wycinków różnych rozmiarów
-przedstawiających wyłącznie fronty autobusów. Ze względu na mnogość
-typów i~nieusystematyzowanie zbioru jego szczegółowy opis nie będzie
-zamieszczony. Ze względu na specyfikę skryptu pobierającego zdjęcia
-z~serwisu zostały ułożone zgodnie z~kolejnością linii autobusowych.
-Kolejność jest pseudo alfabetyczna, gdzie w~pierwszej kolejności
-są numery jednocyfrowe, potem kolejno dwu i~trzycyfrowe.
-
-Poniżej zamieszczono szczegółowy opis części pierwszej zbioru.
-Podział na autobusy Solaris i Inne okazał się nietrafiony. 
-W~naturalny sposób podczas uczenia detektorów zidentyfikowany został 
-inny podział o~czym w~kolejnych rozdziałach.
-
-\subsubsection{Zbiór jJ9ixBfVR5k}
-
-W~zbiorze znalazły się następujące typy autobusów: 
-\begin{itemize}
-    \item Jelcz: M121M (x:3,y:1), M121CNG (x:4,y:1),
-    \item Ikarus 280 (x:1, y:1),
-    \item Man: NL223 (x:2, y:[1:2]), (x:3, y:2 - zielony wyświetlacz),
-        Lion's City (x:4, y:2),
-    \item Scania OmniCity CN (x:1, y:2). 
-\end{itemize}
-Współrzędne w~nawiasach określają pozycję modelu autobusu na rysunku
-\ref{fig:jJ9ixBfVR5k_types}.
-Jeden z modeli autobusów Man został wyposażony w zielony wyświetlacz numeru.
-Jest to bardzo trudny przypadek w kontekście rozpoznawania numeru.
+pojedynczego typu obiektu, oraz tych do przygotowania których użyto
+obiektów znacząco od siebie różnych. Ostatecznie okazało się,
+że podział istnieje, lecz nie taki jak zakładano. Przykładowe
+elementy zbioru pierwszego zaprezentowano na rysunku \ref{fig:jJ9ixBfVR5k_types}, na którym w~czerwonej ramce
+przedstawiono zbiór ogólny oraz osobno podzbiór złożony z~frontów typu
+Solaris w~ramce żółtej.
 
 \begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{img/exp_trainig_data_jJ9}
-    \caption{Typy autobusów zawarte w zbiorze jJ9ixBfVR5k}
-    \label{fig:jJ9ixBfVR5k_types}
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/exp_trainig_data_jJ9}
+	\caption{Przykładowe elementy jednego z 11 zbiorów obrazów
+		przygotowanych na podstawie
+		filmów pobranych z serwisu YouTube}
+	\label{fig:jJ9ixBfVR5k_types}
 \end{figure}
 
-Liczebność zebranych próbek została przedstawiona w~tabelce nr. 
-\ref{tab:jJ9ixBfVR5k_count}.
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        2587    & 222       & 2239
-    \end{tabular}
-    \caption{Liczebność zbioru jJ9ixBfVR5k}
-    \label{tab:jJ9ixBfVR5k_count}
-\end{table}
-
-\subsubsection{Zbiór vYqZ4-tH4M0}
-
-W~zbiorze znalazły się te same dwa modele autobusu Jelcz co w~zbiorze
-poprzednim. Powtórzyły się także modele: Ikarus, Scania oraz dwa modele
-autobusów Man. Dodatkowo pojawił się model: Mercedes Citaro, oraz trzy 
-niezidentyfikowane bliżej modele - pozycje: druga, trzecia i~czwarta 
-w~rzędzie drugim na rysunku \ref{fig:vYqZ4-tH4M0_types} 
-(prawdopodobnie Solaris, Autosan oraz Jelcz).
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\textwidth]{img/exp_trainig_data_vYq}
-    \caption{Typy autobusów zawarte w zbiorze vYqZ4-tH4M0}
-    \label{fig:vYqZ4-tH4M0_types}
-\end{figure}
-
-Jeżeli chodzi o~liczebność to podzbiór ten plasuje się w~środku 
-zestawienia.
-Dokładne dane zamieszczono w~tabeli \ref{tab:vYqZ4-tH4M0_count}.
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        291     & 320       & 230 
-    \end{tabular}
-    \caption{Liczebność zbioru vYqZ4-tH4M0}
-    \label{tab:vYqZ4-tH4M0_count}
-\end{table}
-
-\newpage
-
-\subsubsection{Zbiór J8h8j6096Uw}
-
-W~zbiorze zabrakło zdjąć reprezentujących fronty autobusów marki
-Solaris. Znalazły się natomiast dwa modele marki Man - wersja 
-z~,,płaską'' maską (NL223) oraz model z~charakterystycznym czarnym
-wgłębieniem w~centralnej jej części (Lion's City).
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.65\textwidth]{img/exp_trainig_data_J8h}
-    \caption{Typy autobusów zawarte w zbiorze J8h8j6096Uw}
-    \label{fig:J8h8j6096Uw_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        182     & brak      & 427 
-    \end{tabular}
-    \caption{Liczebność zbioru J8h8j6096Uw}
-    \label{tab:J8h8j6096Uw_count}
-\end{table}
-
-\subsubsection{Zbiór aO71uxrP9B0}
-
-W~zbiorze miejsce znalazły zaledwie dwa modele autobusu Volvo oraz
-występujący już wcześniej Mercedes Citaro.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.65\textwidth]{img/exp_trainig_data_aO7}
-    \caption{Typy autobusów zawarte w zbiorze aO71uxrP9B0}
-    \label{fig:aO71uxrP9B0_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        177     & brak      & 977 
-    \end{tabular}
-    \caption{Liczebność zbioru aO71uxrP9B0}
-    \label{tab:aO71uxrP9B0_count}
-\end{table}
-
-\newpage
-
-\subsubsection{Zbiór J6sD0Tc2Dbs}
-
-Zbiór ten zawiera dwa rodzaje autobusów marki Man oraz dwie wersje autobusu
-Solaris - ze znaczkiem na masce oraz bez niego (maska gładka). Wyświetlacze
-prezentujące numer wykorzystane w~przedstawionych modelach Solarisów
-skutecznie uniemożliwiają odczytanie go przez jakiekolwiek urządzenie. 
-Nawet człowiek nie jest w~stanie domyślić się numeru który został utrwalony
-na zdjęciach - rysunek \ref{fig:J6sD0Tc2Dbs_types}. Historyczne modele
-skody zostały zaprezentowane w~ramach ciekawostki i~nie będą uwzględniane
-w~dalszych eksperymentach.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.65\textwidth]{img/exp_trainig_data_J6s}
-    \caption{Typy autobusów zawarte w zbiorze J6sD0Tc2Dbs}
-    \label{fig:J6sD0Tc2Dbs_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        156     & 124       & 203 
-    \end{tabular}
-    \caption{Liczebność zbioru J6sD0Tc2Dbs}
-    \label{tab:J6sD0Tc2Dbs_count}
-\end{table}
-
-\newpage
-
-\subsubsection{Zbiór IHarVPkXwSg}
-
-W~zbiorze - podobnie jak poprzednio - znalazły się autobusy zabytkowe.
-Modele w~rzędzie pierwszym (dotyczy pozycji pierwszej i~drugiej) nie 
-będą wykorzystane w~dalszych eksperymentach. Mają na celu uzmysłowienie
-stopnia złożoności problemu oraz fakt, że w~zależności od modelu pozycja
-numeru może oscylować w~ramach górnej połowy obszaru zidentyfikowanego
-jako front autobusu. Pozostałe modele, czyli
-dwa modele Jelcza, Mercedes i~(prawdopodobnie, jakiś) model Mana tworzą
-grupę frontów ,,różnych''. W~skład zbioru wchodzą też dwa typy autobusu
-solaris - różne kształty maski.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{img/exp_trainig_data_IHa}
-    \caption{Typy autobusów zawarte w zbiorze IHarVPkXwSg}
-    \label{fig:IHarVPkXwSg_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        342     & 172       & 1510
-    \end{tabular}
-    \caption{Liczebność zbioru IHarVPkXwSg}
-    \label{tab:IHarVPkXwSg_count}
-\end{table}
-
-\subsubsection{Zbiór BJZLDmYMFvo}
-
-Zbiór zawiera jedynie dwa modele autobusu Man, oraz autobusy marek
-Jelcz i Solaris. Jedyna uwaga może tyczyć trudności w~odczytywaniu
-numeru z~autobusu man/jelcz z~wyświetlaczem w~kolorze zielonym. Jeżeli tylko
-warunki oświetleniowe są dobre - jak na rysunku \ref{fig:BJZLDmYMFvo_types}
-- widoczność, a~co za tym idzie rozpoznawalność numeru powinna być na 
-zadowalającym poziomie.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.95\textwidth]{img/exp_trainig_data_BJZ}
-    \caption{Typy autobusów zawarte w zbiorze BJZLDmYMFvo}
-    \label{fig:BJZLDmYMFvo_types}
-\end{figure}
-
-Zbiór ten posiada drugą co do wielkości 
-liczbę obrazów tła (w~pierwszej iteracji). 
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        373     & 8         & 2356
-    \end{tabular}
-    \caption{Liczebność zbioru BJZLDmYMFvo}
-    \label{tab:BJZLDmYMFvo_count}
-\end{table}
-
-\subsubsection{Zbiór \_43HUVkrA7E}
-
-Zbiór składający się głównie ze zdjęć zawierających oznaczone fronty
-zabytkowego już autobusu Jelcz Berliet. Jeżeli chodzi o~liczebność to 
-główną wartością dodaną są obrazy reprezentujące tło.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.75\textwidth]{img/exp_trainig_data__43}
-    \caption{Typy autobusów zawarte w zbiorze \_43HUVkrA7E}
-    \label{fig:_43HUVkrA7E_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        44      & 5         & 197 
-    \end{tabular}
-    \caption{Liczebność zbioru \_43HUVkrA7E}
-    \label{tab:_43HUVkrA7E_count}
-\end{table}
-
-\subsubsection{Zbiór 8wdvLn40CTk}
-
-Najmniejszy zbiór w~kontekście różnorodności zawartych modeli. Z~drugiej
-strony ogromna ilość obrazów tła oraz relatywnie dużo oznaczonych ujęć.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.45\textwidth]{img/exp_trainig_data_8wd}
-    \caption{Typy autobusów zawarte w zbiorze 8wdvLn40CTk}
-    \label{fig:8wdvLn40CTk_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        336     & brak      & 3572
-    \end{tabular}
-    \caption{Liczebność zbioru 8wdvLn40CTk}
-    \label{tab:8wdvLn40CTk_count}
-\end{table}
-
-\subsubsection{Zbiór 75Dz6s7S-Tg}
-
-Kolejny niewielki zbiór. Te same modele autobusu Man co w~zestawie
-pierwszym. Dodatkowo dwie wersje kolorystyczne (wyświetlacz) modelu
-Mercedes Citaro. Na koniec wystąpienie modelu Solaris niestety zaledwie
-w~dwóch egzęplażach.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.75\textwidth]{img/exp_trainig_data_75D}
-    \caption{Typy autobusów zawarte w zbiorze 75Dz6s7S-Tg}
-    \label{fig:75Dz6s7S-Tg_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        81      & 2         & 179 
-    \end{tabular}
-    \caption{Liczebność zbioru 75Dz6s7S-Tg}
-    \label{tab:75Dz6s7S-Tg_count}
-\end{table}
-
-\subsubsection{Zbiór 9hMQ4UGNxhw}
-
-Występujące już wcześniej modele: Mercedes Citaro, zabytkowy Jelcz Berliet,
-Man Lion's City, Scania OmniCity, Ikarus 280 z~ledowym wyświetlaczem,
-Jelcz M121CNG (x:2, y:1). Dodatkowo dwie wersje kolorystyczne autobusu
-Autosan.
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.95\textwidth]{img/exp_trainig_data_9hM}
-    \caption{Typy autobusów zawarte w zbiorze 9hMQ4UGNxhw}
-    \label{fig:9hMQ4UGNxhw_types}
-\end{figure}
-
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{c|c|c}
-        Front   & Solaris   & Background \\ \hline
-        267     & 102       & 363 
-    \end{tabular}
-    \caption{Liczebność zbioru 9hMQ4UGNxhw}
-    \label{tab:9hMQ4UGNxhw_count}
-\end{table}
-
-Ostatecznie po złączeniu wszystkich zaprezentowanych zbiorów powstały
+Ostatecznie po złączeniu wszystkich 11 zbiorów powstały
 dwa końcowe (będące jednocześnie punktem wyjścia do dalszych testów):
 \begin{itemize}
-    \item zbiór wszystkich oznaczonych frontów (różne + solarisy) 
-        - 5781 sztuk,
-    \item zbiór oznaczonych frontów autobusów typu Solaris - 955 sztuk.
+    \item zbiór wszystkich oznaczonych frontów (różne + Solaris) 
+        - 5781 elementów,
+    \item zbiór oznaczonych frontów autobusów typu Solaris - 955
+	    elementów.
 \end{itemize}
 
 Osobny zbiór zawierający tylko fronty typu Solaris miał na celu
 sprawdzenie czy mnogość pozytywnych kształtów nie wpływa na skuteczność
-detekcji. Stąd osobne dane uczące/testowe oraz detektor wykrywający 
-tylko fronty typu Solaris. Jak się później okazało naturalny podział
-- wykryty organoleptycznie, podczas oznaczania wystąpień frontów - 
+detekcji. Jak się później okazało naturalny podział
+- wykryty podczas oznaczania wystąpień frontów - 
 wyznacza dwie grupy frontów: te z~wyświetlaczem led-owym (na całej
-długości górnej krawędzi frontu) oraz te bez niego.
+długości górnej krawędzi frontu) oraz te bez niego. Detektor
+miał większą skuteczność podczas wykrywania frontów nowego typu
+z~wyświetlaczem diodowym. Radził sobie natomiast znaczenie gorzej przy
+wykrywaniu frontów z~tabliczkami drukowanymi - modele marki
+Ikarus, Jelcz Berliet itp.
+
+Zbiór z~obrazami tła
+przygotowano poprzez wybranie tych klatek z~filmów, które nie
+zawierały szukanych obiektów - frontów autobusów. Fragment
+jednego ze zbiorów przedstawiono na rysunku \ref{fig:exp_first_background_sample}.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/exp_first_background_sample}
+	\caption{Przykładowe obrazy tła jednego z 11 zbiorów
+		przygotowanych na podstawie
+		filmów pobranych z serwisu YouTube}
+	\label{fig:exp_first_background_sample}
+\end{figure}
+
+Drugi zestaw
+to obrazy pobrane z~serwisu \verb|http://www.phototrans.eu/|.
+Zbiór zawierał 10164 kwadratowych wycinków różnych rozmiarów
+przedstawiających wyłącznie fronty autobusów. W~przeciwieństwie
+do pierwszego zbioru, w~którym elementy były pełnymi klatkami
+obrazu tak tutaj z~powodu braku przestrzeni dyskowej
+i~zwiększającej się liczebności zbioru podjęto decyzję o~przechowywanie
+jedynie przyciętych obrazów - reprezentujących fronty autobusów.
+Fragment zbioru przedstawiono na rysunku \ref{fig:exp_second_crop_sample}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.95\textwidth]{img/exp_second_crop_sample}
+	\caption{Przykładowe obrazy tła jednego z 11 zbiorów
+		przygotowanych na podstawie
+		filmów pobranych z serwisu YouTube}
+	\label{fig:exp_second_crop_sample}
+\end{figure}
+
+Ze względu na brak możliwości wykorzystania drugiego zbioru
+w~procesie automatycznych testów skuteczności sporządzono trzeci,
+mniejszy zbiór złożony z~pełnych klatek zawierających
+fronty autobusów wraz z~ich współrzędnymi. Zbiór ten składał się
+z~1954 obrazów. Współrzędne umieszczone były tym razem w~nazwach
+plików. Zbiór służył do testowania przygotowanych detektorów. 
+Ze względu na zaobserwowaną większą skuteczność detektorów podczas
+wykrywania frontów nowego typu (z~tablicą diodową) zbiór testowy
+zawierał tylko tego typu obiekty. Fragment przedstawiono na rysunku
+\ref{fig:exp_third_whole_sample}.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{img/exp_third_whole_sample}
+	\caption{Przykładowe obrazy trzeciego zbioru (testowego) 
+		wraz ze współrzędnymi widocznymi w nazwach plików}
+	\label{fig:exp_third_whole_sample}
+\end{figure}
 
 \subsection{Przygotowanie optymalnego detektora frontów}
 
 Pierwsze próby związane z~procesem uczenia detektora miały na celu 
 wyłonienie parametrów mających największy wpływ na skuteczność 
 oraz efektywność trenowanego detektora.
+We wszystkich eksperymentach - jeżeli nie napisane zostało, że
+jest inaczej - wykorzystano domyślne parametry wejściowe omawianych 
+narzędzi.
 
 \subsubsection{Porównanie detektorów HAAR, LBP i HOG}
 
 Pierwsza iteracja uczenia detektorów miała na celu przetestowanie
 opcji jakie można zadać narzędziu uczącemu \verb|opencv_traincascade|.
-
-Za zbiór testowy posłużył zestaw oznaczonych zdjęć oraz zdjęć tła
-przygotowany dla filmu o id jJ9ixBfVR5k (charakterystyka zbioru
-została opisana w~poprzednim rozdziale)
-
 Pierwszy test miał za zadanie wyłonić najefektywniejszą metodę, do dalszych
 eksperymentów. Narzędzie dostarczone wraz z~pakietem OpenCV - wspomniany
 już \verb|opencv_traincascade| - pozwalał na wyszkolenie trzech
@@ -864,34 +619,30 @@ rodzajów detektorów:
     \item detektor HOG.
 \end{itemize}
 
-Gdy jeszcze nie wszystkie wyłuskane zdjęcia były opisane, wykonany został
+Wykonany został
 krótki test porównawczy skuteczności i~czasu potrzebnego na nauczenie
-poszczególnych typów detektorów. Po dość chaotycznie wykonanej próbie
-otrzymano następujące wyniki:
+poszczególnych typów detektorów. Otrzymane wyniki przedstawione 
+zostały w tabeli \ref{tab:haar_lbp_hog_comparison}.
 
 \begin{table}[!h]
 \centering
-\begin{tabular}{r|c|c|c|l}
-        & HAAR         & LBP        & HOG         & Wszystkie wystąpienia  \\
+\begin{tabular}{r|c|c|l}
+             & HAAR     & LBP  & HOG  \\
     \hline
-Solaris & 151  (43\%)  & 81  (23\%) & 61 (17\%)   & 346  \\
-Różne   & 1051 (35\%)  & 748 (25\%) & 712 (24\%)  & 2925 \\
-Tło     & 635  (11\%)  & 386 (6\%)  & 447 (7\%)   & 5588 \\
+Skuteczność - fronty Solaris      & 44\%     & 23\% & 18\%  \\
+Skuteczność - fronty różne        & 36\%     & 26\% & 24\%  \\
+Błędy trafienia            & 635      & 386  & 447   \\
+Czas uczenia (w godzinach) & 6 & 0.7 & 3  
 \end{tabular}
 \caption{Porównanie skuteczności detektorów typu HAAR, LBP i HOG.
-Liczba poprawnie wykrytych frontów w~porównaniu do wszystkich opisanych
-wystąpień.}
+Procent poprawnie wykrytych frontów ogółem oraz dla autobusów typu 
+solaris. Ostatni wiersz to czas potrzebny na przygotowanie detektora.}
 \label{tab:haar_lbp_hog_comparison}
 \end{table}
 
-Zaniżona wartość w~ostatniej wynikała z~faktu,
-że nie wszystkie wyłuskane próbki były w~momencie wykonania testu opisane.
-Łatwo jednak zaobserwować trend dokładności
-tychże detektorów.
-
-Kolejnym kryterium był czas uczenia detektorów.
+Ważnym kryterium był czas uczenia detektorów.
 O ile skuteczność detektora w~funkcji czasu potrzebnego na jego 
-wyszkolenie dla detektorów cech HAAR-a i~LBP był skorelowany i~sensowny,
+wyszkolenie dla detektorów cech HAAR-a i~LBP była skorelowana i~sensowna,
 to w~przypadku cech HOG było już nieco inaczej.
 Detektor oparty o~cechy HAAR-a potrzebował
 zdecydowanie więcej czasu na wytrenowanie co miało przełożenie 
@@ -899,13 +650,6 @@ na jego skuteczność. LBP natomiast okazał się nieco mniej skuteczny
 lecz jego szkolenie trwało krócej o~rząd wielkości.
 Cechy HOG w~tym zestawieniu okazały się mało interesującym kandydatem
 - skuteczność była gorsza niż LBP przy czasie szkolenie o~wiele dłuższym.
-
-Czasy uczenia dla poszczególnych detektorów wyglądały następująco:
-\begin{itemize}
-    \item HAAR - 6 godzin
-    \item HOG - 3 godziny
-    \item LBP - 40 min
-\end{itemize}
 
 \subsubsection{Porównanie detektorów - Solaris i~frontów różnych}
 
@@ -916,18 +660,18 @@ frontów autobusów Solaris niż ten
 wyszkolony z~użyciem tylko tego rodzaju frontów. Wyniki dla ustawień
 domyślnych oraz detektora typu LBP przedstawiono w tabelce nr 
 \ref{tab:sol_vs_all}. Znacznie większa skuteczność detektora
-generycznego spowodowana jest zapewne przez efekt skali
+generycznego spowodowana jest zapewne przez efekt skali,
 gdzie detektor frontów różnych typów (w tym marki Solaris) 
 był wyszkolony na kilkukrotnie większej liczbie próbek.
 
 \begin{table}[!h]
     \centering
-    \begin{tabular}{r|c|c|l}
-          & Solaris    & Fronty różne   & Wszystkie wystąpienia (obrazy) \\
+    \begin{tabular}{r|c|l}
+          & Detektor Solaris    & Detektor generyczny (w tym Solaris) \\
           \hline
-wszystkie & 175 (3\%)  & 3466 (71\%)    & 4836      \\
-solaris   & 609 (63\%) & 854 (89\%)     & 955       \\
-błędy     & 289 (1\%)  & 56088 (310\%)  & 18048     \\
+Skuteczność dla wszystkich frontów & 3\%  & 71\%      \\
+Skuteczność dla frontów Solaris    & 63\% & 89\%      \\
+Błędne trafienia                   & 289  & 56088    \\
     \end{tabular}
     \caption{Skuteczność detektorów wyszkolonych tylko dla typów
     solaris w porównaniu do tych wyszkolonych dla wszystkich typów frontów
@@ -949,63 +693,28 @@ parametrów:
     \item minHitRate,
     \item maxFalseAlarmRate.
 \end{itemize}
-odpowiedzialnych za skuteczność wykrywania żądanych obiektów,
-oraz podatność na błędne wykrycia.
+odpowiedzialnych za skuteczność wykrywania obiektów,
+oraz żądany odsetek błędnych trafień.
 
 Niestety wraz ze zwiększaniem parametru \verb|minHitRate|
 znacząco zwiększała
 się liczba błędnych trafień. Po wykonaniu pięciu sesji
 uczących dla wartości parametru od 0.995 do 0.999 zaobserwowano 
-ogromny wzrost błędnych trafień od odpowiednio 56 tysięcy
-do 124 tysięcy (wykres \ref{chart:hitratio_fal}).
+ogromny wzrost błędnych trafień od odpowiednio 46 tysięcy
+do 124 tysięcy.
 
-\begin{figure}[h!]
-\begin{center}
-\begin{tikzpicture}
-\begin{axis}[
-    ylabel={$Bledne\ trafienia$},
-    xlabel={$minHitRate$},
-    minor y tick num=1,
-    width=\textwidth*0.6, height=5cm
-]
-\addplot [only marks, color=red] table {data/hitratio_fal.dat};
-\end{axis}
-\end{tikzpicture}
-\end{center}
-\caption{Zwiększenie liczby błędnych trafień przy zmianie parametru minHitRate}
-\label{chart:hitratio_fal}
-\end{figure}
 
-W~stosunku do wielkiej liczby błędnych trafień procentowa skuteczność
+W~stosunku do ogromnej wręcz liczby błędnych trafień, procentowa skuteczność
 wykrywania frontów autobusów rosła raczej w~sposób umiarkowany.
-
-
-\begin{figure}[h!]
-\begin{center}
-\begin{tikzpicture}
-\begin{axis}[
-    ylabel={$Pozytywne\ trafienia$},
-    xlabel={$minHitRate$},
-    minor y tick num=1,
-    yticklabel=\pgfmathprintnumber{\tick}\,\%,
-    legend style={at={(0.06,0.73)},anchor=north west},
-    width=\textwidth*0.6, height=6cm
-]
-\addplot [only marks, color=green] table {data/hitratio_fro.dat};
-\addlegendentry{wszystkie}
-\addplot [only marks, color=blue] table {data/hitratio_sol.dat};
-\addlegendentry{solaris}
-\end{axis}
-\end{tikzpicture}
-\end{center}
-\caption{Zwiększenie liczby pozytywnych trafień przy zmianie parametru minHitRate}
-\label{chart:hitratio_fro_sol}
-\end{figure}
-
-Pierwsza próba zmniejszenia nieudanych trafień polegała na zmianie 
-parametru \verb|maxFalseAlarmRate| podczas uczenia detektora. 
-Wykonano pięć
-sesji uczenia detektora dla wartości: od domyślnej 0.5 do 0.1.
+Zaobserwowano wzrost z~poziomu 71\% do 77\%. 
+Niestety oba testowane parametry nie dawały niemal żadnej
+możliwości poprawy skuteczności bez zwiększenia ilości błędnych
+trafień (oraz na odwrót - zmniejszenia liczby
+błędnych trafień bez spadku skuteczności).
+Zwiększanie parametru \verb|minHitRate| i~jednoczesne zmniejszanie
+\verb|maxFalseAlarmRate| skutkowało tylko wydłużonym czasem
+szkolenia detektorów przy zachowaniu wyników mniej więcej na
+tym samym poziomie.
 
 Ostatecznie przy ilości próbek pozytywnych i~negatywnych 
 na poziomie 5000 opisywane wyżej parametry nie miały już prawie w~cale
@@ -1016,12 +725,12 @@ przedstawiono w~podrozdziale dotyczącym drugiej iteracji.
 
 \subsubsection{Usuniecie zdeformowanych frontów}
 
-Podczas oznaczania frontów autobusów nastąpiła pewnego rodzaju
-nadgorliwość. Podczas wyboru klatek do późniejszego oznaczenia
+Podczas oznaczania frontów autobusów nastąpiła swego rodzaju
+nadgorliwość. W~trakcie wyboru klatek do późniejszego oznaczenia
 wystąpienia frontu klasyfikowano wszystkie wystąpienia autobusu
-czołem do kamery jako poprawne i~wartościowe. Podczas gdy autobus
-był ustawiony prostopadle do matrycy aparatu klatka taka była
-jak najbardziej poprawna i~zawarte w~niej informacje mogły
+czołem do kamery jako poprawne i~wartościowe. Podczas gdy oś autobusu
+ustawiona była prostopadle do matrycy aparatu, klatkę taką można było
+uznać za jak najbardziej poprawną, a~zawarte w~niej informacje mogły
 z~powodzeniem być wykorzystane podczas uczenia detektora. Jednak
 gdy kąt między osią autobusu, a~płaszczyzną matrycy był mniejszy
 niż 45 stopni, zdjęcie nie niosło ze sobą informacji przydatnych
@@ -1043,28 +752,23 @@ zaobserwować na zdjęciu \ref{fig:deformation_samples}.
     \label{fig:deformation_samples}
 \end{figure}
 
-Podsumowując, w~ramach
-eksperymentów powstało 15 plików definiujących detektory, do utworzenia
+Po usunięciu zniekształcony frontów ze zbioru, przetestowano
+15 plików definiujących detektory, do utworzenia
 których użyto zmiennych parametrów. W~pierwszej iteracji zmianie podlegały
 wartości:
 
 \begin{itemize}
-\item featureType - HAAR(default), LBP, HOG,
-\item minHitRate - minimalna procentowa wartość pozytywnych wykryć (domyślnie 0.995),
-\item maxFalseAlarmRate - maksymalna procentowa wartość błędów (domyślnie 0.5),
-\item numNeg - liczba obrazów tła do wykorzystania.
+\item \verb|featureType| - HAAR(default), LBP, HOG,
+\item \verb|minHitRate| - minimalna procentowa wartość pozytywnych wykryć (domyślnie 0.995),
+\item \verb|maxFalseAlarmRate| - maksymalna procentowa wartość błędów (domyślnie 0.5),
+\item \verb|numNeg| - liczba obrazów tła do wykorzystania,
+\item \verb|numPos| - liczba oznaczonych obiektów.
 \end{itemize}
-
-Dodatkowo powstały dwa detektory LBP osobno dla frontów typu solaris i~dla
-całości zbioru (5690 wystąpień). 
-
-W~tabeli \ref{tab:it1detectorlist} przedstawiono użyte wartości
-wymienionych parametrów dla wszystkich 15 detektorów.
 
 \begin{table}[!h]
     \centering
     \begin{tabular}{r|c|c|c|c|c|c|l}
-Lp.       & Typ cech & minHitRate & maxFAR & numNeg & numPos & \%ok & błędy\\
+Lp.       & Typ cech & minHitRate & maxFAR & numNeg & numPos & skuteczność & błędy\\
           \hline
 01        & haar     & 0.995      & 0.5       & 1000 & 2000 & 28\% &  994 \\
 02        & hog      & 0.995      & 0.5       & 1000 & 2000 & 19\% &  773 \\
@@ -1089,44 +793,24 @@ Lp.       & Typ cech & minHitRate & maxFAR & numNeg & numPos & \%ok & błędy\\
     \label{tab:it1detectorlist}
 \end{table}
 
-Pierwsze trzy pliki utworzone były na ograniczonym podzbiorze danych, gdyż
-nie wszystkie próbki były wtedy opisane.
-
 Procedura porównywania skuteczności operowała na zbiorze obrazów
 reprezentujących wystąpienia frontów autobusów solaris połączonym
-z~ogólnym zbiorem. Poprawne
+ze~zbiorem ogólnym. Poprawne
 wykrycie liczone było wtedy gdy współrzędne prostokątów wykrytego
 i~oznaczonego znajdowały się w~odległości nie większej niż 25\% odpowiadającego
 wymiaru prostokąta oznaczonego: dla odciętych i~rzędnych odpowiednio szerokość
-i~wysokość prostokąta. Do zliczania błędnych wykryć wykorzystano ten sam zbiór.
-Ze względu na ograniczenie czasowe zrezygnowano z~wykorzystania zbioru
-obrazów tła. Wyniki zaprezentowano w~tabeli \ref{tab:it1detectorlist} oraz
-na wykresie \ref{fig:it1detectorlist}.
+i~wysokość prostokąta. Do zliczania błędnych wykryć wykorzystano ten sam zbiór, a~samo trafienie klasyfikowane było jako błędne 
+gdy współrzędne czworokątów oznaczonego i~wykrytego nie 
+spełniały przytoczonych kryteriów, czyli były oddalone o~więcej niż wspomniane
+25\% odpowiadającego wymiaru czworokąta wyznaczającego 
+front autobusu (\textit{ang. ground truth}).
+Wyniki zaprezentowano w~tabeli \ref{tab:it1detectorlist}.
+Zgodnie z~przewidywaniami kluczowe parametry to ilość zdjęć
+pozytywnych i~negatywnych (obrazów tła). Co prawda można 
+sterować liczbą trafień pozytywnych i~negatywnych za pomocą parametrów \verb|minHitRate| oraz
+\verb|maxFalseAlarmRate| ale zakres skuteczności takich działań nadal
+ograniczony jest przez liczebność zbioru uczącego.
 
-\begin{figure}
-\begin{center}
-\begin{tikzpicture}
-\begin{groupplot}[group style={group size=1 by 2},
-height=5cm,width=0.8\textwidth,
-legend style={at={(0.03,0.93)},anchor=north west}]
-\nextgroupplot
-\addplot [only marks, color=blue] table {data/15_detectors_comparison_positive_percentage.dat};
-
-\addlegendentry{Skutecznosc}
-
-\nextgroupplot
-\addplot [only marks, color=red] table {data/15_detectors_comparison_negative_count.dat};
-\addlegendentry{Bledne trafienia}
-\end{groupplot}
-\end{tikzpicture}
-\end{center}
-\caption{Zależność skuteczność i~błędnych trafień dla poszczególnych detektorów}
-\label{fig:it1detectorlist}
-\end{figure}
-
-Jak widać wyniki w~większości przypadków oscylowały w~granicach 90\%.
-W~odróżnieniu od poprzednich testów, te wykonane były na klatkach obrazu
-w~oryginalnej rozdzielczości (wysokość 720p). 
 Kolejnym krokiem było znalezienie
 optymalnego czynnika skalującego. Innymi słowy jak bardzo można zmniejszyć
 obraz wejściowy aby utrzymać wyniki na zadowalającym poziomie
@@ -1134,7 +818,7 @@ obraz wejściowy aby utrzymać wyniki na zadowalającym poziomie
 poprawić skuteczność w~porównaniu do skuteczności detektora uruchomionego
 dla obrazu w~rozmiarze oryginalnym).
 
-\subsubsection{Skalowanie obrazu wejściowego - podsumowanie}
+\subsubsection{Skalowanie obrazu wejściowego}
 
 W~celu zmniejszenia złożoności obliczeniowej przeprowadzone zostały
 testy przy przeskalowanych klatkach wejściowych. W~tym przypadku
@@ -1165,7 +849,7 @@ W~procesie półautomatycznego uczenia i~oznaczania
 próbek
 zaobserwowano jeden szczególny trend, który faworyzował pewne
 szczególne cechy frontów z~wyświetlaczem. Podczas ostatniego przebiegu
-(do 5000 pozytywnych oznaczeń) zaobserwowano, że detektor
+(5000 pozytywnych oznaczeń) zaobserwowano, że detektor
 chętnie identyfikuje fronty z~diodowym wyświetlaczem zajmującym 
 całą górną część frontu. Przy tak dużej liczbie oznaczeń
 cechą szczególną okazał się właśnie ów wyświetlacz. Cecha ta była
@@ -1178,7 +862,7 @@ nie zajmował całej długości górnej krawędzi - rysunek
     \centering
     \includegraphics[width=0.95\textwidth]{img/exp_front_detector_curiosity}
     \caption{Tendencja do oznaczania fragmentów z~dużą ilością
-    małych elementów w górnej części}
+    niewielkich elementów w górnej części}
     \label{fig:frontdetectormorph}
 \end{figure}
 
@@ -1187,14 +871,14 @@ detektora frontowego tak aby wykrywał również tablice boczne. Minusem
 tego rozwiązania jest fakt, że z~lokalizowaniem autobusów z~tablicami
 drukowanymi detektor radzi sobie znacznie gorzej. Co za tym idzie
 zostały one wykluczone z~dalszych rozważań. Aby skutecznie wykrywać
-fronty autobusów typu Ikarus lub starych Jelczy niezbędny byłby 
+fronty autobusów typu Ikarus lub Jelczy Berliet niezbędny byłby 
 dodatkowy dedykowany detektor i~prawdopodobnie dedykowane wersje
 pozostałych elementów.
 
 \subsection{Detektor numerów}
 
 Kaskadowy detektor wykrywający numer w~lewym górnym rogu wykrytego
-frontu był jednym z~ostatnich zaimplementowanych elementów. Do wyszkolenia
+frontu był drugim stopniem kaskady. Do wyszkolenia
 detektora użyto 450 oznaczonych wystąpień numerów (jedno, dwu
 i~trzycyfrowych) oraz 800 instancji tła. Ze względu na problemy podczas
 szkolenia detektora dla większej liczby pozytywnych i~negatywnych 
@@ -1202,7 +886,10 @@ instancji zaprzestano zwiększania ich ilości. Problem polegał na
 zawieszeniu się procesu uczenia na jednym z~etapów i~gdy normalnie 
 cała procedura liczona była w~dziesiątkach minut (maksymalnie 1-2 godziny)
 to dla zbyt dużej liczby - w~szczególności obrazów tła proces potrafił
-utknąć na danym etap na dobę.
+utknąć na danym etap na dobę. Późniejsze testy wykazały, że
+problem dotyczył jedynie implementacji na środowisku Windows. 
+Narzędzia skompilowane i~uruchomione na systemie Linux nie 
+wykazywały tendencji do zawieszania się.
 
 Element ten był najsłabiej przetestowany i~wymagał usprawnienia 
 w~pierwszej kolejności. Pewnym uproszczeniem było
