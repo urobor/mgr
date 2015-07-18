@@ -429,72 +429,97 @@ detektor oparty na cechach Haara.
 \section{Testy narzędzi i~algorytmów wykorzystanych w~rozwiązaniu 
 	końcowym}
 
-W~podrozdziale tym przedstawione i~omówione zostały doświadczenia
-związane z~algorytmami, narzędziami i~bibliotekami wykorzystanymi
-w~ostatecznym programie. Opis powstawał równolegle
-do toczących się prac więc może wykazywać pewne cechy sprawozdania
-lub relacji na bieżąco.
-Prezentacja oraz dokładna analiza wyników powstała w~ramach
-drugiego podejścia, kiedy to gotowy był już działający prototyp programu.
-Druga tura miała na celu rzetelną weryfikację skuteczności
-i~wydajności przygotowanego rozwiązania.
-Celem pierwszego przebiegu była jak najszybsza implementacja
-działającego programu na urządzeniu mobilnym z~systemem Android.
-
-Zarówno w~pierwszej jak i~drugiej iteracji postępowano
-zgodnie z~poniższym planem:
+W podrozdziale tym przedstawione i omówione zostały doswiadczenia związane
+z algorytmami, narzędziami i bibliotekami, które wykorzystane zostały
+w~ostatecznej wersji programu. Prace, tak jak sam proces wykrywania 
+i~odczytywania numeru linii autobusowej podzielone były na trzy etapy:
 
 \begin{enumerate}
-    \item Przygotowanie zbioru uczącego (który miał być jednocześnie
-        zbiorem testowym). Początkowo przyjęta forma przechowywania danych
-        - pełne klatki w~których oznaczone były wystąpienia
-        frontów oraz osobny plik tekstowy ze współrzędnymi -
-        pozwalała na wykorzystanie zbioru uczącego również
-        w~procesach testowych. 
-        Próba ograniczenia miejsca zajmowanego przez zbiór -
-        przechowywanie wycinków
-        zawierających tylko szukane obiekty - 
-        uniemożliwiło wykorzystanie zbioru uczącego podczas 
-        testów. Funkcja
-        gorzej radziła sobie z~wyszukiwaniem obiektów, które nie
-        zawierały dostatecznego marginesu wokół obiektów.
-        Był to jeden z~powodów przeprowadzenia drugiej iteracji
-        w~procesie przygotowywania programu końcowego. Trzeci (ostatni)
-        zbiór wykorzystany do testów przygotowany był podobnie 
-        jak pierwszy i~składał się z~całych zdjęć z~dodatkowymi
-        danymi odnośnie tego gdzie w~zdjęciu znajduje się interesujący
-        nas obiekt.
-    \item Wstępna segmentacja - wyszukiwanie frontu autobusu, wraz
-        z~dodatkową analizą wpływu zadanych parametrów na skuteczność
-        szkolonego detektora.
-    \item Wyłuskanie fragmentu obrazu zawierającego wyłącznie numer -
-        kaskadowy detektor numerów uruchamiany dla zdjęcia 
-        reprezentującego front autobusu.
-    \item Dziesięć detektorów wykrywających cyfry
-        w~celu zawężenia obszaru poszukiwań w~procesie dopasowywania 
-        wzorca (\textit{ang. Template Matching}), który to proces
-        był najbardziej intensywny obliczeniowo z~dotychczasowo omawianych.
-    \item Krótkie testy związane ze skutecznością i~zasadnością
-        wykorzystania metody \textit{Template Matching} w~celu weryfikacji
-        potencjalnych obszarów reprezentujących cyfry.
+	\item Przygotowanie i~przetestowanie detektora frontów autobusów w~scenie.
+	\item Przygotowanie i przetestowanie detektora numerów w~wycinku obrazu
+	reprezentującym front autobusu.
+	\item Przygotowanie i przetestowanie klasyfikatora numerów, reprezentowanych
+	przez obrazy o~jednakowych wymiarach.
 \end{enumerate}
 
-Pierwszy etap pochłonął najwięcej czasu. Podjęte zostały próby 
-przygotowania procedury i~oprogramowania wspomagających określenie
-skuteczności implementowanych rozwiązań oraz określenia 
-najbardziej optymalnych parametrów do wykorzystania podczas procesu
-uczenia detektora narzędziem z~pakietu OpenCV: \verb|train_cascade|.
+Wszystkie powyższe kroki wymagały jednego wspólnego prerekwizytu - zbiorów obrazów
+niezbędnych w~procesie uczenie detektorów i~przygotowywania klasyfikatora.
+Ze względu na brak, lub nieumiejętność odnalezienia stosownych zbiorów
+w~sieci Internet, zbiory obrazów przygotowane zostały własnoręcznie.
 
-O~ile skuteczność znajdowania frontów autobusów - wstępna segmentacja - 
-była kluczowa dla poprawnego funkcjonowania projektowanego programu 
-i~zasadnym było jej rzetelne przetestowanie to skuteczność pozostałych
-etapów - ze względu na zastosowane ograniczenia - nie była już tak
-istotna (o~czym więcej w~następnym rozdziale). Głównym powodem nie przetestowania wszystkich parametrów
-wejściowych narzędzia do przygotowywania detektorów był długi czas 
-trwania procesu
-- od jednej do kilkunastu godzin, dla detektora cech LBP. Ostatecznie
-celem nie była analiza samych narzędzi a~opracowanie i~implementacja
-skutecznego programu do odczytywania numerów nadjeżdżających autobusów.
+Drugim powtarzającym się krokiem dla wszystkich trzech powyższych etapów było
+testowanie skuteczności detektorów, oraz klasyfikatora przy zmiennych
+parametrach zadanych podczas procesu uczenia, detekcji i~klasyfikacji.
+
+Był to jeden z~najbardziej wymagających rozdziałów niniejszej pracy, a~jego
+przygotowanie zajęło najwięcej czasu. Wiele wieczorów przeznaczonych zostało 
+na oznaczanie i~docinanie kilkunastu tysięcy obrazów. Kolejnym czynnikiem były długie,
+nawet kilkudniowe, sesje uczenia detektorów. Na potrzeby sesji testowych,
+badających wpływ parametrów wywołania narzędzia uczenia, przygotowano
+kilkadziesiąt, jeżeli nie kilkaset detektorów.
+
+Wyniki wielu takich sesji nie zostały zamieszczone na łamach niniejszego opracowania.
+Pomimo ogromnych nakładów pracy, czasu i~nerwów, powstrzymano się
+od prezentowania bezwartościowych, przekłamanych i~zaburzonych wyników.
+Przyczyn było wiele.
+Błędne założenia, błędy popełnione podczas przygotowywania zbiorów czy 
+przedwczesna optymalizacja ("źródło wszelkiego zła") wpłyneły wielokrotnie
+na decyzję o~powtórzeniu już raz wykonanego procesu uczenia i~testowania
+detektorów. Były też powodem kilkukrotnego, ponownego przygotowywania lub poprawiania
+zbiorów obrazów uczących i~testowych. Poniżej przedstawiono kilka wybranych 
+potknięć.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/exp_removed_distorted_fronts}
+	\caption{Usunięte oznaczenia ze względu na zniekształcenia geometryczne}
+	\label{fig:deformation_samples}
+\end{figure}
+
+Pierwszy błąd popełniony został podczas oznaczania
+frontów autobusów. Niestety dopoiero próby oraz testy skuteczności wykazały
+istotną wadę przygotowanego zbioru. Wyniki (dużo gorsze od spodziewanych)
+automatycznego pomiaru skuteczności poparte organoleptyczną weryfikacją 
+typu i~sposobu wytrywania obiektów, wykazały błędną klasyfikację próbek pozytywnych
+w~zbiorze uczącym. Wszystkie wystąpienia frontu autobusu czołem do fotografującego
+oznaczone były jako poprawne i~wartościowe pozytywy. Po usunięciu zbyt
+zniekształconych geometrycznie frontów - jak na rysunku \ref{fig:deformation_samples} -
+powtórzony został proces uczenia. Ponownie wykonane zostały też testy skuteczności.
+
+
+Później zbiory uczące i~testowe przygotowywano jeszcze kilkukrotnie. Raz ze względu
+za zbyt mały margines tła pozostawiony wokół szukanego obieku. Innym powodem 
+była forma przechowywanych obrazów. Początkowo pełne sceny zawierające wystąpienie
+interesującego obiektu, wraz ze współrzędnymi czworokątów okalających z~powodzeniem
+nadawały się do wykorzystania podczas testów skuteczności. Kolejne wersje
+zbiorów, przechowywano w~postaci wycinków zawierających jedynie inetersujące obiekty.
+Wymusiło to sporządzenie osobneych zbiorów, w~pierwotnej formie, jedynie na potrzeby testów.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/exp_trainig_data_jJ9}
+	\caption{Przykładowe elementy jednego z 11 zbiorów obrazów
+		przygotowanych na podstawie
+		filmów pobranych z serwisu YouTube}
+	\label{fig:jJ9ixBfVR5k_types}
+\end{figure}
+
+Kolejny przykład to nieudana próba wykazania różnicy w~skuteczności detektorów
+do wyszkolenia których użyto frontów różnych marek i~modeli pojazdów, oraz tych
+nauczonych przy użyciu takich samych frontów. Podział zilustrowany został na 
+rysunku \ref{fig:jJ9ixBfVR5k_types}, gdzie w~czerwonej ramce przedstawione
+zostały front typów różnych. Żółta ramka przedstawia próbki jednego typu - 
+w~tym przypadku autobusu Solaris Urbino.
+
+Naturalny podział zaobserwowano w~trakcie półautomatycznego oznaczania frontów
+autobusów. Prawdopodobnie było to spowodowane tym, że zbiór uczący składał
+się w~znacznej mierze z~frontów autobusów z~wyświetlaczem ledowym. Tak jak na
+rysunku \ref{fig:jJ9ixBfVR5k_types}, detektor świetnie wykrywał wszystkie 
+przedstawione obiekty, z~wyjątkiem frontu autobusu Ikarus w~lewym górnym rogu.
+
+Opisane powyżej problemy, w~dużo mniejszym stopniu powtarzały się w~kolejnych 
+dwuch etapach prac. Niektóre błędy możliwe były do wykrycia dopiero po
+zestawieniu wszystkich trzech etapów w~jeden proces. O~tym krócej w~podsumowaniu.
 
 \subsection{Zbiory danych uczących i testowych}
 
@@ -745,12 +770,6 @@ usunięto wszystkie oznaczenia frontu pasujące do opisu
 z~poprzedniego akapitu. Kilka takich przypadków można
 zaobserwować na zdjęciu \ref{fig:deformation_samples}.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{img/exp_removed_distorted_fronts}
-    \caption{Usunięte oznaczenia ze względu na zniekształcenia geometryczne}
-    \label{fig:deformation_samples}
-\end{figure}
 
 Po usunięciu zniekształcony frontów ze zbioru, przetestowano
 15 plików definiujących detektory, do utworzenia
