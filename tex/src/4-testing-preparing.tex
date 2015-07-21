@@ -430,7 +430,7 @@ detektor oparty na cechach Haara.
 	końcowym}
 
 W podrozdziale tym przedstawione i omówione zostały doswiadczenia związane
-z algorytmami, narzędziami i bibliotekami, które wykorzystane zostały
+z~algorytmami, narzędziami i bibliotekami, które wykorzystane zostały
 w~ostatecznej wersji programu. Prace, tak jak sam proces wykrywania 
 i~odczytywania numeru linii autobusowej podzielone były na trzy etapy:
 
@@ -471,23 +471,23 @@ potknięć.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{img/exp_removed_distorted_fronts}
+	\includegraphics[width=0.6\textwidth]{img/exp_removed_distorted_fronts}
 	\caption{Usunięte oznaczenia ze względu na zniekształcenia geometryczne}
 	\label{fig:deformation_samples}
 \end{figure}
 
-Pierwszy błąd popełniony został podczas oznaczania
+Jeden z~pierwszych błądów popełniony został podczas oznaczania
 frontów autobusów. Niestety dopoiero próby oraz testy skuteczności wykazały
 istotną wadę przygotowanego zbioru. Wyniki (dużo gorsze od spodziewanych)
 automatycznego pomiaru skuteczności poparte organoleptyczną weryfikacją 
-typu i~sposobu wytrywania obiektów, wykazały błędną klasyfikację próbek pozytywnych
+typu i~sposobu wytrywania obiektów wykazały błędną klasyfikację próbek pozytywnych
 w~zbiorze uczącym. Wszystkie wystąpienia frontu autobusu czołem do fotografującego
 oznaczone były jako poprawne i~wartościowe pozytywy. Po usunięciu zbyt
 zniekształconych geometrycznie frontów - jak na rysunku \ref{fig:deformation_samples} -
 powtórzony został proces uczenia. Ponownie wykonane zostały też testy skuteczności.
 
-
-Później zbiory uczące i~testowe przygotowywano jeszcze kilkukrotnie. Raz ze względu
+Podczas dalszych prac zbiory uczące i~testowe przygotowywano jeszcze kilkukrotnie.
+Raz ze względu
 za zbyt mały margines tła pozostawiony wokół szukanego obieku. Innym powodem 
 była forma przechowywanych obrazów. Początkowo pełne sceny zawierające wystąpienie
 interesującego obiektu, wraz ze współrzędnymi czworokątów okalających z~powodzeniem
@@ -497,8 +497,8 @@ Wymusiło to sporządzenie osobneych zbiorów, w~pierwotnej formie, jedynie na p
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.8\textwidth]{img/exp_trainig_data_jJ9}
-	\caption{Przykładowe elementy jednego z 11 zbiorów obrazów
+	\includegraphics[width=0.6\textwidth]{img/exp_trainig_data_jJ9}
+	\caption{Przykładowe elementy jednego ze zbiorów obrazów
 		przygotowanych na podstawie
 		filmów pobranych z serwisu YouTube}
 	\label{fig:jJ9ixBfVR5k_types}
@@ -521,56 +521,26 @@ Opisane powyżej problemy, w~dużo mniejszym stopniu powtarzały się w~kolejnyc
 dwuch etapach prac. Niektóre błędy możliwe były do wykrycia dopiero po
 zestawieniu wszystkich trzech etapów w~jeden proces. O~tym krócej w~podsumowaniu.
 
-\subsection{Zbiory danych uczących i testowych}
+\subsection{Przygotowanie i testy detektora frontów}
 
-Jak już wspomniano, dane wykorzystane do procesu uczenia detektorów frontów autobusów były przygotowane w~trzech podejściach.
-Pierwszy zbiór składał się z~11 zestawów obrazów
-przygotowanych z~uprzednio pobranych filmów z~serwisu YouTube.
-Każdy zestaw składał się z co najmniej dwóch zbiorów - obrazów 
-reprezentujących oznaczone fronty autobusów, oraz obrazów tła. 
-Opcjonalnym zbiorem był zestaw oznaczonych 
-frontów autobusów typu Solaris. Osobny zestaw frontów miał na celu
-porównanie skuteczności detektorów przygotowanych tylko przy pomocy
-pojedynczego typu obiektu, oraz tych do przygotowania których użyto
-obiektów znacząco od siebie różnych. Ostatecznie okazało się,
-że podział istnieje, lecz nie taki jak zakładano. Przykładowe
-elementy zbioru pierwszego zaprezentowano na rysunku \ref{fig:jJ9ixBfVR5k_types}, na którym w~czerwonej ramce
-przedstawiono zbiór ogólny oraz osobno podzbiór złożony z~frontów typu
-Solaris w~ramce żółtej.
+W~procesie uczenia wykorzystano zbiór 10145 obrazów reprezentujących fronty autobusów.
+Zdjęcia były przygotowane w~ten sposób, że przedstawiały jedynie szukane obiekty
+wraz z~niewielką ramkną wokłu nich. Zachowano oryginalny rozmiar obrazów, których
+wymiary mieściły się w~przedziale od 33x33 pikseli do 771x771 pikseli.
+Przykładowe elementy zbioru przedstawiono na rysunku \ref{fig:exp_second_crop_sample}.
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=0.8\textwidth]{img/exp_trainig_data_jJ9}
-	\caption{Przykładowe elementy jednego z 11 zbiorów obrazów
-		przygotowanych na podstawie
-		filmów pobranych z serwisu YouTube}
-	\label{fig:jJ9ixBfVR5k_types}
+	\includegraphics[width=0.8\textwidth]{img/exp_second_crop_sample}
+	\caption{Elementy zbioru uczącego - przykład tzw. obrazów pozytywnych}
+	\label{fig:exp_second_crop_sample}
 \end{figure}
 
-Ostatecznie po złączeniu wszystkich 11 zbiorów powstały
-dwa końcowe (będące jednocześnie punktem wyjścia do dalszych testów):
-\begin{itemize}
-    \item zbiór wszystkich oznaczonych frontów (różne + Solaris) 
-        - 5781 elementów,
-    \item zbiór oznaczonych frontów autobusów typu Solaris - 955
-	    elementów.
-\end{itemize}
-
-Osobny zbiór zawierający tylko fronty typu Solaris miał na celu
-sprawdzenie czy mnogość pozytywnych kształtów nie wpływa na skuteczność
-detekcji. Jak się później okazało naturalny podział
-- wykryty podczas oznaczania wystąpień frontów - 
-wyznacza dwie grupy frontów: te z~wyświetlaczem led-owym (na całej
-długości górnej krawędzi frontu) oraz te bez niego. Detektor
-miał większą skuteczność podczas wykrywania frontów nowego typu
-z~wyświetlaczem diodowym. Radził sobie natomiast znaczenie gorzej przy
-wykrywaniu frontów z~tabliczkami drukowanymi - modele marki
-Ikarus, Jelcz Berliet itp.
-
 Zbiór z~obrazami tła
-przygotowano poprzez wybranie tych klatek z~filmów, które nie
-zawierały szukanych obiektów - frontów autobusów. Fragment
-jednego ze zbiorów przedstawiono na rysunku \ref{fig:exp_first_background_sample}.
+przygotowano poprzez wybranie tych klatek z~filmów pobranych z~serwisu
+YouTube, które nie
+zawierały szukanych obiektów. Fragment zbioru, który w~całości
+składał się z~548 elementów, przedstawiono na rysunku \ref{fig:exp_first_background_sample}.
 
 \begin{figure}[!h]
 	\centering
@@ -581,26 +551,7 @@ jednego ze zbiorów przedstawiono na rysunku \ref{fig:exp_first_background_sampl
 	\label{fig:exp_first_background_sample}
 \end{figure}
 
-Drugi zestaw
-to obrazy pobrane z~serwisu \verb|http://www.phototrans.eu/|.
-Zbiór zawierał 10164 kwadratowych wycinków różnych rozmiarów
-przedstawiających wyłącznie fronty autobusów. W~przeciwieństwie
-do pierwszego zbioru, w~którym elementy były pełnymi klatkami
-obrazu tak tutaj z~powodu braku przestrzeni dyskowej
-i~zwiększającej się liczebności zbioru podjęto decyzję o~przechowywanie
-jedynie przyciętych obrazów - reprezentujących fronty autobusów.
-Fragment zbioru przedstawiono na rysunku \ref{fig:exp_second_crop_sample}
-
-\begin{figure}[!h]
-	\centering
-	\includegraphics[width=0.95\textwidth]{img/exp_second_crop_sample}
-	\caption{Przykładowe obrazy tła jednego z 11 zbiorów
-		przygotowanych na podstawie
-		filmów pobranych z serwisu YouTube}
-	\label{fig:exp_second_crop_sample}
-\end{figure}
-
-Ze względu na brak możliwości wykorzystania drugiego zbioru
+Ze względu na brak możliwości wykorzystania zbioru uczącego
 w~procesie automatycznych testów skuteczności sporządzono trzeci,
 mniejszy zbiór złożony z~pełnych klatek zawierających
 fronty autobusów wraz z~ich współrzędnymi. Zbiór ten składał się
@@ -609,7 +560,8 @@ plików. Zbiór służył do testowania przygotowanych detektorów.
 Ze względu na zaobserwowaną większą skuteczność detektorów podczas
 wykrywania frontów nowego typu (z~tablicą diodową) zbiór testowy
 zawierał tylko tego typu obiekty. Fragment przedstawiono na rysunku
-\ref{fig:exp_third_whole_sample}.
+\ref{fig:exp_third_whole_sample}. Zbiór uczący wykorzystany do
+przygotowywania detektorów zawierał wszystkie typy autobusów.
 
 \begin{figure}[!h]
 	\centering
@@ -619,30 +571,151 @@ zawierał tylko tego typu obiekty. Fragment przedstawiono na rysunku
 	\label{fig:exp_third_whole_sample}
 \end{figure}
 
-\subsection{Przygotowanie optymalnego detektora frontów}
+Proporcja ponad 10 tysięcy obrazów pozytywnych do 548 obrazów tła (negatywnych), 
+może wydawać się pewnym niedopatrzeniem. Jednak jak to zostało później opisane,
+w~eksperymentach wykorzystano nieco ponad połowę przygotowanego zbioru. Dodatkowo
+machanizm działania narzędzia służącego do przygotowywania detektorów przewidywał
+automatyczne wyszukiwanie fałszywych pozytywów w~dostarczonych zdjęciach. 
 
-Pierwsze próby związane z~procesem uczenia detektora miały na celu 
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{img/exp_false_positive_mechanism}
+	\caption{Sposób wyłuskiwania fałszywych pozytywów z~obrazów tła podczas procesu
+		uczeina przedstawiona jako analogia do ilości błędnych trafień niskiej
+		jakości detektora}
+	\label{fig:exp_false_positive_mechanism}
+\end{figure}
+
+Teoretycznie z~jednej klatki obrazu wyłuskanych mogło być kilkadziesiąd lub
+nawet kilkaset podobrazów. Czyli analogicznie do sytuacji w~której - jak 
+na rysunku 
+\ref{fig:exp_false_positive_mechanism}
+- bardzo słabej jakości detektor wykrywa dużo fałszywych pozytywów, tak
+automat uczączy wybiera z~obrazów tła odpowiednie podobrazy celem liczby
+błędnych wykryć uczonego w~ten sposób detektora.
+
+Pierwsze próby związane z~procesem uczenia miały na celu 
 wyłonienie parametrów mających największy wpływ na skuteczność 
-oraz efektywność trenowanego detektora.
+oraz efektywność trenowanych detektorów.
 We wszystkich eksperymentach - jeżeli nie napisane zostało, że
-jest inaczej - wykorzystano domyślne parametry wejściowe omawianych 
-narzędzi.
+jest inaczej - wykorzystano domyślne parametry wejściowe prezentowanych 
+narzędzi:
 
-\subsubsection{Porównanie detektorów HAAR, LBP i HOG}
+\begin{lstlisting}
+[-numPos <number_of_positive_samples = 2000>]
+[-numNeg <number_of_negative_samples = 1000>]
+[-numStages <number_of_stages = 20>]
+[-precalcValBufSize <precalculated_vals_buffer_size_in_Mb = 256>]
+[-precalcIdxBufSize <precalculated_idxs_buffer_size_in_Mb = 256>]
+[-featureType <{HAAR(default), LBP, HOG}>]
+[-w <sampleWidth = 24>]
+[-h <sampleHeight = 24>]
+[-bt <{DAB, RAB, LB, GAB(default)}>]
+[-minHitRate <min_hit_rate> = 0.995>]
+[-maxFalseAlarmRate <max_false_alarm_rate = 0.5>]
+[-weightTrimRate <weight_trim_rate = 0.95>]
+[-maxDepth <max_depth_of_weak_tree = 1>]
+[-maxWeakCount <max_weak_tree_count = 100>]
+\end{lstlisting}
 
 Pierwsza iteracja uczenia detektorów miała na celu przetestowanie
 opcji jakie można zadać narzędziu uczącemu \verb|opencv_traincascade|.
-Pierwszy test miał za zadanie wyłonić najefektywniejszą metodę, do dalszych
-eksperymentów. Narzędzie dostarczone wraz z~pakietem OpenCV - wspomniany
-już \verb|opencv_traincascade| - pozwalał na wyszkolenie trzech
-rodzajów detektorów:
+Na początku
+uczono detektory oparte na
+cechach LBP. Zgodnie z dokumentacją \cite{OCV:cascadeclassifiertraining}, ze względu na wykorzystanie liczb całkowitych,
+metoda ta (w porównaniu do klasycznego detektora opartego na cechach HAAR-a) powinna być
+kilkukrotnie szybsza zarówno podczas uczenia jak i wykrywania obiektów.
+
+Pierwszy test miał wskazać optymalny stosunek wykorzystania próbek pozytywnych
+do negatywnych. W~tabeli 4.4 przedstawiono wyniki dla detektora LBP, 
+złożonego z 10 kaskad
+przy liczbie 5000 próbek pozytywnych i zmiennej liczbie obrazów tła.
+
+\begin{table}[!h]
+	\centering                                                          
+	\caption{Skuteczność detektorów wyszkolonych 
+		dla różnych wartości parametrów narzędzia traincascade 
+		- zmienna liczba próbek negatywnych dla 5000 pozytywów.
+	}
+	\begin{tabular}{r|c|c|c|l}
+		Liczba próbek & Poprawne & Błędne   & Czas         & Czas    \\
+		negatywnych   & wykrycia & pozytywy & wykrycia (sek) & uczenia (min) \\
+		\hline
+		2000        & 593      & 211002   & 1,098       & 11 \\
+		3000        & 594      & 195190   & 0,989       & 12,5 \\
+		4000        & 1110     & 145873   & 0,911       & 15 \\
+		5000        & 840      & 169297   & 0,964       & 16,5 \\
+		6000        & 876      & 161671   & 0,917       & 18 \\
+		7000        & 1580     & 98354    & 0,823       & 22 \\
+		8000        & 1486     & 104533   & 0,781       & 25 \\
+		9000        & 1641     & 76363    & 0,776       & 33,5 \\
+		10000       & 1661     & 77879    & 0,741       & 40 \\
+	\end{tabular} 
+	\label{tab:it1detectorlist}
+\end{table}
+
+Mając do dyspozycji 1903 obrazy z oznaczonymi frontami, przetestowano 80 detektorów
+wyszkolonych przy zmiennej liczbie obrazów tła. Wyniki zamieszczone w powyższej tabeli
+\ref{tab:it1detectorlist} wskazują kilka ciekawych zależności. Po pierwsze przy stosunku próbek negatywnych do
+pozytywnych równym 1:1 skutecznść była nie tylko niezadowalająca, lecz wysoce niestabilna.
+Osiągano skrajnie różne wyniki, dla niewielkich 
+różnic w~liczbie próbek negatywnych:
 
 \begin{itemize}
-    \item detektor wykorzystujący tzw. cechy Harra - wartość 
-        domyślna (HAAR),
-    \item detektor LBP,
-    \item detektor HOG.
+	\item 3800 - 256/1903 (skuteczność 13\%),
+	\item 4000 - 1110/1903 (skuteczność 58\%).
 \end{itemize}
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		xlabel={$Liczba\ probek\ negatywnych$},
+		minor y tick num=1,
+		legend style={at={(0.55,0.90)},anchor=north west},
+		width=\textwidth*0.9, height=6cm
+		]
+		\addplot [only marks, color=blue] table {data/front_pos_5000_neg_2000_1000_effectiveness.dat};
+		\addlegendentry{skuteczność (\%)}
+		\addplot [only marks, color=red] table {data/front_pos_5000_neg_2000_1000_false_positives.dat};
+		\addlegendentry{liczba błędów (w tysiącach)}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Skuteczność w procentach oraz liczba błędnych trafień
+		w~zależności od liczby próbek negatywnych wykorzystanych 
+		w~procesie uczenia.}
+	\label{chart:5000to2000_10000neg}
+\end{figure}
+
+W~omawianym eksperymiencie przygotowano 80 detektorów, co może wydawać
+się lekką przesadą. Przeprowadzono go jednak i~opisano w~celu nakreślenia
+problemu jaki pojawia się przy zagadnieniach związanych
+z~uczeniem maszynowym
+w~kontekście wykrywania obiektów. Mowa o~efekcie skali 
+i~ogromnych zbiorach obrazów niezbędnych do przygotowania
+detektorów i~klasyfikatorów o~dobrych parametrach. 
+Jak to zostało podkreślone, przy niewielkiej liczbie próbek - na poziomie kilku tysięcy 
+(3800 - 4000) - pojawienie się kliku(set)
+specyficznych obrazów może
+zupełnie zmienić charakterystykę uczonego detektora. Wraz ze wzrostem liczebności zbioru
+obrazów tła skuteczność szkolonych detektorów stabilizowała się na poziome 1600[+/-50]/1903
+(84[+/-3]\%).
+
+Oczywistym wręcz wnioskiem jest to, że im więcej negatywnych próbek tym lepiej.
+Co ciekawe, wraz ze wzrostem ilości obrazów tła, odnotowano nie tylko spadek 
+wykryć błędnych lecz
+co ważniejsze, znaczny wzrost skuteczności uczonych detektorów. Wartości te były ze sobą
+skorelowane - "lepsze" detektory miały lepszą skuteczność przy jednoczesnym mniejszym
+odsetku błędnych trafień - wykres \ref{chart:5000to2000_10000neg}.
+
+Rosnąca liczba wykorzystanych obrazów tła, oprócz poprawienia skuteczności, miała
+też wpływ na wydajność, czyli szybkość wykrywania obiektu w~obrazie. Najprawdopodobniej
+fragmenty obrazów nie zawierające frontu autobusu były częściej i~szybciej odrzucane jako
+niepoprawne, przy jednoczesnym wykorzystaniu mniejszej ilości cech oraz kaskad.
+Wraz ze wzrostem liczby negatywnych próbek wykorzystanych w~procesie przygotowywania
+detektora, z~dwuch do dziesięciu tysięcy uzyskano wzros wydajności żędu 300 milisekund - 
+tabela \ref{tab:it1detectorlist} (test wykonany na maszynie z~procesorem AMD Sempron 2800+).
 
 Wykonany został
 krótki test porównawczy skuteczności i~czasu potrzebnego na nauczenie
