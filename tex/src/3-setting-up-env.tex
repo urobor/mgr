@@ -10,7 +10,7 @@ w~pierwszej kolejności były przetwarzane przez algorytmy o~najmniejszej
 złożoności obliczeniowej. Dzięki temu
 bardziej złożone i~intensywne obliczeniowo algorytmy będą operowały 
 na mniejszych zbiorach danych, przez co czas przetwarzania ulegnie
-skróceniu, a~otrzymane wyniki będą bardziej adekwatne.
+skróceniu, a~otrzymane wyniki powinny być bardziej adekwatne.
 
 Przykładowa sekwencja mogłaby wyglądać
 w~sposób następujący:
@@ -18,16 +18,14 @@ w~sposób następujący:
 \begin{enumerate}
     \item Przeszukiwanie klatki pod kątem wystąpienia frontu autobusu -
         wstępna segmentacja.
-    \item Identyfikacja marki i~modelu (opcjonalne).
+    \item Opcjonalna identyfikacja marki i~modelu autobusu w~celu wybrania
+    odpowiedniej ścieżki dalszego przetwarzania.
     \item Przeszukiwanie fragmentu reprezentującego front autobusu
         pod kątem numeru linii.
     \item Odczyt numeru z~odnalezionego fragmentu obrazu.
 \end{enumerate}
 
-Postępująca segmentacja obrazu powinna umożliwić rozpoznanie
-numeru autobusu w~czasie rzeczywistym, niezależnie od klasy urządzenia.
-
-Biorąc pod uwagę powyższe wymagania
+Biorąc pod uwagę powyższe wymagania,
 w~ramach niniejszej pracy dyplomowej powinien powstać algorytm 
 składający się co najmniej z~trzech niezależnych elementów. 
 Każdy ze wspomnianych procesów musi zostać odpowiednio skonfigurowany
@@ -41,7 +39,7 @@ wydaje się być kaskadowy detektor dostępny w~bibliotece OpenCV.
 Wybór ten niesie za sobą konieczność przeprowadzeniu procesu uczenia
 detektorów. Jest to bardzo czasochłonne przedsięwzięcie, 
 wymaga dużych zbiorów danych uczących, zbioru testowego, a~wykonanie
-jednego przebiegu programu może trwać nawet do kilkunastu godzin. 
+jednego przebiegu programu może trwać nawet do kilku dni. 
 W~następnych podrozdziałach 
 przedstawione zostały narzędzia, których
 zadaniem miała być maksymalna automatyzacja i~optymalizacja procesu uczenia
@@ -52,8 +50,8 @@ weryfikacji.
 
 Celem tego rozdziału było więc udokumentowanie prób przeprowadzonych
 na drodze do osiągnięcia jak najbardziej zoptymalizowanego 
-i~zautomatyzowanego procesu przygotowywania oraz testowania detektorów,
-oraz innych elementów docelowego systemu.
+i~zautomatyzowanego procesu przygotowywania oraz testowania detektorów, 
+czyli głównych i~jedynych uczonych maszynowo elementów systemu.
 
 \section{Wspomaganie pobierania filmów z serwisu YouTube}
 
@@ -67,7 +65,7 @@ następujące:
 
 \begin{enumerate}
     \item Wizualizacja stanu w~jakim znajduje się oglądany film - 
-        możliwe są dwa stany:
+        możliwe były dwa stany:
     \begin{itemize}
         \item co najmniej jedna wersja filmu została już pobrana,
         \item film nie został pobrany w~żadnej wersji.
@@ -77,26 +75,26 @@ następujące:
     \item Tworzenie pliku CSV (\textit{ang. Comma Separated Value})
         z~danymi pobranych filmów, celem identyfikacji już pobranych
         pozycji. Plik powinien być tak skonstruowany aby można go było
-        również wykorzystać do odtworzenia bazy filmów na dysku. W~razie
+        również wykorzystać do odtworzenia bazy filmów na dysku w~razie
         awarii lub chęci przeprowadzenia całego procesu uczenia od
         początku.
 \end{enumerate}
 
-Powstały dwie wersje wtyczki. Pierwsza wkomponowana w~stronę portalu
-jak na rysunku \ref{fig:firefoxplugin1}, oraz druga, 
-ze względu na problemy 
-z~interakcją z~interfejsem serwisu, umieszczona w~GUI samej przeglądarki.
-
 \begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{img/env_yt_dwn_indicator}
-    \caption{Przycisk rozwijanego menu, oraz wskaźnik stanu}
-    \label{fig:firefoxplugin1}
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/env_yt_dwn_indicator}
+	\caption{Przycisk rozwijanego menu oraz wskaźnik stanu}
+	\label{fig:firefoxplugin1}
 \end{figure}
+
+Powstały dwie wersje wtyczki. Pierwsza wkomponowana w~stronę portalu
+jak na rysunku \ref{fig:firefoxplugin1} oraz druga, 
+ze względu na problematyczną integrację przycisków z~interfejsem serwisu,
+umieszczona w~GUI samej przeglądarki.
 
 Funkcjonalność drugiej wersji programu została drastycznie zmniejszona.
 Ograniczała się do możliwości oznaczania wybranego filmu 
-wraz z~jego wersją, oraz
+wraz z~jego wersją oraz
 eksportu tak utworzonych wpisów do pliku.
 Przepływ sterowania dla drugiej wersji programu został przedstawiony
 na diagramie \ref{fig:firefoxpluginflow}.
@@ -108,14 +106,13 @@ na diagramie \ref{fig:firefoxpluginflow}.
     \label{fig:firefoxpluginflow}
 \end{figure}
 
-Niestety pierwszy program ,,pomocniczy'' okazał się narzędziem nie
-adekwatnym
+Niestety pierwszy program ,,pomocniczy'' okazał się narzędziem nieadekwatnym
 (zbyt skomplikowanym i~pracochłonnym) do postawionego mu zadania. 
 Okazało się, że
 filmów zawierających fronty autobusów jest znacznie mniej niż mogło 
 by się wydawać. Po znalezieniu 14 pozycji zawartość serwisu 
 (w~kontekście frontów autobusów) nagle się
-wyczerpała. Ostatecznie wielotygodniowe (dokładnie dwu) prace nad 
+wyczerpała. Ostatecznie dwutygodniowe prace nad 
 wtyczką do programu 
 Firefox zaowocowały bazą czternastu pozycji w~formie pliku CSV,
 co oczywiście o~wiele szybciej, prościej, wydajniej, taniej i~krótko 
@@ -146,13 +143,13 @@ Skrypt podobnie jak uprzednio opisana wtyczka był napisany
 nieco zbyt wcześnie. W~tym przypadku jednak nakład pracy jaki 
 można było zautomatyzować był znacznie większy. Oznaczonych zostało 
 bowiem kilka tysięcy klatek reprezentujących fronty autobusów
-(w tym kilkaset frontów autobusów Solaris Urbino), oraz kilka tysięcy
+(w tym kilkaset frontów autobusów Solaris Urbino) oraz kilka tysięcy
 obrazów tła. 
 
 Po wyeksportowaniu plików roboczych na serwery serwisu GitHub
 nadarzyła się okazja do przetestowania omawianego skryptu.
 Podczas przenoszenia danych - wyłuskanych 
-zdjęć z~podziałem na fronty, solarisy i~tła, nastąpiła awaria dysku
+zdjęć z~podziałem na fronty, fronty typu Solaris i~obrazy tła, nastąpiła awaria dysku
 twardego. Posiadając jedynie pliki wskazujące klatki oraz plik 
 z~danymi filmów udało się odtworzyć wszystkie wyłuskane i~oznaczone
 zdjęcia. Po drobnych poprawkach w~skrypcie zaoszczędzono kilka wieczorów
@@ -165,7 +162,15 @@ W~miarę jak prace nad algorytmem i~implementacją postępowały, powstawały
 coraz to nowe narzędzia pomocnicze, których mnogość i~prostota nie
 pozwalały na zamieszczenie ich szczegółowego opisu. 
 
-Problem którego nie udało się zautomatyzować 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/env_benchmark_fail_1}
+	\caption{Błędne założenia przy implementacji narzędzi do
+		weryfikacji skuteczności}
+	\label{fig:autoverificationfail}
+\end{figure}
+
+Problem, którego nie udało się zautomatyzować 
 w~ramach pierwszej iteracji to weryfikacja skuteczności
 całego algorytmu oraz poszczególnych jego elementów. Pierwszą
 próbą weryfikacji skuteczności było prymitywne porównywanie współrzędnych
@@ -175,14 +180,6 @@ detektorów.
 Przyjęty margines błędu - (+/-) 1/4 wysokości i~szerokości - skutkował dość
 wysokimi uzyskanymi współczynnikami skuteczności. Podejście to okazało
 się jednak zupełnie nieadekwatne do postawionego zadania.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{img/env_benchmark_fail_1}
-    \caption{Błędne założenia przy implementacji narzędzi do
-    weryfikacji skuteczności}
-    \label{fig:autoverificationfail}
-\end{figure}
 
 Stosując przedstawianą metodę otrzymywano 
 duży odsetek mocno nieprecyzyjnych oznaczeń
@@ -202,7 +199,8 @@ oraz plik tekstowy wskazujący współrzędne czworokąta okalającego.
 Ogólny odsetek wykryć na takim zbiorze był zadowalający. 
 Ostatecznie zrezygnowano z~przechowywania pełnych klatek na rzecz
 wycinków reprezentujących wyłącznie instancje szukanych obiektów.
-Było to spowodowane ograniczeniem przestrzeni dyskowej. Zbiór pełnych
+Było to spowodowane ograniczeniem przestrzeni dyskowej (w~tym momencie
+prac posiadano jedynie niewielki dysk SSD o~pojemności 120GB). Zbiór pełnych
 klatek zajmował 22 GB, kiedy te same dane - fronty autobusów - po
 przycięciu zajmowały nieco ponad 2 GB.
 
@@ -218,8 +216,7 @@ zbioru testowego co było główną przyczyną
 całkowitego zaniechania automatycznych testów skuteczności
 w~ramach pierwszej iteracji.
 
-
-Za główny cel, postawiono jak najszybsze uruchomienie
+Za główny cel postawiono jak najszybsze uruchomienie
 aplikacji na urządzeniu. Mając działający prototyp, czyli
 pewność, że aplikacja da się uruchomić, działa w~czasie zbliżonym
 do rzeczywistego i~zwraca wyniki wskazujące na możliwość
@@ -240,28 +237,36 @@ zbiorowej. Organizacja serwisu umożliwiła zastosowanie
 podziału zbioru ze względu na numer linii, niestety
 w~skład każdego zbioru wchodziły zarówno autobusy miejskie, dalekobieżne
 jaki i~tramwaje. Ostatecznie pobrano 528 zestawów zdjęć reprezentujących
-poszczególne linie, oraz zawierających średnio 40 zdjęć każdy, co
+poszczególne linie, zawierających średnio 40 zdjęć każdy, co
 w~sumie dało 19367 obrazów, które trzeba było poddać weryfikacji.
 
-W~celu weryfikacji detektorów frontów autobusów wybranych zostało 2000
+W~celu weryfikacji detektorów frontów autobusów wybranych zostało 3100
 zdjęć zawierających przody autobusów posiadających:
 
 \begin{itemize}
     \item wyświetlacz diodowy z~numerem i~nazwą kierunku,
     \item numer linii w~lewym górnym rogu frontu.
-\end{itemize}.
+\end{itemize}
 
-Ograniczenia wynikały ze względu na tendencje do wykrywania 
-tego typu frontów przez przygotowane detektory, oraz
-potrzebę uproszczenia przy wyszukiwaniu numeru linii w~znalezionym
-froncie autobusu. Jednocześnie
+Ograniczenie zbioru do frontów autobusów z~wyświetlaczem diodowym
+wynikało ze względu na tendencje do wykrywania 
+tego typu frontów przez przygotowane detektory. Ograniczenie
+obszaru wyszukiwania numeru do lewego górnego rogu frontu
+spowodowane było znacznym odsetkiem takich właśnie modeli 
+występujących w~posiadanym zbiorze. Można było 
+w~ten sposób znacznie zwiększyć odsetek poprawnych wyników,
+wprowadzając jednocześnie marginalną liczbę nieudanych odczytów.
+Było to wymagane, gdyż zaobserwowano tendencje do 
+wykrywania ,,numerów'' w~tekście opisującym 
+kierunek danej linii, co zupełnie uniemożliwiało odczyt.
+Jednocześnie
 był to zbiór na tyle obszerny, że tak przygotowany prototyp aplikacji byłby
 w~pełni funkcjonalny w~wielu miastach (na przykład w~Warszawie - gdzie
 wszystkie aktualnie wykorzystywane autobusy spełniają oba powyższe
 ograniczenia).
 
-Kolejnym narzędziem był skrypt przygotowujący zestaw wybranych 2000 zdjęć,
-tak aby można było je wykorzystać w~procesie zarówno weryfikacji jak 
+Kolejnym narzędziem był skrypt przygotowujący zestaw wybranych 3100 zdjęć
+tak, aby można było je wykorzystać w~procesie zarówno weryfikacji jak 
 i~optymalizacji detektorów. Uruchomienie skryptu polegało na wyświetleniu
 każdego ze zdjęć z~możliwością oznaczenia czworokąta okalającego front
 (wykorzystano w~tym celu bibliotekę OpenCV). Dodatkowym ograniczeniem

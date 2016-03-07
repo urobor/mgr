@@ -1,38 +1,21 @@
 \chapter{Implementacja i testy na telefonie}
 
-Ostatecznie zaimplementowano dwie wersje programu na urządzeniu mobilnym.
-Pierwszy program był jednowątkowy, gdzie odczytany numer zapisywany
-był tylko do pliku z~logami. Była
-to wersja deweloperska i~nie zostały podjęte żadne próby optymalizacji
-działania aplikacji. Celem przedsięwzięcia
-było uruchomienie wszystkich komponentów na telefonie. Głównie
-chodziło o~dostosowanie elementów aplikacji odpowiedzialnych za
-dostęp do plików tekstowych i~graficznych zapisanych w~pamięci telefonu.
-Był to obszar który najbardziej różnił aplikacje napisane z~myślą
-o~uruchomienia na komputerze stacjonarnym od tych pisanych na telefon.
-
-Druga wersja programu została wzbogacona o~komentarz głosowy
-podczas jego działania. Wprowadzona została wielowątkowość, 
-która powinna zwiększyć wydajność aplikacji uruchomionej na 
-urządzeniu z~wieloma rdzeniami procesora.
-Wprowadzona została minimalna funkcjonalność przepływu
-sterowania aplikacją. Wprowadzone zostały dwa tryby wyszukiwania
-i~tryb spoczynku. Jest to pierwsza wersja demonstracyjna, którą
-bez dodatkowych modyfikacji można użyć do testów w~terenie.
-
-\section{Pierwsza wersja programu - implementacja na dwuch urządzeniach}
-
-Pierwszą wersję programu uruchomiono na dwóch urządzeniach:
-
+Od rozpoczęcia prac do ostatniej implementacji upłynęły 653 dni.
+Pierwsze dwie instalacje wykonano na urządzeniach:
 \begin{itemize}
-    \item HTC Desire Z,
-    \item SONY Xperia E.
+	\item HTC - Desire Z,
+	\item Sony - Xperia E.
 \end{itemize}
+
+Były to wersje algorytmu wykorzystującego jeszcze dopasowywanie 
+wzorca w~ostatnim etapie celem weryfikacji odnalezionych cyfr.
+Ze względu na słabe wyniki, które zmusiły do przeprojektowania
+rozwiązania, nie wykonano wtedy żadnych szczegółowych pomiarów.
 
 Na urządzeniu HTC osiągnięto wydajność rzędu 4-6 klatek na sekundę
 w~trybie wyszukiwania frontu. Odnalezienie frontu i~przejście 
 w~tryb odczytu numeru powodowało spadek częstotliwości odświeżania
-do 0.76 klatki na sekundę (rysunek \ref{fig:imp_htc_v1}).
+do 0.77 klatki na sekundę (rysunek \ref{fig:imp_htc_v1}).
 
 \begin{figure}[h!]
     \centering
@@ -52,166 +35,661 @@ klatki na sekundę (rysunek \ref{fig:imp_sony_v1}).
     \label{fig:imp_sony_v1}
 \end{figure}
 
-Jak widać oba urządzenia są podobnej klasy. Ze względu na brak
-znaczących różnic w~wydajności dalsze testy drugiej wersji 
-programu odbywały się na urządzeniu SONY.
-
-\section{Druga wersja programu}
-
-Usprawnienia wprowadzone w~drugiej wersji miały na celu zwiększenie
-wydajności, zwiększenie funkcjonalności oraz przystosowanie 
-aplikacji do działań w~terenie.
-
-Zwiększenie wydajności ograniczało się do doboru optymalnych parametrów
-detektorów - funkcji \verb|detectMultiScale| - czyli:
-
+Trzeba pamiętać, że rozdzielczość na obu urządzeniach była ograniczona
+rozdzielczością wyświetlacza \footnote{Biblioteka OpenCV do ciągłego pobierania
+	danych z~aparatu urządzenia wykorzystuję funkcję podglądu 
+	dostępną w~API systemu Android. Minusem takiego podejścia 
+	jest zaniżona rozdzielczość pobieranych obrazów, która w~trybie podglądu jest ograniczona
+	rozdzielczością wyświetlacza.}, która w~obu przypadkach była zbliżona:
 \begin{itemize}
-    \item współczynnika skalowania,
-    \item minimalnych wymiarów czworokąta okalającego,
-    \item maksymalnych wymiarów czworokąta okalającego,
-    \item ilości sąsiadów.
+	\item HTC - 800x480,
+	\item Sony - 768x432.
 \end{itemize}
 
-Kluczowe dwa parametry to współczynnik skalowania i~minimalny rozmiar
-obiektu. Dodatkowym czynnikiem wpływającym na wydajność było
-skalowanie obrazu wejściowego. W~pierwszym kroku - detektor frontu -
-klatka obrazu pobrana z~aparatu była zmniejszana do zadanej wartości
-celem przyspieszenia procesu detekcji. Pozostałe kroki wykorzystywały
-ten mechanizm raczej w~celu ujednolicenia wymiarów, czy to całych 
-numerów czy pojedynczych cyfr. W~tabelce zamieszczono wszystkie 
-parametry wykorzystane w~poszczególnych krokach.
+Będąc w~posiadaniu końcowej wersji aplikacji opartej na dwunastu
+detektorach kaskadowych przystąpiono do szczegółowych pomiarów. 
+Tym razem urządzeniem testowym był aparat LG G3. Większa rozdzielczość
+wyświetlacza umożliwiała wykonywanie testów nawet w~rozdzielczości 1920x1440.
+Biorąc pod uwagę ponad siedmiokrotne zwiększenie liczby pikseli 
+w~obrazie do przeszukania, pierwszym etapem było zbadanie 
+wydajności urządzenia na biegu jałowym. Wyniki pomiaru 
+pobierania klatek z~aparatu przedstawiono w~następnym podrozdziale. 
 
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{r c c c c c }
-        Etap    & Wysokość  & Wsp. skal.    & Min   & Max   & Sąsiedzi \\ \hline
-        Front   & 140       & 1.02          & 60    & 120   & 10 \\
-        Numer   & 150       & 1.01          & 30    & 150   & 5 \\
-        Cyfry   & 110       & 1.01          & 40    & 110   & 40
-    \end{tabular}
-    \caption{Parametry detektorów}
-    \label{tab:imp_det_params}
-\end{table}
+\section{Testy wydajności podstawowych funkcji}
 
-Funkcjonalność została zwiększona poprzez możliwość włączania i~wyłączania
-trybu wyszukiwania. Dodany został komentarz słowny opisujący stany 
-aplikacji. W~tym celu wykorzystano syntezator tekstu na mowę
-obecny w~bibliotekach systemu android. W~wersji roboczej używane
-były komunikaty w~języku angielski opisujące następujące stany:
-
-\begin{itemize}
-    \item po uruchomieniu aplikacji odczytywany był powitalny komunikat -
-        ,,Point phone on bus front'',
-    \item po wykryciu frontu aplikacja przechodziła w~stan zbierania
-        maksymalnie stu klatek do bufora celem późniejszego przetworzenia.
-        Towarzyszył temu zdarzeniu komunikat ,,Bus spotted, gathering
-        data'',
-    \item po zapełnieniu kolekcji (jeżeli odczyt nie nastąpił wcześniej),
-        odczytywany był komunikat ,,Data gathered, processing'',
-    \item opcjonalnie, gdy dla 20 klatek z~rzędu nie następowało wykrycie
-        frontu następował odczyt komunikatu ,,Bus lost'', a~aplikacja
-        automatycznie przechodziła w~stan spoczynku,
-    \item ostatnim komunikatem był po prostu odczytany numer, po 
-        odczytaniu tego komunikatu aplikacja również przechodziła
-        w~stan spoczynku.
-\end{itemize}
-
-Zaimplementowany
-mechanizm wielowątkowości zakładał istnienie trzech kolejek FIFO,
-w~których umieszczano wyniki poszczególnych etapów algorytmu.
-Po uruchomieniu aplikacja znajdowała się w~stanie spoczynku (idle)
-i~dopiero po kliknięciu przycisku w~menu - Start/Stop - mogła
-zostać wprowadzona w~stan wyszukiwania frontu w~scenie.
-W~stanie wyszukiwania frontu uruchomiany był detektor frontów,
-który przeszukiwał wszystkie pobrane z~aparatu klatki pod kątem
-wystąpienia frontu autobusu. Po pierwszym odnalezieniu frontu
-uruchamiane były wszystkie trzy wątki poprzez umieszczenie
-stu kolejno pobranych obrazów do pierwszej kolejki.
-
-Wątek główny umieszczał obrazy pobrane z~kamery telefonu do
-pierwszej kolejki zawierającej pełne klatki. Proces ten trwał
-do zapełnienia kolejki, której rozmiar określony był na 100 elementów.
-
-Drugi wątek (pierwszy wątek tła) odpowiedzialny był za pobieranie 
-obrazów z~pierwszej kolejki i~umieszczanie wycinków obrazów 
-reprezentujących fronty
-w~następnej kolejce. Wątek ten był uruchamiany wraz ze startem aplikacji
-jednak gdy kolejka z~pełnymi klatkami była pusta, czy uległa właśnie 
-wyczerpaniu, wątek wprowadzany był w~stan spoczynku i~sprawdzał co
-100 ms czy kolejka ma elementy. W~podobny mechanizm wyposażony był
-trzeci wątek. Tu z~kolei wejściowa kolejka zawierała fronty autobusów
-na wyjściu natomiast uzupełniania była kolejka z~obrazami zawierającymi
-jedynie numer linii.
-
-Ostatni wątek - najbardziej intensywny obliczeniowo - pobierał obrazy
-z~kolejki z~numerami i~kolejno uruchamiał detektory cyfr oraz 
-funkcję dopasowującą wzorce. Wynikiem pojedynczej iteracji był 
-ciąg znaków zawierający odczytany numer. Pewnego rodzaju zabezpieczeniem
-było umieszczanie odczytanych ciągów znaków w~słowniku z~przypisaną
-im liczbą wystąpień. Po osiągnięciu pewnej z~góry zadanej liczby
-odczytów wybierany był ten numer do którego przypisana była największa 
-liczba wystąpień. Wtedy automat odczytywał numer i~wprowadzał 
-aplikację w~stan jałowy.
-
-Przykładowy film z~działania aplikacji można znaleźć na kanale
-,,Kuba Sałkowski'' w~serwisie YouTube. Można tam również znaleźć 
-większość z~pozostałych przeprowadzonych eksperymentów.
-
-Na zakończenie wykonano dziesięć prób wykrycia numeru autobusu
-ze statycznego zdjęcia wyświetlanego na ekranie monitora.
-Zdjęcie przedstawiało autobus Neoplan linii 188 jak na rysunku poniżej.
+Podczas obcowania z~urządzeniem zaobserwowany został niepokojący fakt - telefon
+będąc dłużej pod pełnym obciążeniem znacząco się rozgrzewał. Obudowa 
+stawała się odczuwalnie gorąca. Podczas pierwszego kilkuminutowego
+testu zbadano wpływ temperatury urządzenia na jego wydajność. Wyniki zaprezentowane
+zostały na wykresie \ref{chart:time_2_temp_2_fps}. 
 
 \begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.9\textwidth]{img/imp_final_test_img}
-    \caption{Obraz testowy ostatecznej wersji programu}
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Liczba\ klatek\ na\ sekunde$},
+		xlabel={$Liczba\ pobranych\ klatek$},
+		minor y tick num=1,
+		legend style={at={(0.05,0.30)},anchor=north west},
+		width=\textwidth*0.9, height=6cm
+		]
+		\addplot [only marks, color=blue] table {data/phone/raw1920x1440x01.dat};
+		\addlegendentry{pierwsza proba}
+		\addplot [only marks, color=red] table {data/phone/raw1920x1440x02.dat};
+		\addlegendentry{druga proba}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Częstość pobierania klatek obrazu w~zależności od czasu (podczas 
+		ciągłej pracy urządzenie stawało się odczuwalnie gorące). 
+		Druga próba wykonana była po wystygnięciu urządzenia zaraz po pierwszej.
+		Najwidoczniej urządzenie nie wystygło w~pełni i~szybciej się rozgrzało
+		co spowodowało przejście urządzenie w~stan ograniczonej wydajności.}
+	\label{chart:time_2_temp_2_fps}
 \end{figure}
 
-Dla przedstawionego zdjęcia otrzymano wyniki zaprezentowane
-w~tabeli \ref{tab:imp_lab_final_test_result}.
+Zakładając, że w~implementacji bazowej dostarczonej wraz z~biblioteką 
+OpenCV nie ma wycieków pamięci, można wysnuć tezę, że dwukrotny spadek
+wydajności urządzenia spowodowany jest owym wzrostem temperatury.
+Celem tego eksperymentu nie było wyznaczanie czasu
+po którym następuje spadek wydajności, czy innych precyzyjnych parametrów.
+Najważniejszym był fakt, że problem w~ogóle się pojawia i~trzeba brać go pod uwagę.
+Może on nie dotyczyć wszystkich urządzeń lub objawiać się w~większym bądź
+mniejszym stopniu. Ważnym jest aby podczas projektowania rozwiązania
+mieć świadomość, że taki przypadek może mieć miejsce.
+ Można zastosować wiele technik ograniczających zużycie 
+procesora jak chociażby wprowadzenie oszczędnego trybu pracy podczas
+wyszukiwania samego frontu. W~takim trybie aplikacja pobierałaby na przykład
+co dziesiątą klatkę obrazu lub uruchamiała detektor
+co sekundę. Powinno to znacząco ograniczyć wykorzystanie zasobów
+obliczeniowych urządzenia.
 
-\begin{table}[!h]
-    \centering
-    \begin{tabular}{r c c c l }
-        Lp. & Zebranie 100 próbek   & Odczyt    & Suma  & Wynik \\ \hline
-        1   & 06.72                 & 07.03     & 13.75 & 188   \\
-        2   & 06.57                 & 02.84     & 09.41 & 18    \\
-        3   & 05.35                 & 04.36     & 09.71 & 188   \\
-        4   & 05.65                 & 10.90     & 16.55 & Error \\
-        5   & 06.30                 & 04.05     & 10.35 & 166   \\
-        6   & 05.90                 & 07.36     & 13.26 & 188   \\
-        7   & 06.04                 & 04.99     & 11.03 & 188   \\
-        8   & 06.35                 & 02.86     & 09.21 & 1     \\
-        9   & 05.60                 & 05.95     & 11.55 & 188   \\
-        10  & 05.15                 & 07.38     & 12.53 & 188   \\
-    \end{tabular}
-    \caption{Wyniki testów manualnych w~warunkach laboratoryjnych}
-    \label{tab:imp_lab_final_test_result}
-\end{table}
+Kolejnym testem było sprawdzenie wpływu wielkości obrazu na 
+wydajność. Po ponad siedmiokrotnym zmniejszeniu rozdzielczości - z 1920x1440 na 
+800x480 (jak na urządzeniach poprzedniej generacji: SONY i HTC) nie uzyskano 
+zbyt wielkiego skoku wydajnościowego. 
 
-Podsumowując, średni czas potrzebny na zebranie 100 próbek to około 6
-sekund. Trudno określić czas potrzebny na odczyt, ponieważ 
-wątek odpowiedzialny za to zadanie uruchamiany był zaraz 
-po zebraniu i~wyłuskaniu obszaru z~numerem z~pierwszej klatki 
-zawierającej front autobusu. Jednak widać, że ilość uruchomionych
-detektorów miała duży wpływ na długość tej fazy. Cechowała się
-ona też dużą zmiennością - od 3 do 11 sekund. Co prawda czas 
-poniżej 3 sekund osiągnięto dla próby w~której otrzymano wynik błędny,
-a~czas powyżej 10 sekund był wynikiem błędu aplikacji. 
-Dla poprawnych rezultatów czasy wahały się od 4 do 7 sekund.
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Liczba\ klatek\ na\ sekunde$},
+		xlabel={$Liczba\ pobranych\ klatek$},
+		minor y tick num=1,
+		legend style={at={(0.05,0.30)},anchor=north west},
+		width=\textwidth*0.9, height=6cm
+		]
+		\addplot [only marks, color=blue] table {data/phone/raw1920x1440x01.dat};
+		\addlegendentry{rozdzielczosc 1920x1440}
+		\addplot [only marks, color=green] table {data/phone/raw800x480x01.dat};
+		\addlegendentry{rozdzielczosc 800x480}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Częstość pobierania klatek obrazu w~zależności od czasu oraz
+		rozmiarów zdjęć pobieranych z~aparatu urządzenia}
+	\label{chart:time_2_temp_2_fps_with_resolution_change}
+\end{figure}
 
-Czas od rozpoznania pierwszego wystąpienia
-frontu do pełnego wyhamowania autobusu to od 3 do 5 sekund. Faza zbierania 
-pełnych klatek wydaje się więc być jednym z~pierwszych elementów 
-w~kolejce do usprawnienia. Kryterium końcowym fazy pobierania obrazów
-mogło by być osiągnięcie przez kwadrat okalający odpowiedniej 
-zadanej z~góry maksymalnej wysokości lub wielkość w~ogóle. 
-Jasnym jest, że końcowa wersja programu przygotowana na potrzeby
-tego opracowania jest dopiero punktem wyjścia do dalszych 
-bardziej niezawodnych implementacji. Wydaje się, że wiele usprawnień
-można wprowadzić niewielkim nakładem pracy. Niestety 
-do osiągnięcia zadowalających wyników niezbędnym jest wprowadzenie
-ich niemal w~każdej fazie algorytmu i~elemencie programu. 
-Ważnym aspektem pozostaje weryfikacja dokładności i~skuteczności
-działania algorytmu o~czym szerzej w~podsumowaniu.
+Jedyne co można zaobserwować na wykresie \ref{chart:time_2_temp_2_fps_with_resolution_change} to mniejsza podatność
+na wzrost temperatury urządzenia, czyli mniejszy spadek wydajności
+po dłuższej pracy pod obciążeniem.
 
+\subsection{Pomiar czasu detekcji frontu na zdjęciu przeskalowanym do zadanej
+	wysokości}
+
+Przeskalowanie klatki obrazu o~wymiarach 1920x1440 pikseli do rozmiarów
+300x225 wraz z~uruchomieniem detektora frontów w~tak przygotowanym obrazie
+zajęło około 50 milisekund. Zdarzały się przypadki na poziomie poniżej
+25 ms jednak wraz ze wzrostem temperatury urządzenia czas wykrywania 
+frontu wzrastał, co zostało przedstawione na wykresie \ref{chart:detector_ms_time}.
+Można tu odnotować trzy interesujące przedziały czasowe, dla których
+wyliczono następujące średnie:
+\begin{itemize}
+	\item 1 - 1133 gdy urządzenie było jeszcze zupełnie zimne, średni czas
+	wykonania: 44 ms,
+	\item 1133 - 2611 zauważalny wzrost temperatury (pojedyncze przypadki na poziomie lub poniżej 50 ms), średni czas wykonania: 73 ms,
+	\item 2612 - 3000 - przejście urządzenia w tryb oszczędny ze względu na temperaturę, średni czas wykonania: 131 ms,
+	niemal wszystkie odczyty powyżej 100 ms.
+\end{itemize}
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Czas\ pobrania\ obrazu$},
+		xlabel={$Liczba\ pobranych\ klatek$},
+		minor y tick num=1,
+		legend style={at={(0.05,0.90)},anchor=north west},
+		width=\textwidth*0.9, height=6cm
+		]
+		\addplot[mark=none, green, line width=2pt] coordinates {(0,44) (1150,44)};
+		\addlegendentry{średni czas 44 ms}
+		\addplot[mark=none, yellow, line width=2pt] coordinates {(1160,73) (2620,73)};
+		\addlegendentry{średni czas 73 ms}
+		\addplot[mark=none, red, line width=2pt] coordinates {(2630,131) (3000,131)};
+		\addlegendentry{średni czas 131 ms}
+		\addplot [only marks, mark size=0.5, color=green] table {data/phone/detector01.dat};
+		\addplot [only marks, mark size=0.5, color=yellow] table {data/phone/detector02.dat};
+		\addplot [only marks, mark size=0.5, color=red] table {data/phone/detector03.dat};
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Rosnący czas, potrzebny na pobranie obrazu z~aparatu urządzenia, w~zależności
+		od czasu pracy pod obciążeniem z~uwzględnieniem etapów kiedy urządzenie jest:
+		zimne (kolor zielony), rozgrzewa się (kolor żółty), ze względu na 
+		temperaturę zostało w~prowadzone w~tryb
+		ograniczonej wydajności (kolor czerwony)}
+	\label{chart:detector_ms_time}
+\end{figure}
+
+Im dłużej urządzenie pracowało na pełnych obrotach, tym bardziej wzrastała jego 
+temperatura i~spadała wydajność. Co ważne, do momentu pobrania
+nieco ponad tysiąca klatek przeskalowanie obrazu i~przeszukanie go
+pod kątem wystąpienia frontu autobusu trwało nie więcej niż 75 milisekund,
+a~znaczna większość przypadków trwała krócej niż 50 ms. Jest to bardzo 
+ważna wartość progowa. Tyle właśnie czasu trwa pobranie pojedynczego
+obrazu z~aparatu urządzenia bez żadnych dodatkowych modyfikacji.
+Rozpatrując potencjalne zrównoleglenie procesu, czasy
+pobrania klatki i~wyszukania frontu będące na tym samym poziomie 
+umożliwiają optymalne wykorzystanie co najmniej dwóch rdzeni procesora urządzenia. 
+Urządzenie testowe - LG G3 - wyposażone zostało w~czterordzeniowy procesor. Istnieje 
+więc realna szansa wykonania całego procesu nawet do~20 razy na sekundę. 
+Jednak wszystkie dotychczasowe wersje testowe jak i~program końcowy zaprojektowane i~zaimplementowane
+zostały w~sposób jednowątkowy. Osiągnięcie wydajności na poziomie 20 odczytów na
+sekundę jest więc jednym z~proponowanych usprawnień.
+
+Wykrywanie numeru okazało się zadaniem dużo mniej złożonym obliczeniowo.
+Średni czas wykrycia numeru we froncie to 16 ms. Założenie, że nigdy nie
+przekroczy on 40 ms jest bardziej niż pewne.
+To, z~kolei ,
+umożliwia przeszukanie 25 frontów pod kątem wystąpienia numeru na sekundę.
+W~razie potrzeby proces ten mógłby być obsługiwany przez kolejny wątek.
+Wąskim gardłem byłyby w~tym przypadku operacje pobrania obrazu 
+z~aparatu urządzenia oraz przeskalowania i~przeszukana go pod kątem wystąpienia 
+frontu autobusu. Obie operacje, nawet wykonane równolegle uniemożliwiają 
+wykonanie całego algorytmu częściej niż 20 razy na sekundę.
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Czas\ wykonania\ [ms]$},
+		xlabel absolute, xlabel style={yshift=-0.5cm},
+		xlabel={$Liczba\ pobranych\ klatek$},
+		minor y tick num=1,
+		x tick label style={rotate=45},
+		legend style={at={(0.05,0.90)},anchor=north west},
+		width=\textwidth*0.9, height=6cm
+		]
+		\addplot [only marks, color=blue] table {data/phone/digits01.dat};
+		%\addlegendentry{czas odczytu numeru linii}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Czas potrzebny na odczytanie numeru linii z~fragmentu
+		obrazu go reprezentującego w~zależności liczby pobranych 
+		i~przetworzonych
+		klatek}
+	\label{chart:digits_ms_time}
+\end{figure}
+
+Odczyt wartości widocznej na obrazie reprezentującym numer linii
+trwał średnio 18 ms. Była to wartość uzyskana podczas pracy
+na zimnym urządzeniu. Po dokonaniu ponad 1900 odczytów
+wartość średniego czasu wykonania wzrosła do 40 ms.
+Moment przejścia urządzenia w~tryb oszczędny (chroniący go przed
+osiągnięciem nadmiernej temperatury) jest dobrze widoczny na wykresie
+\ref{chart:digits_ms_time}.
+
+W~ramach podsumowania przygotowano zbiorcze wykresy 
+przedstawiające sumaryczny czas wykonania wszystkich wspomnianych
+etapów:
+\begin{enumerate}
+    \item Pobrania obrazu z~aparatu urządzenia.
+    \item Przeskalowania klatki do 300 pikseli wysokości i~przeszukania 
+    jej pod kątem wystąpienia frontu autobusu.
+    \item Przeskalowania wycinka przedstawiającego front do 250 pikseli wysokości
+    i~przeszukania go pod kątem wystąpienia numeru (w~lewym górnym rogu obrazu).
+    \item Przeskalowanie wycinka przedstawiającego numer do 50 pikseli wysokości
+    i~przeszukania go z~wykorzystaniem dziesięciu detektorów cyfr oraz~przygotowania
+    ciągu znaków reprezentującego numer.
+\end{enumerate}
+
+Trzy wykresy reprezentują trzy wspomniane stany urządzenia: zimne,
+ciepłe (przed przejściem w~tryb oszczędny), gorące (w~trybie oszczędnym).
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Czas\ wykonania\ [ms]$},
+		xlabel absolute,
+		xlabel={$Liczba\ pobranych\ klatek$},
+		stack plots=y,
+		area style,      
+		ymin=0,         
+		minor y tick num=1,   
+		enlarge x limits=false,
+		enlarge y limits=upper,
+		width=\textwidth*0.9, height=6cm,
+		legend style={at={(0.575,0.50)},anchor=north west}
+		]
+		\addplot+[y] table {data/phone/allxother.dat} \closedcycle;
+		\addlegendentry{pobranie obrazu z aparatu}
+		\addplot+[y] table {data/phone/allxfront.dat} \closedcycle ;
+		\addlegendentry{wyszukanie frontu}
+		\addplot+[y] table {data/phone/allxnumber.dat} \closedcycle;
+		\addlegendentry{wyszukanie numeru}
+		\addplot+[y] table {data/phone/allxdigits.dat} \closedcycle;
+		\addlegendentry{odczytanie numeru}
+		
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Ogólny czas wykonania całego algorytmu na zimnym urządzeniu}
+	\label{chart:whole_alg_ms_time_cold}
+\end{figure}
+
+Gdy urządzenie było zupełnie zimne - pierwsze 600 pobranych klatek - 
+ogólny czas wykonania nie przekraczał 150 ms (dane widoczne na wykresie
+\ref{chart:whole_alg_ms_time_cold}). Wyodrębnić można podział na 
+maksymalnie trzy wątki (wyszukanie i~odczytanie numeru jako jeden wątek), 
+co w~rezultacie umożliwiłoby wykonanie pełnego cyklu w~czasie równym
+pobraniu obrazu z~aparatu: 50 ms (20 klatek na sekundę).
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Czas\ wykonania\ [ms]$},
+		xlabel absolute,
+		xlabel={$Liczba\ pobranych\ klatek$},
+		stack plots=y,
+		area style,      
+		ymin=0,         
+		minor y tick num=1,   
+		enlarge x limits=false,
+		enlarge y limits=upper,
+		width=\textwidth*0.9, height=6cm,
+		legend style={at={(0.575,0.50)},anchor=north west}
+		]
+		\addplot+[y] table {data/phone/allxother02.dat} \closedcycle;
+		\addlegendentry{pobranie obrazu z aparatu}
+		\addplot+[y] table {data/phone/allxfront02.dat} \closedcycle ;
+		\addlegendentry{wyszukanie frontu}
+		\addplot+[y] table {data/phone/allxnumber02.dat} \closedcycle;
+		\addlegendentry{wyszukanie numeru}
+		\addplot+[y] table {data/phone/allxdigits02.dat} \closedcycle;
+		\addlegendentry{odczytanie numeru}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Ogólny czas wykonania całego algorytmu na ciepłym urządzeniu}
+	\label{chart:whole_alg_ms_time_warm}
+\end{figure}
+
+Wzrost temperatury skutkował pojedynczymi wydłużonymi czasami wykonania,
+które trwały ponad 200 ms (dane zaprezentowane na wykresie
+\ref{chart:whole_alg_ms_time_warm}). Urządzenie nie przeszło wtedy
+jeszcze w~tryb zmniejszonej częstotliwości procesora.
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Czas\ wykonania\ [ms]$},
+		xlabel absolute,
+		xlabel={$Liczba\ pobranych\ klatek$},
+		stack plots=y,
+		area style,      
+		ymin=0,         
+		minor y tick num=1,   
+		enlarge x limits=false,
+		enlarge y limits=upper,
+		width=\textwidth*0.9, height=6cm,
+		legend style={at={(0.575,0.50)},anchor=north west}
+		]
+		\addplot+[y] table {data/phone/allxother03.dat} \closedcycle;
+		\addlegendentry{pobranie obrazu z aparatu}
+		\addplot+[y] table {data/phone/allxfront03.dat} \closedcycle ;
+		\addlegendentry{wyszukanie frontu}
+		\addplot+[y] table {data/phone/allxnumber03.dat} \closedcycle;
+		\addlegendentry{wyszukanie numeru}
+		\addplot+[y] table {data/phone/allxdigits03.dat} \closedcycle;
+		\addlegendentry{odczytanie numeru}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Ogólny czas wykonania całego algorytmu na gorącym urządzniu
+		pracującym w~trybie oszczędnym}
+	\label{chart:whole_alg_ms_time_hot}
+\end{figure}
+
+Po dostatecznie długiej pracy i~pobraniu ponad 1600 klatek obrazu urządzenie
+przeszło w~tryb oszczędny. Wydajność spadła prawie dokładnie dwukrotnie,
+a~czasy wykonania całego algorytmu wydłużyły się do niemal 300 milisekund
+(wykres \ref{chart:whole_alg_ms_time_hot}). Jest to problem, który
+na pewno trzeba by wziąć pod uwagę podczas projektowania
+i~implementacji komercyjnego rozwiązania.
+Na potrzeby niniejszej pracy wystarczy mieć świadomość, że zjawisko
+występuje. Przy założeniu, że aplikacja obsługiwana byłaby przez 
+trzy wątki oraz po wprowadzeniu urządzenia w~tryb ograniczonej wydajności
+czas wykonania pojedynczego odczytu wzrósłby do 100 milisekund. Czyli nadal
+możliwe byłoby pobranie i~przetworzenie 10 klatek obrazu w~ciągu jednej sekundy.
+Zakładając, że od wykrycia autobusu do zatrzymania jest około 2-4 sekundy 
+nadal dysponujemy wystarczającą liczbą obrazów do wykonania odczytu numeru.
+Problemem byłaby zatem temperatura urządzenia sama w~sobie oraz
+drastycznie skrócony czas pracy telefonu na baterii.
+	
+\subsection{Testy skuteczności na urządzeniu}
+
+Do przetestowania skuteczności wybrano zbiór 3100 wycinków
+obrazów reprezentujących fronty autobusów z~wyświetlaczem
+diodowym. Pojedynczy obraz wyświetlany był wielokrotnie
+przy jednoczesnym zwiększaniu jego rozmiarów.
+Począwszy od kwadratu o~rozmiarach 500x500 pikseli, 
+każdorazowo zwiększano wysokość i~szerokość wyświetlanego obrazu
+o~10 pikseli. Po pięćdziesięciu próbach odczytu (oraz osiągnięciu
+wymiarów równych 1000x1000 pikseli) cała procedura była powtarzana
+dla kolejnego obrazu.
+Celem tego ćwiczenia była jak najwierniejsza
+ symulacja sytuacji z~przystanku autobusowego.
+Wyświetlane w~ten sposób obrazy były odczytywane przez
+telefon ustawiony na statywie przed monitorem.
+Dane z~telefonu przekazywane były do komputera poprzez 
+kabel USB, a~następnie porównywane z~wartościami określającymi
+numer linii, które zawarte były w~nazwach plików.
+
+Taki wstępny test tylko
+na pozór symulował sytuację z~przystanku. Nie do odtworzenia
+była bowiem zmiana oświetlenia i~geometrii, a~co za tym idzie
+stopnia trudności spowodowanego przez zakłócenia. Teoretycznie,
+wykorzystując proponowaną metodę, osiągnięte wyniki
+powinny być znacznie gorsze niż w~rzeczywistości. 
+Jeżeli bowiem oryginalne zdjęcie zawierało odblaski zupełnie 
+uniemożliwiające odczytanie numeru, to stopniowe zwiększanie obrazu 
+nie usunęło tego problemu.
+Numer nie został odczytany. W~naturalnych warunkach odblaski
+na szybie powinny się ciągle zmieniać, przez co prawdopodobieństwo 
+poprawnego odczytu powinno być dużo większe. Niemożliwa byłaby bowiem sytuacja,
+ aby wraz z~przemieszczaniem się autobusu
+promienie słoneczne odbijały się cały czas w~sposób uniemożliwiający odczyt.
+
+Na wykresie \ref{chart:final_device_test} przedstawiono wyniki testu.
+Niebieskie kropki reprezentują liczbę obrazów w~poszczególnych
+grupach skuteczności. Jeżeli podczas prób z~danym obrazem, wartość
+poprawnych odczytów była równa 50 (czyli maksymalnej liczbie wyświetlanych obrazów), obraz taki umieszczany był w~katalogu o~nazwie 100. Suma wszystkich
+obrazów, per katalog, została zaprezentowana na wspomnianym wykresie
+numer \ref{chart:final_device_test}. 
+
+\begin{figure}[h!]
+	\begin{center}
+		\begin{tikzpicture}
+		\begin{axis}[
+		ylabel={$Liczba\ obrazow\ w\ danej\ grupie$},
+		xlabel={$Grupy\ procentowej\ skutecznosci\ detekcji\ calego\ systemu$},
+		minor y tick num=1,
+		legend style={at={(0.05,0.30)},anchor=north west},
+		width=\textwidth*0.9, height=6cm
+		]
+		\addplot [only marks, color=blue] table {data/final/result.dat};
+		%\addlegendentry{pierwsza proba}
+		\end{axis}
+		\end{tikzpicture}
+	\end{center}
+	\caption{Reprezentacja podzbiorów obrazów, dla których
+		testowany system osiągnął daną skuteczność wyrażoną w~procentach 
+		(oś x) oraz liczba elementów przypisanych do danej grupy (oś y)}
+	\label{chart:final_device_test}
+\end{figure}
+
+Najliczniejszą grupą - niemal 300 - 
+są obrazy dla których nie odnotowano ani jednego poprawnego odczytu.
+Kolejna liczna grupa - nieco ponad 200 - to próbki dla których
+co najmniej jeden odczyt był już prawidłowy. Co ciekawe i~ważne, odnotowano 98
+przypadków dla których wszystkie 50 odczytów było poprawnych.
+
+Patrząc na powyższy wykres można stwierdzić, że rozwiązanie jest 
+dalekie od doskonałości. Sposób mierzenia skuteczności 
+był również bardzo niedoskonały i~niepoprawnie modelował rzeczywistość.
+W~nie-laboratoryjnych warunkach wyniki powinny być raczej dużo lepsze.
+
+Ważnym produktem ubocznym omawianego doświadczenia był zestaw podzbiorów obrazów
+podzielonych i~posortowanych zgodnie z~rosnącą trudnością ich poprawnej obsługi.
+Posiadając tak spreparowane zbiory, można było w~łatwy sposób zweryfikować
+jakie były słabe elementy systemu oraz jakie przypadki użycia
+sprawiały aplikacji największe problemy.
+
+\subsection{Ręczna weryfikacja wyników na urządzeniu}
+
+Po przygotowaniu podzbiorów, posortowanych zgodnie z~rosnącą
+trudnością w~ich odczytaniu, przystąpiono do ręcznej weryfikacji wyników.
+Zupełnie pominięte zostały fronty autobusów z~odblaskami widocznymi
+w~szybie osłaniającej wyświetlacz. Jak już to zostało 
+wspomniane problem w~warunkach naturalnych nie powinien występować,
+a~przynajmniej nie w~tej skali.
+
+Kolejnym problemem był dobór samych frontów. Pominąwszy
+pojedyncze egzemplarze w~których numer był umieszczony z~prawej
+strony - niespełnienie założenia wstępnego - skupiono się na wychwyceniu nietypowych
+przypadków. Większość eksperymentów odbywała się na zbiorze obrazów,
+dla których nie odnotowano ani jednego poprawnego odczytu.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{img/final/front}
+	\caption{Pięć przykładowych frontów, które nie zostały wykryte
+		podczas automatycznej sesji testowej - na czarnym 
+		pasku umieszczono wyniki trzech ręcznie wykonanych prób
+		weryfikacyjnych}
+	\label{fig:final_front}
+\end{figure}
+
+Na rysunku \ref{fig:final_front} 
+przedstawionych został pięć przykładowych frontów, których
+kształt nie pozwalał na ich lokalizację. Brak lokalizacji frontu
+uniemożliwiał dalsze działanie algorytmu. Kontrprzykład, czyli autobus
+linii 174, który udało się odczytać podczas manualnej sesji
+testowej, unaocznia pewne niedociągnięcia
+przygotowanej procedury testowej. Zakładała ona jedynie 
+przeskalowanie, czyli ustawiczne powiększanie 
+obrazu reprezentującego front. Nie uwzględnione były inne 
+przekształcenia geometryczne, perspektywiczne i~różnice w~oświetleniu.
+W~tym konkretnym przypadku po niedługim manipulowaniu aparatem udało się
+odnaleźć właściwy kąt dla którego odczyt przebiegał bez zakłóceń.
+
+Kolejny problem to utrwalone na zdjęciach zniekształcenia geometryczne 
+prezentowanych frontów.
+Także w~tym przypadku,
+udało się poprawić wyniki podczas ręcznego operowania telefonem.
+Przykłady zamieszczono na obrazie nr \ref{fig:final_deform}.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{img/final/deform}
+	\caption{Fronty autobusów, które ze względu na duże zniekształcenia 
+		geometryczne nie zostały wykryte przez detektor frontów -
+		na czarnym pasku zamieszczono wyniki trzech ręcznych prób
+		wykonanych w~celu weryfikacji testu automatycznego}
+	\label{fig:final_deform}
+\end{figure}
+
+Po odpowiednim nachyleniu aparatu fronty z~pierwszych dwóch obrazów
+zostały na tyle ,,wyprostowane'', że udało się uzyskać poprawny odczyt.
+
+O~ile poprzednia klasa problemów, wymagałaby przeprojektowania 
+rozwiązania lub co najmniej przygotowania osobnego zestawu
+detektorów frontów, to zjawisko zniekształceń w~praktyce
+w~ogóle nie powinno się pojawić.
+Stojący na przystanku obserwator niemal zawsze będzie widział
+front autobusu idealnie zwrócony w~jego stronę. Zniekształcenia
+geometryczne mogą pojawić się dopiero przy bardzo małych odległościach
+od obserwowanego obiektu.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{img/final/jednocy}
+	\caption{Przykładowy podzbiór autobusów z~numerem jednocyfrowym.
+		Dodatkowym utrudnieniem w~dwóch pierwszych przykładach była
+		niewielka odległość między numerami, a~tekstem opisującym trasę.}
+	\label{fig:final_jednocy}
+\end{figure}
+
+Pierwsze znaczące błędy
+i~praktyczny brak odczytów pojawił się dla liczb jednocyfrowych.
+Rozwiązanie od początku było projektowane z~myślą o~numerach trzycyfrowych,
+które jako jedyne występowały w~środowisku testowym (miasto stołeczne).
+Numery jednocyfrowe stanowią najtrudniejszą do rozwiązania klasę
+problemów. Po pierwsze są one niechętnie wykrywane przez detektor
+numerów, który został przygotowany głównie na zbiorach trzycyfrowych.
+Po drugie, przy niewielkich odległościach numeru od opisu trasy,
+pojawia się niebezpieczeństwo potraktowania pierwszych liter opisu jako cyfr.
+Można wtedy błędnie uzyskać numer trzycyfrowy który nijak się ma do
+faktycznego numeru linii autobusowej. Przykład
+takiego zachowania przedstawiono na rysunku \ref{fig:final_jednocy}.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{img/final/waskie}
+	\caption{Przykłady autobusów z~wyświetlaczami wykorzystującymi 
+		wąskie czcionki. Na czarnych paskach przedstawiono wyniki
+		trzech manualnych odczytów testowych.}
+	\label{fig:final_waskie}
+\end{figure}
+
+Kolejne dwa przypadki to tak naprawdę dwa aspekty tego samego zagadnienia.
+Wynikały one z~faktu, że przyjęta w~programie odległość między poszczególnymi 
+cyframi nie była elastyczna i~ustawiono ją na konkretną wartość.
+Testy dla pierwszych pięciu
+sekwencji przygotowanych na podstawie filmów nakręconych na przystankach
+wykazały, że optymalna odległość między cyframi, dla obszaru obrazu
+reprezentującego numer przeskalowanego do 250 pikseli wysokości to 10 pikseli.
+Był to pierwszy element algorytmu, którego implementację należało jeszcze
+raz przemyśleć i~udoskonalić.
+Kilka przykładów, wraz z~odczytanymi wartościami 
+zaprezentowano na rysunku \ref{fig:final_waskie}, 
+gdzie czcionki były nieco węższe niż te które posłużyły jako pierwowzór.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=1\textwidth]{img/final/szerokie}
+	\caption{Przykłady autobusów z~wyświetlaczami wykorzystującymi 
+		szerokie czcionki. Na czarnych paskach przedstawiono wyniki
+		trzech manualnych odczytów testowych.}
+	\label{fig:final_szerokie}
+\end{figure}
+
+Z~drugiej strony gdy czcionki były szersze - jak na rysunku \ref{fig:final_szerokie} -
+elementem uniemożliwiającym odczyt nie była z~góry zadana odległość
+między cyframi, a~sam detektor numerów.
+Obszar oznaczany jako numer był zbyt mały, w~wyniku czego do funkcji
+odczytującej przekazywane były jedynie dwie pierwsze cyfry,
+gdzie ostatnia była zupełnie pominięta.
+Prostym rozwiązaniem tego problemu mogłoby być
+dodanie kilku pikseli właśnie z~owej prawej strony, tak by obszar wynikowy
+zawierał wszystkie trzy cyfry.
+
+Krój czcionki oraz zmienna liczba cyfr w~numerze
+nie zostały wzięte pod uwagę podczas projektowania i~implementacji. 
+Szczególnie trudny problem stanowią numery jednocyfrowe,
+z~niedalekim sąsiedztwem tekstu opisującego trasę. Wprowadzenie
+usprawnienia na tym polu byłoby jednym z~ostatnich działań, które 
+można poczynić w~celu poprawy jakości i~skuteczności proponowanego rozwiązania.
+To i~kilka innych drobnych usprawnień, jak na przykład osobne zestawy
+detektorów dla różnych typów frontów, czy weryfikacja możliwych
+numerów na podstawie współrzędnych geograficznych, umożliwiłyby
+uzyskanie skuteczności na zadowalającym poziomie.
+Wykracza to jednak poza zakres tej pracy.
+
+\subsection{Testy w terenie}
+
+Wyniki z~poprzedniego podrozdziału nie 
+przekładały się na to, co zaobserwowano podczas testów terenowych. Po wykonaniu 
+kilkudziesięciu sesji testowych odnotowano tylko jeden niepoprawny odczyt.
+Próby wykonywano tak, aby po zatrzymaniu autobus był nadal kilka metrów
+przed obserwatorem. W~ten sposób, przy liczbie obrazów niezbędnych do wykonania
+odczytu ustawionej na 3, do pełnego zatrzymania się autobusu 
+możliwe było wykonanie dwóch, czasami nawet trzech odczytów. Dla takiej
+konfiguracji wszystkie, z~wyjątkiem jednej, sesje były zakończone
+w~stu procentach poprawnymi wynikami. Na przystanku Metro Ratusz Arsenał 
+dla linii 227 w~sesji uzyskano trzy odczyty przy czym dwa
+z~nich były poprawne i~jeden
+niepoprawny (27).
+
+Kolejną zidentyfikowaną słabą cechą proponowanej aplikacji była maksymalna odległość
+autobusu umożliwiająca poprawny odczyt. Wynosiła ona od 
+20 do 25 metrów. Ostatnią 
+czynnością wykonaną w~ramach tej pracy były
+próby zwiększenia tej wartości.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.6\textwidth]{img/final/framescaling/400height}
+	\caption{Rozdzielczość obrazu przedstawiającego numer linii po
+		przeskalowaniu klatki wejściowej do wysokości równej 400 pikseli 
+		z~zachowaniem proporcji}
+	\label{fig:final_resize_400}
+\end{figure}
+
+
+\subsection{Testy zasięgu}
+
+Jako ostatni przeprowadzono test
+ze zmiennym parametrem pierwszego elementu kaskady, czyli wysokością
+do jakiej przeskalowywane były oryginalne klatki na potrzeby wykrywania
+frontu autobusu.
+
+W~pierwszej iteracji zwiększono wysokość z~300 do 400 pikseli. 
+Przykładowe fragmenty obrazów reprezentujące numer, jakie były
+pobierane dla najmniejszego frontu jaki można było zlokalizować
+przedstawiono na rysunku \ref{fig:final_resize_400}.
+Skuteczność ani wydajność nie uległy zmianie. Bardzo prawdopodobnym jest,
+że zmiana ta nie będzie mieć negatywnego wpływu na ogólne działanie 
+aplikacji. Zwiększy się natomiast tylko jej zasięg.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.6\textwidth]{img/final/framescaling/500height}
+	\caption{Rozdzielczość obrazu przedstawiającego numer linii po
+		przeskalowaniu klatki wejściowej do wysokości równej 500 pikseli 
+		z~zachowaniem proporcji}
+	\label{fig:final_resize_500}
+\end{figure}
+
+Drugi z~serii i~ostatni w~ogóle, był test wykonany dla wysokości
+ustawionej na 500 pikseli. Przykładowe fragmenty obrazów
+przedstawiające numer zamieszczono na rysunku \ref{fig:final_resize_500}.
+Dla tej sesji testowej odczyty były już dużo mniej stabilne.
+Średnio co drugi odczyt był niepoprawny, a~niewielkie ruchy aparatem
+powodowały zupełny jego brak. Oczywiście, aby ustalić dokładną wartość trzeba
+by przeprowadzić kolejne testy automatyczne, jednak ze względu na brak
+rzetelnej procedury testowej nie zostały one przeprowadzone ponownie.
+Sama zastosowana metoda wydaje się być na tyle niestabilna, że
+jakiekolwiek określanie jej skuteczności na tym etapie było niepożądane.
+Przed następną sesją testową rozsądnym byłoby usprawnienie
+elementów, błędów oraz niedociągnięć, które zostały zlokalizowane, takich
+jak niedokładność detektorów dla mniej niż trzycyfrowych numerów
+lub problemy z~wyznaczaniem liczby cyfr dla wąskich czcionek. 
+
+Aplikacja bez wprowadzania wyżej opisanych usprawnień udostępniała
+minimalną funkcjonalność. Implementacja była daleka od optymalnej 
+jednak przeprowadzone testy pozwoliły określić poziom skuteczności,
+jakiego można się po niej w~obecnym stanie spodziewać. Zastosowana architektura
+umożliwia poprawę jej działania poprzez dopracowywanie poszczególnych elementów,
+dodawanie nowych lub wymianę mało skutecznych kroków na zupełnie nowe
+rozwiązania. Duży potencjał w~kontekście odczytywania już zlokalizowanego
+numeru drzemie w~sieciach neuronowych, jednak podobnie 
+jak to miało miejsce w~przypadku detektorów tak i~do przygotowania
+sieci neuronowych potrzebne byłyby ogromne zbiory danych i~takie same ilości czasu. 
+Powstrzymano się więc od kolejnych usprawnień, udoskonaleń i~przeprowadzania
+dodatkowych testów z~tym związanych. Do działającej, rzetelnej
+i~budzącej zaufanie wersji aplikacji pozostała jeszcze bardzo długa droga.\footnote{Jedną z~uwag jakie otrzymałem podczas redagowania
+	tekstu, był zbyt krytyczny stosunek do rzetelności przygotowanego
+	oprogramowania. Jednak gdybym to ja był osobą niewidomą i~miał polegać
+	tylko na odczytach oferowanych przez proponowaną aplikację,
+	byłbym w~nie lada tarapatach. Skuteczność na poziomie 80\% to dużo,
+	jednak jeden na pięć autobusów wiozących w~nieodpowiednie miejsce
+	to już inna sprawa. Mówiąc o~wersji rzetelnej i~budzącej zaufanie,
+	miałem na myśli gotowy produkt, który można by zaoferować użytkownikom
+	końcowym. Produktem niniejszej pracy jest wczesna wersja prototypowa.}

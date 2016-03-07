@@ -3,23 +3,44 @@
 	\textbf{Streszczenie}
 \end{center}
 
-Celem pracy była implementacja aplikacji możliwej do uruchomienia
-na urządzeniu mobilnym z~systemem android, której zadaniem
-byłoby odczytywanie numeru linii z~frontu nadjeżdzającego autobusu.
-W~pierwszej częśći pracy zamieszczono przegląd narzędzi, algorytmów,
-bibliotek i~frameworków służących do wykrywania obiektów w~scenach
-oraz ich identyfikacji - rozpoznawania. 
+W~ramach pracy wykonano projekt oraz implementację aplikacji możliwej do zainstalowania 
+i~uruchomienia
+na urządzeniu mobilnym z~systemem Android. Głównym i~jedynym 
+zadaniem wytworzonego oprogramowania
+było odczytywanie numeru linii z~frontu nadjeżdżającego autobusu.
+Zgodnie z~architekturą, program po uruchomieniu na telefonie
+wchodził w~tryb pobierania klatek obrazu z~aparatu urządzenia. 
+Po pobraniu zadanej z~góry liczby klatek z~wystąpieniem frontu
+autobusu następował odczyt.
+
+W~pierwszej części pracy zamieszczono przegląd narzędzi, algorytmów,
+bibliotek i~struktur ramowych służących do wykrywania obiektów w~scenach
+oraz ich identyfikacji - rozpoznawania. Przygotowany w~ten sposób
+zbiór narzędzi i~technik wykorzystano w~celu wyłonienia tych najbardziej
+adekwatnych w~danym zagadnieniu. Główne kryteria przy doborze to m.in:
+skuteczność, łatwość implementacji, dostępna dokumentacja oraz możliwość
+konfiguracji.
+
 Następnie zamieszczono opis przeprowadzonych eksperymentów
 mających na celu wyłonienie najpewniejszych rozwiązań, które
-zostałyby wykorzystane do skonstruowania ostatecznej implementacji.
+zostały wykorzystane do skonstruowania ostatecznej implementacji.
 W~pracy zawarty został też opis prób podjętych w~celu automatyzacji
 procesu przygotowywania oraz weryfikacji powstających narzędzi 
 i~programów.
-Podsumowując, niniejsze opracowanie jest 
-swoistym dziennikiem opisującym przebieg procesu myślowego
-od studium dostępnych rozwiązań, poprzez szereg przygotowań
-i~eksperymentów, aż do implementacji działającej aplikacji
-prototypowej na telefonie z~Androidem.
+
+Praca dokumentuje i~systematyzuje zastosowane pomysły i~metody.
+Część okazała się nietrafiona, co skutecznie uniemożliwiło ich
+wykorzystanie w~rozwiązaniu docelowym. W~wyniku
+bardzo licznych eksperymentów udało się wyłonić zbiór 
+narzędzi, dzięki którym implementacja była wykonalna.
+
+Wykonane testy skuteczności pomogły w~określeniu niezawodności,
+a~przez to przydatności wykonanej aplikacji. Na szczęście
+modułowa budowa programu umożliwiała doskonalenie oraz
+wymianę poszczególnych jej elementów. Ścieżki rozwoju
+i~możliwości usprawnień zostały przedstawione w~ostatniej
+części pracy.
+
 
 \vspace*{\baselineskip}
 

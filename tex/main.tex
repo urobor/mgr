@@ -9,7 +9,6 @@
 }
 \documentclass[a4paper,onecolumn,oneside,12pt]{mwrep}
 
-
 \usepackage{url}
 \usepackage{times}
 \usepackage{polski}
@@ -24,7 +23,26 @@
 \usepackage{tikz}
 \usepackage[autostyle]{csquotes}
 \usepackage[tableposition=top]{caption}
+\usepackage{subcaption}
 
+\usepackage{array}
+\usepackage{makecell}
+
+\newcolumntype{x}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+\newcommand\diag[4]{%
+	\multicolumn{1}{p{#2}|}{\hskip-\tabcolsep
+		$\vcenter{\begin{tikzpicture}[baseline=0,anchor=south west,inner sep=#1]
+			\path[use as bounding box] (0,0) rectangle (#2+2\tabcolsep,\baselineskip);
+			\node[minimum width={#2+2\tabcolsep},minimum height=\baselineskip+\extrarowheight] (box) {};
+			\draw (box.north west) -- (box.south east);
+			\node (A) at (-0.35,-0.2) {#3};
+			\node (B) at (0.3, 0.2) {#4};
+			\end{tikzpicture}}$\hskip-\tabcolsep}}
+
+\captionsetup{compatibility=false}
+
+\renewcommand\lstlistingname{Wdruk}
 \hyphenpenalty=10000        % nie dziel wyrazów zbyt często
 \clubpenalty=10000          % kara za sierotki
 \widowpenalty=10000         % nie pozostawiaj wdów

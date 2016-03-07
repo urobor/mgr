@@ -3,36 +3,36 @@
 Widzenie maszynowe jest jedną z~najprężniej rozwijających się
 dziedzin z~pogranicza algorytmiki, optymalizacji, przetwarzania obrazów,
 przetwarzania sygnałów, statystyki oraz szeroko pojętej sztucznej
-inteligencji jeżeli chodzi o~zagadnienia informatyczne w~ostatnich
+inteligencji, jeżeli chodzi o~zagadnienia informatyczne w~ostatnich
 latach. Sporządzenie definicji widzenia komputerowego jest niezmiernie
-trudne, głównie z~powodu wspomnianej interdyscyplinarności, 
+trudne. Głównie z~powodu wspomnianej interdyscyplinarności
 jaką niesie ze sobą omawiany termin. Klasyczne, jednozdaniowe
-definicje przedstawiają w~zwięzły sposób ogólny zarys koncepcji,
+definicje przedstawiają w~zwięzły sposób ogólny zarys koncepcji
 jaka kryje się za sformułowaniami określanymi mianem wizji komputerowej.
 Wysoki poziom abstrakcji oraz zwięzłość formy zmuszają do pominięcia
 wielu istotnych aspektów, które nienaświetlone mogą w~poważny sposób
-zaburzyć wyobrażenie o~tymże jak niezmiernie interesującym 
+zaburzyć wyobrażenie o~tym niezmiernie interesującym 
 obszarze nauki i~techniki.  
 Poniżej przedstawiono kilka definicji wprowadzonych na przestrzeni
 kilkunastu ostatnich lat. 
 
 DEFINICJA 1 \cite{ShapiroStockman200102}:
 
-\blockquote{Zadaniem wizji komputerowej jest podejmowanie 
+,,Zadaniem wizji komputerowej jest podejmowanie 
 decyzji na temat rzeczywistych (fizycznych) obiektów
-oraz scen na podstawie obrazów.}
+oraz scen na podstawie obrazów.''
 
 W~komentarzu do zaprezentowanej definicji wprowadzony został
 cel pośredni. Aby podjęcie decyzji na temat rzeczywistych obiektów
 było możliwe, niemal zawsze niezbędne jest sporządzenie ich modelu lub 
-opisu na podstawie posiadanych zdjęć. Zgodnie z~powyższym 
+opisu na podstawie posiadanych zdjęć. Zgodnie z~powyższym,
 równolegle do poprzedniej definicji, zaproponowana została druga, mniej
 abstrakcyjną wersja, którą umieszczono poniżej.
 
 DEFINICJA 2 \cite{ShapiroStockman200102}:
 
-\blockquote{Zadaniem wizji komputerowej jest sporządzanie
-opisów scen rzeczywistych na podstawie obrazów.}
+,,Zadaniem wizji komputerowej jest sporządzanie
+opisów scen rzeczywistych na podstawie obrazów.''
 
 Jest to pierwsza próba ograniczenia danych wyjściowych jakich należałoby
 oczekiwać po uruchomieniu procesu określanego mianem wizji komputerowej.
@@ -45,8 +45,8 @@ W~tym kontekście następne zdanie definiuje produkt omawianego zagadnienia.
 
 DEFINICJA 3 (na podstawie \cite{morris2004computer}):
 
-\blockquote{Wizja komputerowa obejmuje swym zakresem wydobywanie
-danych numerycznych z~obrazów.}
+,,Wizja komputerowa obejmuje swym zakresem wydobywanie
+danych numerycznych z~obrazów.''
 
 Tak jak przetwarzanie obrazów określa działania na obrazach wynikiem
 których są obrazy o~zmienionych właściwościach w~porównaniu do obrazów
@@ -80,11 +80,11 @@ z~tym zagadnieniem zilustrowano na rys. \ref{fig:int_cv_inter_discip}.
     \label{fig:int_cv_inter_discip}
 \end{figure}
 
-Za początek widzenia maszynowego, w~bardzo dużym przybliżeniu, można
-uznać początek drugiej połowy ubiegłego wieku.
+Narodziny widzenia maszynowego miały
+miejsce na początku drugiej połowy ubiegłego wieku.
 W~latach pięćdziesiątych wdrożone zostały dwie implementacje 
 pierwszego komercyjnego systemu OCR (\textit{ang. Optical Character 
-Recognition}). Pierwszym klientem było wydawnictwo Reader's Digest, 
+Recognition}). Pierwszym klientem było wydawnictwo Reader's Digest,
 gdzie system wykorzystywano do automatycznego odczytywania adresów
 z~przesyłek wysyłanych do czytelników w~celu ich sortowania.
 Drugim klientem komercyjnego systemu OCR 
@@ -93,8 +93,8 @@ służyło odczytywaniu danych z~kart kredytowych w~celach
 rozliczeniowych \cite{WEB:ocrhistory}.
 
 Obecnie istnieje wiele narzędzi do odczytywania tekstu z~zeskanowanych
-dokumentów, przy czym najlepsze rozwiązanie dostępne na rynku
-można nabyć za cenę niewiele wyższą od tej w~jakiej oferowany jest
+dokumentów. Najlepsze rozwiązanie dostępne na rynku
+można nabyć za cenę zbliżoną do tej w~jakiej oferowany jest
 popularny pakiet oprogramowania biurowego.
 
 Według innego opracowania \cite{web:huangcvevolution}
@@ -106,17 +106,17 @@ z~dwuwymiarowych widoków perspektywicznych został okrzyknięty
 w~latach 60 na uczelni MIT \cite{books/garland/Roberts63}.
 
 Ważnym wydarzeniem z~perspektywy niniejszej pracy dyplomowej była
-implementacja algorytmu wykrywającego wystąpienie twarzy
+pierwsza implementacja algorytmu wykrywającego wystąpienie twarzy
 w~obrazie w~czasie rzeczywistym.
 Na początku obecnego stulecia opracowano oraz zaimplementowano algorytm
 \cite{DBLP:conf/cvpr/ViolaJ01}, który uruchomiony na komputerze 
-z~procesorem Intel Pentium III 700 MHz był wstanie przeszukać 15 
-obrazów na sekundę pod kątem wystąpienia twarzy.
+z~procesorem Intel Pentium III 700 MHz był w~stanie przeszukiwać obrazy
+pod kątem wystąpienia twarzy w~tempie 15 klatek na sekundę.
 Rozdzielczość obrazów wejściowych była równa 384 na 288 pikseli.
 Dzisiaj, ze względu na moc obliczeniową urządzeń mobilnych, algorytm ten 
 bez trudu można uruchomić
 na telefonie lub aparacie fotograficznym. 
-Ponadto uzyskane wyniki przekraczają wspomniane 15 obrazów na sekundę
+Ponadto uzyskane wyniki przekraczają wspomniane 15  na sekundę
 przy jednoczesnym wykorzystaniu obrazów wejściowych w~znacznie
 większej rozdzielczości: 720p czy nawet 1080p.
 Jedną z~bardziej 
@@ -129,7 +129,7 @@ uśmiech.
 
 Moc obliczeniowa współczesnych smartfonów pozwala na uruchomienie
 znacznie bardziej skomplikowanych algorytmów. Najnowsze jednostki,
-wyposażone w~procesory cztero i ośmiordzeniowe można nabyć
+wyposażone w~procesory cztero- i~ośmiordzeniowe można nabyć
 w~cenie już kilkuset złotych. Dodatkowo mnogość dostępnych bibliotek 
 sprawia, że głównym ograniczeniem przy projektowaniu i~implementacji
 rozwiązań z~dziedziny widzenia komputerowego jest już niemal
@@ -138,7 +138,7 @@ kamera dostępna w~urządzeniu, jednak ograniczenie to obowiązuje
 tylko podczas implementacji algorytmów precyzyjnej lokalizacji
 i~rozpoznawania obiektów na podstawie danych z~aparatu.
 
-Jednym z~popularniejszych zastosowaniem widzenia komputerowego w~telefonach
+Jednym z~popularniejszych zastosowań widzenia komputerowego w~telefonach
 jest odczytywanie kodów QR. Jest to często stosowana technika
 np. w~muzeach. Aplikacje udostępniane przez placówki 
 umożliwiają uzyskanie szczegółowych opisów eksponatów na
@@ -149,7 +149,7 @@ Osobną grupę aplikacji stanowią programy napisane z~myślą
 o~niewidomych. W~skład zbioru wchodzą między innymi aplikacje
 do rozpoznawania banknotów, obiektów na podstawie
 naklejonych kodów QR, odczytywania napisów itp.
-Zasadnym wydaje się też istnienie aplikacji odczytującej numer 
+Zasadnym wydaje się więc istnienie aplikacji odczytującej numer 
 autobusu właśnie w~kontekście wykorzystania przez osoby niewidome lub
 niedowidzące. 
 
@@ -184,39 +184,39 @@ Scenariusz wykorzystania aplikacji zaprezentowano na rysunku
 
 \section{Zakres pracy}
 
-W~pracy zawarto przegląd dostępnych implementacji związanych
-z~detekcją i~identyfikacją obiektów. W~drugim rozdziale 
-wprowadzono obowiązujące
-w~tym opracowaniu definicje detekcji i~identyfikacji. 
-W~pierwszym podrozdziale omówiono metody wykrywania obiektów.
-Skupiono się
+W~kolejnym rozdziale zawarto przegląd dostępnych implementacji związanych
+z~detekcją i~identyfikacją obiektów. Wprowadzono obowiązujące
+w~tej pracy definicje detekcji i~identyfikacji. 
+Omówione zostały metody wykrywania obiektów, przy czym uwagę skupiono
 głównie na istniejących rozwiązaniach, algorytmach, narzędziach 
-i~bibliotekach. Duży nacisk położono na bibliotekę OpenCV. 
-Jest ona bowiem dostępna na komputery PC, systemy Windows oraz Linux, 
-urządzenia
-mobilne, a~także system Android. Zaskakująco dobre
-rezultaty skłoniły do opisania biblioteki OpenTLD. 
-Drugi podrozdział to krótka wzmianka o~metodach
-rozróżniania obiektów.
+i~bibliotekach. Ze względu na mnogość implementacji - dostępność 
+na wielu platformach i~w~wielu językach - duży nacisk położono 
+na bibliotekę OpenCV. Opisano zaskakująco dobre
+rezultaty doświadczeń z~biblioteką OpenTLD, oraz problemy
+na jakie natrafiono.
 
 W~trzecim rozdziale przedstawiono proces implementacji
 narzędzi wykorzystanych do zbudowania środowiska deweloperskiego
 oraz testowego.
 
-Kolejny - czwarty rozdział - opisywał wykonane doświadczenia.
+Kolejny - czwarty rozdział - zawarł opis i~podsumowanie wykonanych doświadczeń.
 W~pierwszej kolejności zamieszczono opis 
-prób wykonanych w~celu identyfikacji najodpowiedniejszych 
-narzędzi. Metody testowane 
+prób testowych, przeprowadzonych w~celu identyfikacji najodpowiedniejszych 
+narzędzi. Metody przedstawione 
 w~tym rozdziale nie zostały wykorzystane w~rozwiązaniu końcowym.
-W~podsumowaniu rozdziału czwartego zamieszczono opis prób kompletnej
-implementacji, uruchamianej jednak jeszcze na komputerze stacjonarnym.
+Podsumowanie rozdziału czwartego to opis prób przeprowadzonych z~wykorzystaniem
+kompletnej
+implementacji, uruchamianej na komputerze stacjonarnym.
 
-Piąty powstał w~wyniku implementacji rozwiązania na 
-systemie docelowym. Opisano pierwsze próby aplikacji deweloperskiej
-uruchomionej na dwóch podobnej klasy urządzeniach. Na końcu
-zaprezentowano wyniki doświadczeń z~aplikacją demonstracyjną,
-która zawierała już niemal całą zakładaną funkcjonalność.
+Ostatni - piąty rozdział - to zbiór wyników i~opisów doświadczeń 
+wykonanych po implementacji rozwiązania na 
+systemie docelowym. W~pierwszej kolejności
+zbadano wydajność i~złożoność obliczeniową proponowanego rozwiązania.
+Po zbadaniu czasów wykonania przeprowadzony został automatyczny test na 3000 obrazów
+reprezentujących fronty autobusów. Ostatnim zagadnieniem były testy terenowe.
+Opisano napotkane problemy środowiskowe i~ograniczenia technologiczne.
 
-Po implementacji programu na telefonie utworzone zostały zbiory 
-i~narzędzia testowe. Opis uzyskanych w~ten sposób wyników, oraz
-usprawnień końcowego systmu umieszczono na końcu rozdziału czwartego.
+W~podsumowaniu jeszcze raz opisane zostały problemy i~ograniczenia.
+Pokrótce wspomniano o~możliwościach rozwoju aplikacji i~możliwych usprawnieniach.
+Ostatecznie przedstawiono rozwiązania alternatywne, ich wady i~zalety
+w~porównaniu do systemu, który powstał w~ramach tej pracy.

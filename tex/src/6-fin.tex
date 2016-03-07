@@ -1,144 +1,186 @@
 \chapter{Podsumowanie i~wnioski}
 
-Praca ta miała na celu zidentyfikowanie optymalnej metody
-odczytu numeru z~nadjeżdżającego autobusu oraz jej implementację
-na urządzeniu mobilnym z~systemem Android. Zaimplementowano
-rozwiązanie oparte na 12 kaskadowych detektorach oraz pętli 
-dopasowań wzorców. Jednak nie stwierdzono czy metoda której użyto
-jest optymalna. Jedyne co można o~niej powiedzieć to to, że
-skuteczność jest na dostatecznym poziomie wyjściowym do dalszych 
-usprawnień. Dzięki modułowemu podejściu można stopniowo ją
-zwiększać poprzez poprawianie i~dopracowywanie poszczególnych
-elementów. 
+Praca ta miała na celu zidentyfikowanie odpowiedniej metody
+odczytu numeru nadjeżdżającego autobusu oraz jej implementację
+na urządzeniu mobilnym z~systemem Android. 
+Sporządzono przegląd algorytmów, narzędzi i~bibliotek
+potencjalnie przydatnych podczas rozwiązywania omawianego zagadnienia.
+Wykorzystując bibliotekę OpenCV stworzono aplikację 
+opartą na rzetelnych i~sprawdzonych rozwiązaniach.
+Poprzez serię testów i~wielokrotne dostrajanie oraz konfigurację poszczególnych elementów
+programu udało się zbudować narzędzie
+posiadające zakładaną funkcjonalność. Wiele wysiłku i~cierpliwości
+wymagało przygotowanie nie tylko dużych ale i~wartościowych
+zbiorów obrazów służących do uczenia detektorów kaskadowych - głównych
+elementów składowych prezentowanego rozwiązania. Wiele czasu 
+poświęcono na przygotowanie i~przeprowadzenie procedur
+testowych wytworzonego oprogramowania. Zarówno proces uczenia
+maszynowego jak i~późniejsze testy przeprowadzono wielokrotnie,
+korygując przy tym wykryte błędy w~założeniach, przygotowanych 
+zbiorach obrazów oraz identyfikując i~wykorzystując napotkane 
+trendy oraz tendencje detektorów do wykrywania określonych cech w~obrazach.
 
-\section{Wyniki}
+Dzięki modułowej architekturze aplikacji z łatwością można było 
+udoskonalać lub zupełnie wymieniać elementy odpowiedzialne za poszczególne 
+kroki proponowanej kaskady:
+- wyszukanie frontu autobusu w~scenie,
+- lokalizacja numeru linii we froncie,
+- odczytanie ciągu znaków z~fragmentu obrazu reprezentującego numer linii.
+Wielokrotnie poprawiano i~dopracowywano poszczególne 
+moduły, wraz z~pojawianiem się nowych danych w~postaci wyników przeprowadzonych testów.
+Głównym obiektem modyfikacji były parametry wejściowe narzędzia służącego do przygotowywania
+detektorów kaskadowych dostępnego w~ramach pakietu OpenCV. W~końcowym
+etapie prac zupełnie przebudowany został ostatni moduł odpowiedzialny za odczytywanie
+numeru linii. Zrezygnowano z~intensywnej obliczeniowo metody dopasowywania
+wzorca na rzecz detektorów kaskadowych.
 
-Ostatecznym wynikiem jest utworzenie szkieletu aplikacji
-składającej się z~trzech elementów ułożonych kaskadowo, które
-mogą być uruchomione równolegle celem zwiększenia szybkości wykonywania:
+Przygotowany prototyp aplikacji nie jest ani optymalny, ani nie 
+pokrywa wszystkich przypadków szczególnych. W~sprzyjających warunkach
+jest jednak wyjątkowo skuteczny, a~modułowa architektura umożliwia
+wprowadzanie usprawnień i~modyfikacji, które pozwolą na obsługę większej
+liczby niestandardowych scenariuszy.
+W~testach terenowych na kilkadziesiąt dokonanych 
+  odczytów odnotowano jedynie dwie pomyłki wprowadzające użytkownika w~błąd.
+Kilka prób zakończyło się serią poprawnych odczytów, z~pojedynczymi tylko błędami. 
+Proponowane rozwiązanie
+jest jednak dalekie od stanu pozwalającego na publikację
+i~udostępnienie go szerszemu gronu użytkowników. Specyfika pracy takiego narzędzia,
+czyli pomoc osobom niewidomym, wymaga bardzo wysokiej niezawodności.
+Komercyjna aplikacja powinna obsługiwać więcej przypadków użycia niż
+zostało przewidzianych, opracowanych i~opisanych na łamach niniejszej
+pracy. W~normalnych warunkach wszelkie prace powinny zostać
+poprzedzone rzetelną analizą potrzeb i~wymagań stawianych projektowanemu 
+narzędziu.
 
-\begin{enumerate}
-    \item Detektor frontu.
-    \item Detektor numeru we froncie.
-    \item Czytnik numeru.
-\end{enumerate}
+\section{Napotkane problemy}
 
-Detektor frontów podczas pisania tego tekstu prezentował skuteczność
-na więcej niż zadowalającym poziomie.
-Detektor numeru musiał zostać wspomożony ograniczeniem obszaru wyszukiwania
-do lewego górnego rogu odnalezionego frontu autobusu.
-Jest to element którego istnienie, oraz próba przetestowania
-wykazała jak istotna jest liczność zbiorów uczących i~testowych.
-Wykorzystując uczenie maszynowe w~celu lokalizacji i~odczytywania
-tekstu z~tak zwanej sceny naturalnej wymaganym jest posiadania
-zbiorów danych liczących dziesiątki, a~nawet setki tysięcy 
-przykładów.
+Dwa główne problemy podczas przygotowywania
+oprogramowania wykorzystującego proces uczenia 
+maszynowego to czasochłonność i~ogromne ilości danych wejściowych.
+Wielokrotne poprawki parametrów wejściowych i~samych zbiorów obrazów:
+pozytywnych i~negatywnych zajmowały bardzo dużo czasu i~ostatecznie
+trwały długo. Dodatkowo sam proces uczenia detektorów trwał od kilku godzin do 
+kilku dni. Poprawki były możliwe do naniesienia dopiero po wykonaniu, najkrótszych, bo 
+kilkuminutowych testów skuteczności. Wielokrotnie powtarzany proces
+uczenia detektorów, wykonywania testów, analizy wyników i~nanoszenia poprawek 
+trwał bardzo, ale to na prawdę bardzo długo. 
+Wypracowywanie metodologii i~sposobów postępowania 
+również zajęło sporo czasu. Ostatecznie, dzięki dopracowaniu procedur
+testowych przygotowano detektory cechujące się skutecznością na zadowalającym poziomie.
+Co ważne, poziomie (w~większym lub mniejszym stopniu) rzetelnie weryfikowalnym.
 
-Detektory poszczególnych cyfr wprowadzone zostały w~celu ograniczenia
-złożoności obliczeniowej podczas dopasowywania wzorców. Ich skuteczność
-jest daleka od oczekiwanej lecz problemy podczas trenowania detektorów
-o~większej ilości próbek (negatywnych i~pozytywnych)
-utrudniają znacząco przygotowywanie nowych instancji.
+Jeżeli chodzi o~problemy związane z~samym zagadnieniem
+to można wyodrębnić trzy główne grupy:
 
-\section{Problemy i~utrudnienia}
+\begin{itemize}
+	\item zakłócenia utrudniające odczyt,
+	\item różnorodność modeli autobusów, sposobów prezentacji numeru, czcionek itp,
+	\item niska rozdzielczość współczesnych aparatów.
+\end{itemize}
 
-Największym utrudnieniem okazało się błędne podejście do zagadnienia. 
-O~ile nie do uniknięcia było wykonanie doświadczeń i~eksperymentów,
-które zakończyły się jedynie poszerzeniem posiadanej wiedzy.
-To błędnym było wykonywanie ogromnej ilości prób i~pomiarów na
-wczesnym etapie poszukiwań odpowiedniego rozwiązania. 
-Wynikiem takiego podejścia były testy wykonane przy zbyt małej 
-wiedzy na temat zagadnienia i~architektury końcowej programu. 
+Zakłócenia uniemożliwiające odczyt to miedzy innymi: ludzie stojący
+na przystanku zasłaniający czoło autobusu, opady atmosferyczne,
+odblaski słoneczne widoczne w~szybie osłaniającej numer uniemożliwiające jego
+odczytanie. Jest to dziedzina problemów, które jeżeli wystąpią,
+czynią proponowane narzędzie bezużytecznym, nieważne ile pracy
+poświęci się na usprawnienia. W~tych sytuacja informacje 
+o~numerze nie są zawarte w~pobieranych zdjęciach, przez co niemożliwe
+jest ich odczytanie - danych po prostu nie ma.
 
-Rzetelne testy wydajności i~dokładności należało wykonać na końcu
-gdy wiadomo było już jakie algorytmy, narzędzia i~biblioteki zostaną
-zastosowane w~rozwiązaniu docelowym. 
+Zaobserwowanym utrudnieniem było też zjawisko migotania wyświetlacza, przez
+co numery były widoczne częściowo lub były zupełnie wygaszone.
+Podejście statystyczne, które wykorzystywało kilka obrazów
+w~procesie jednej sesji odczytu numeru skutecznie rozwiązało ten problem.
 
-W~celu rozwiązania tego problemu wykonano drugie podejście,
-głównie skupiając się na przygotowaniu zestawów danych testowych
-i~narzędzi do automatycznej weryfikacji skuteczności.
-Podczas drugiej próby, przez wykorzystanie dwóch zestawów
-testowych, zidentyfikowano problem zbyt małej ilości próbek w~nich
-zwartych. Przeprowadzono udaną optymalizację,
-i~weryfikację drugiej wersji detektora
-numerów na jednym zestawie testowym (3000 próbek). Po czym okazało się, że na
-innym zestawie (1903 próbki) pierwsza wersja wykazuje się większą 
-skutecznością. 
+Kolejne zagadnienie było bardziej wyzwaniem niż utrudnieniem. Chodzi
+bowiem o~ogromną różnorodność autobusów, sposobów prezentacji numeru,
+wykorzystanych krojów czcionek itp. Wiąże się to z~dogłębną analizą
+i~przygotowaniem odpowiedniej wersji aplikacji dla danego kraju,
+miasta, bądź nawet przystanku.
 
-\section{Dalsze prace}
+Ostatnim problemem ograniczającym funkcjonalność omawianej 
+aplikacji była rozdzielczość przetwarzanych
+obrazów, równa 1920x1440 pikseli.
+Była ona ograniczona przez implementację biblioteki OpenCV dostępnej
+na platformie Android. Wykorzystane podejście - podgląd klatki 
+na wyświetlaczu - wprowadzało ograniczenie w~postaci rozdzielczości
+właśnie tego wyświetlacza. Testowe urządzenie - telefon LG G3 - 
+umożliwiało nagrywanie obrazu w~rozdzielczości 4K (3840x2160) czyli
+prawie dwukrotnie większej. Rozwiązanie tego ograniczenia wymagałoby jednak przygotowania
+własnej implementacji obsługującej pobieranie i~przetwarzanie 
+obrazów z~kamery. Większa rozdzielczość oznaczałaby większą 
+złożoność obliczeniową. Z~drugiej jednak strony umożliwiłoby to
+poprawne odczytanie numeru z~większej odległości.
 
-Pierwszym krokiem w~celu przygotowania aplikacji na poziomie 
-skuteczności, niezawodności i~użyteczności pozwalającym na 
-wydanie komercyjne jest przygotowanie środowiska testowego.
-Posiadanie kilkudziesięciu tysięcy oznaczonych i~opisanych
-próbek wydaje się być sensowym punktem wyjścia.
-Jest to niezbędne w~celu rzetelnej weryfikacji wprowadzanych 
-usprawnień.
+\section{Dalsze prace i~usprawnienia}
 
-Możliwe są zmiany w~implementacji niosące za sobą większą funkcjonalność.
-Może to być na przykład wykrywanie innych typów frontów niż 
-tych z~wyświetlaczem. Cel można osiągnąć poprzez zastosowanie 
-dodatkowych, specjalnie w~tym celu przygotowanych detektorów. Można też 
-podjąć próbę implementacji detektorów tablic bocznych a także tyłów 
-autobusów, gdzie oba te fragmenty zawierają numer linii.
+Dalsze prace powinny rozpocząć się od zrobienia kroku w~tył.
+Podejmując ogromny wysiłek jaki niewątpliwie związany byłby z~doprowadzeniem 
+proponowanej aplikacji do stanu użyteczności, trzeba zadać sobie pytanie
+czy ma to sens. Niezbędnym jest przeprowadzenie rzetelnej analizy
+biznesowej, wywiad z~osobami niewidomymi i~zebranie ich wymagań.
+Bez zainteresowania ze~strony docelowej grupy użytkowników końcowych
+popełnianie jakiejkolwiek aplikacji nie miałoby najmniejszego sensu.
 
-Usprawnieniem i~pewnego rodzaju ułatwieniem odczuty byłoby zawężenia
-możliwych do odczytania numerów do zbioru z~konkretnego przystanku. 
-Współrzędne przystanków wraz z~listą numerów byłyby umieszczane 
-w~centralnej bazie. Aplikacja mogła by pobierać aktualne 
-współrzędne z~urządzenia GPS zainstalowanego w~telefonie i~na ich podstawie
-ograniczać możliwy do odczytania zbiór do pobranej listy numerów.
+W~następnej kolejności należałoby się skupić na problemach, które już zidentyfikowano.
+Mechanizm odczytujący numer 
+linii autobusowej powinien zostać przebudowany i~usprawniony (ostatni element proponowanej kaskady).
+Rozsądnym wydaje się przygotowanie w~tym celu mechanizmu opartego na sieciach
+neuronowych, które to ze względu na złożoność konfiguracji i~niekiedy
+dłuższe czasy przygotowywania niż opisane detektory kaskadowy zostały
+pominięte w~sposób zupełnie świadomy.
 
-Poprawę działania algorytmu można również osiągnąć wykorzystując 
-lepszy telefon, zawierający lepszej jakości kamerę oraz
-większą moc obliczeniową. Na rynku dostępne są już urządzenia
-wyposażone w~procesory ośmiordzeniowe z~kamerami umożliwiającymi 
-nagrywanie filmów w~rozdzielczości 4K.
+Można wymieniać wiele możliwych usprawnień:
+\begin{itemize}
+	\item przygotowanie zbioru oczekiwanych numerów na podstawie współrzędnych
+	GPS i~danych z~bazy przystanków i~przypisanych do nich możliwych numerów linii,
+	\item przygotowywanie detektorów dla poszczególnych modeli autobusów,
+	\item wymiana lub usprawnienia posiadanych elementów systemu,
+	\item wprowadzanie dodatkowego kroku weryfikującego czy wykryty 
+	fragment rzeczywiście jest szukanym obiektem,
+	\item wykorzystanie telefonu z~obiektywem o~zmiennej ogniskowej,
+	umożliwiającym wykonanie optycznego powiększenia obrazu,
+	\item itd.
+\end{itemize}
 
-Niewielką zmianą możliwą do zaimplementowania jest też wprowadzenie
-tłumaczeń odczytywanych komunikatów na język użytkownika. 
-Jest to zmiana raczej kosmetyczna jednak znacząca jeżeli chodzi
-o~aplikacje komercyjne.
+Po głębszym zastanowieniu, drugim krokiem powinien być następny
+etap analizy. Należałoby ustalić pierwotny obszar wykorzystania 
+hipotetycznej aplikacji. Czy odczytywane mają być numery autobusów,
+czy może też tramwajów. Czy aplikacja ma być wykorzystywana na terenie
+konkretnego kraju, wielu krajów, w~konkretnym mieście, czy może ma mieć zasięg
+globalny. Nie istnieje bowiem ogólny i~uniwersalny wzorzec frontu pojazdu
+odnośnie którego można by przygotować równie uniwersalny i~skuteczny
+zestaw detektorów - nieistotne jakiego typu (co prawda wykorzystanie
+sieci neuronowych może nieść ze sobą spektakularne rezultaty, jednak
+wymaga to ogromnych wręcz zbiorów obrazów potrzebnych do ich wytrenowania).
+Odpowiedzi na tak postawione pytania mogą mieć wpływ
+na architekturę rozwiązania. Jeżeli aplikacja swym zasięgiem 
+miałaby objąć cały świat to z~pewnością powinna być bardziej konfigurowalna, 
+łatwiej rozszerzalna o~dodatkowe moduły dodające nowe funkcjonalności.
+Aplikacja dostępna w~obecnej formie, najprawdopodobniej poradzi sobie
+w~ponad osiemdziesięciu procentach przypadków wykorzystania w~Warszawie, i~być
+może w~innych dużych miastach w~naszym kraju. Zaprojektowanie i~napisanie
+aplikacji uniwersalnej, konfigurowalnej i~niezawodnej, z~perspektywy
+doświadczeń nabytych podczas pisania tej pracy, jest jak najbardziej
+możliwe, jednak stanowczo wykracza poza jej zakres.
 
-Ostatecznie istnieje szereg możliwości wzbogacania i~dodawania
-funkcjonalności aplikacji w~oparciu o~użyte technologie.
-Można na przykład dopisać moduł lokalizacji przystanków
-na podstawie znaków - zadanie o~wiele łatwiejsze. Wymagało by to
-wyszkolenia kolejnego detektora. W~tym przypadku, detektora znaków
-występujących przy przystankach. Aplikacja przy wykorzystaniu 
-modułu GPS była by w~stanie doprowadzić osobę do przystanku.
+Biorąc pod uwagę doświadczenia zawodowe, niemal zawsze próba napisania
+uniwersalnego i~konfigurowalnego narzędzia kończy się koszmarem podczas utrzymania i~rozwijania 
+ogromnej bazy skomplikowanego kodu. Niejednokrotnie próby rozszerzenia bądź konfiguracji
+kończą się na pisaniu dziwacznego zestawu trików w~kodzie, którego autor akurat tego przypadku
+nie przewidział, a~sama aplikacja nie jest tak konfigurowalna jakby się tego chciało.
+Więc nowe pomysły i~usprawnienia owszem są możliwe do wykonania jednak rozsądnym byłoby
+powrócenie i~skupienie się na etapie analizy zagadnienia.
 
-Można dodać obsługę rozpoznawania mowy, w~celu zadania punktu docelowego.
-Przy tak zdefiniowanych kryteriach aplikacja używając komunikatów
-głosowych prowadziła by użytkownika do najbliższego przystanku. 
-Asystowała by też przy poprawnym ustawieniu telefonu w~celu odczytania
-numeru. Podczas podróży możliwe było by aktualizowanie czasu oraz
-odległości pozostałej do osiągnięcia celu. O~czym użytkownik informowany
-był by przy pomocy osobnych komunikatów głosowych.
+Niezaprzeczalną wartością dodaną pozyskaną podczas pisania tej pracy
+jest zdobyta wiedza z~dziedziny uczenia maszynowego. Jak ważny jest
+dobrze przygotowany zbiór obrazów pozytywnych i~negatywnych. Ile znaczy
+skuteczna procedura testowa i~jakie znaczenie ma liczebność zbioru danych
+na których testowane są wyszkolone detektory. Jest to wiedza na tyle 
+uniwersalna, że z~pewnością nie ogranicza się jedynie do detektorów
+kaskadowych Violi-Jonesa. Podobne mechanizmy występują we wszystkich
+algorytmach i~narzędziach wykorzystujących uczenia maszynowe, w~tym modnych
+ostatnio sieciach neuronowych. Dzięki zdobytym doświadczeniom, każda
+następna próba rozwiązania jakiegokolwiek zagadnienia z~wykorzystaniem uczenia maszynowego
+będzie z~pewnością bardziej przemyślana, świadoma i~co za tym idzie o~wiele skuteczniejsza.
 
-Jak widać możliwości rozbudowywania proponowanego narzędzia są niemal
-nieskończone. Jedynym kryterium jakie powinno obowiązywać przy
-doborze funkcji do zakodowania jest ich przydatność dla użytkowników 
-końcowych. To oni tak na prawdę powinni być największymi beneficjentami 
-potencjalnego systemu i~bez konsultacji z~przynajmniej jedną osobą
-niewidomą nie ma wręcz sensu wdrażać rozwiązania, które mogą 
-okazać się zupełnie nieprzydatne.
-
-Największą
-wartością dodaną tego opracowania jest stwierdzenie możliwości odczytania
-numeru nadjeżdżającego autobusu przez urządzenie mobilne.
-Osiągnięcie poziomu niezawodności pozwalającego osobie niewidomej 
-na swobodne poruszanie się i~korzystanie z~transportu miejskiego jest
-realne lecz wymaga ogromnego nakładu pracy. Pytaniem nad którym 
-trzeba się poważnie zastanowić jest sens istnienia takiego programu.
-Technologie typu OCR są zawodne, a~w~środowisku nie laboratoryjnym
-zależą od wielu czynników zewnętrznych: oświetlenia, zniekształceń,
-odblasków, przeszkód i~wielu innych. Pierwsze systemy 
-OCR wykorzystywano m.in. do odczytywania danych z~kart kredytowych.
-Jednak zaraz po pojawieniu się pasków magnetycznych zrezygnowano
-z~technologii OCR na rzecz bardziej niezawodnych 
-czytników magnetycznych. Z~drugiej strony zaletą OCR jest zerowy
-koszt dodatkowej infrastruktury oraz elastyczność rozwiązania.
-Dodatkowo prace naukowców na zbiorze SVHN pokazują, że 
-dziedzina przetwarzania obrazów w~połączeniu z~sieciami neuronowymi
-może mieć przed sobą jeszcze wiele znaczących osiągnięć.
