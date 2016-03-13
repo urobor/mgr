@@ -45,19 +45,57 @@ części pracy.
 \vspace*{\baselineskip}
 
 \noindent\textbf{Słowa kluczowe:} \textit{Android, OpenCV, Tesseract,
-wizja komputerowa, detektor, wykrywanie obiektów, rozpoznawanie obiektów,
-OCR, autobus, numer autobusu, odczytywanie numeru autobusu.}
+widzenie komputerowe, detektory kaskadowe, 
+wykrywanie obiektów, rozpoznawanie obiektów,
+OCR, odczytywanie numeru autobusu.}
 
 \vspace*{2\baselineskip}
+\newpage
 
 \begin{center}
 	\textbf{Abstract}
 \end{center}
 
-IN ENGLISH\ldots 
+This paper describes process of design and implementation
+of an Android application which could help or even replace 
+humans at reading city bus line numbers from the front 
+part of the aproaching vihicle. Initial design assumed
+that first prototype application would have very limited functionality.
+Just after first lunch, program would try to find bus front 
+in each frame taken from device camera. After first positive
+check, fixed number of frame shall be taken and processed
+in case of bus front identification and localization, number
+localization and filally recognition of digits in the identified number.
+
+First described activity was the review of available tools, algorythms,
+libraries and frameworks which could be helpful in object
+detection and recognition in natural scenes. Preapred set of
+tools and techniques was reviewed to choose most usefull ones
+for each problem. Main criteria were: efficiency and effectiveness,
+ease of implementation,
+available documentation and possible configuraion.
+
+In next chapter description of conducted experiments was made.
+Performed tests were supposed to help in finding 
+best suited algorithms and implementation of those
+algorithms according to the problem which shall be solved.
+After many hours and days spent on preparing and
+executing tests the fixed set of tools was chosen 
+to make final implementation. At this stage it was 
+certain that application was doable.
+
+Extensive test results allowed to determine the effectiveness
+and hence the usefulness of proposed applicaiton.
+Focus put on modularity led to the fact that implemented
+software was easly extendable. Every step of algorithm 
+could be improved separately or even raplaced whith completely
+different one. Paths of development and improvement
+were described in the last chapter.
 
 \vspace*{\baselineskip}
-
-\noindent\textbf{Keywords:} \textit{keyword1, keyword2.}
+\noindent\textbf{Keywords:} \textit{Android, OpenCV, Tesseract,
+	cumputer vision, cascade detectors, 
+	object detection, object recognition,
+	OCR, city bus number reading.}
 
 \setcounter{page}{2}

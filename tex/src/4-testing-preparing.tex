@@ -719,7 +719,8 @@ różnic w~liczbie próbek negatywnych:
 		xlabel={$Liczba\ probek\ negatywnych$},
 		minor y tick num=1,
 		legend style={at={(0.55,0.90)},anchor=north west},
-		width=\textwidth*0.9, height=6cm, ymajorgrids, xmajorgrids
+		width=\textwidth*0.9, height=6cm, ymajorgrids, xmajorgrids,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot [only marks, color=blue] table {data/front_pos_5000_neg_2000_1000_effectiveness.dat};
 		\addlegendentry{skuteczność (\%)}
@@ -778,7 +779,8 @@ na wykresie \ref{chart:500to11200pos_2x_neg}.
 		xlabel={$Liczba\ probek\ pozytywnych$},
 		minor y tick num=1,
 		legend style={at={(0.55,0.90)},anchor=north west},
-		width=\textwidth*0.9, height=12cm, ymajorgrids, xmajorgrids
+		width=\textwidth*0.9, height=12cm, ymajorgrids, xmajorgrids,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot [only marks, color=blue] table {data/front_pos_500_10000_effectiveness.dat};
 		\addlegendentry{skuteczność (\%)}
@@ -830,22 +832,22 @@ Pozostawiono stosunek (1 do 2) próbek pozytywnych do negatywnych ustanowiony na
 		Liczby    & Poprawne     & Błędy  & Średni czas    & Czas     \\
 		kaskad    & wykrycia     &        & wykrycia (sek) & uczenia  \\
 		\hline
-		20        & 1801 (95\%)  & 148    & 0.737   & 87 godz.\\
-		19        & 1818 (96\%)  & 219    & 0.738   & 42 godz.\\
-		18        & 1834 (96\%)  & 389    & 0.735   & 21 godz.\\
-		17        & 1854 (97\%)  & 835    & 0.732   & 12 godz.\\
-		16        & 1865 (98\%)  & 1736   & 0.730   & 7 godz. \\
-		15        & 1879 (99\%)  & 3495   & 0.738   & 4 godz. \\
-		14        & 1880 (99\%)  & 6683   & 0.729   & 2 godz. \\
-		13        & 1887 (99\%)  & 12940  & 0.762   & 2 godz. \\
-		12        & 1871 (98\%)  & 24859  & 0.734   & 1 godz. \\
-		11        & 1822 (96\%)  & 45749  & 0.747   & 55 min. \\
-		10        & 1661 (87\%)  & 77879  & 0.742   & 2 godz. \\
-		9         & 1258 (66\%)  & 128532 & 0.764   & 33 min. \\
-		8         & 525  (27\%)  & 201264 & 0.891   & 27 min. \\
-		7         & 122  (6.4\%) & 299567 & 1.636   & 23 min. \\
-		6         & 7    (0.4\%) & 508466 & 6.219   & 19 min. \\
-		5         & 0    (0.0\%) & 858169 & 12.30   & 15 min. \\
+		20        & 1801 (95\%)  & 148    & 0,737   & 87 godz.\\
+		19        & 1818 (96\%)  & 219    & 0,738   & 42 godz.\\
+		18        & 1834 (96\%)  & 389    & 0,735   & 21 godz.\\
+		17        & 1854 (97\%)  & 835    & 0,732   & 12 godz.\\
+		16        & 1865 (98\%)  & 1736   & 0,730   & 7 godz. \\
+		15        & 1879 (99\%)  & 3495   & 0,738   & 4 godz. \\
+		14        & 1880 (99\%)  & 6683   & 0,729   & 2 godz. \\
+		13        & 1887 (99\%)  & 12940  & 0,762   & 2 godz. \\
+		12        & 1871 (98\%)  & 24859  & 0,734   & 1 godz. \\
+		11        & 1822 (96\%)  & 45749  & 0,747   & 55 min. \\
+		10        & 1661 (87\%)  & 77879  & 0,742   & 2 godz. \\
+		9         & 1258 (66\%)  & 128532 & 0,764   & 33 min. \\
+		8         & 525  (27\%)  & 201264 & 0,891   & 27 min. \\
+		7         & 122  (6,4\%) & 299567 & 1,636   & 23 min. \\
+		6         & 7    (0,4\%) & 508466 & 6,219   & 19 min. \\
+		5         & 0    (0,0\%) & 858169 & 12,30   & 15 min. \\
 	\end{tabular} 
 	\label{tab:cascade_2_effi}
 \end{table}
@@ -859,6 +861,12 @@ opartej na procesorze AMD Sempron 2800+. Celem testu było zbadanie wpływu licz
 na skuteczność i~wydajność uczonych detektorów. Wyniki zaprezentowane zostały w tabeli 
 \ref{tab:cascade_2_effi}.
 
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/exp_numer_od_odleglosci}
+	\caption{Rozdzielczość wykrytego numeru w zależności od odległości}
+	\label{fig:dist2res}
+\end{figure}
 
 W~dalszych eksperymentach wykorzystano domyślną wartość - 20 kaskad. Ze względu
 na liczbę poprawnie wykrytych frontów nie jest to co prawda optymalny wybór,
@@ -915,8 +923,8 @@ w~tabeli \ref{tab:cpu_comparison}.
 		Procesor  & Średni czas      & Czas     \\
 		& wykrycia (w sek) & uczenia  \\
 		\hline
-		Sempron 2800+        & 0.737  & 87 godz. \\
-		Core i5 3570K        & 0.186  & 24 godz. \\
+		Sempron 2800+        & 0,737  & 87 godz. \\
+		Core i5 3570K        & 0,186  & 24 godz. \\
 	\end{tabular} 
 	\label{tab:lbp_hog_haar}
 \end{table}
@@ -939,9 +947,9 @@ Wyniki dla trzech przebiegów zamieszczono w tabeli \ref{tab:cpu_comparison}.
 		Typ    & Poprawne     & Błędy  & Średni czas    & Czas     \\
 		cech   & wykrycia     &        & wykrycia (sek) & uczenia  \\
 		\hline
-		LBP        & 1801 (95\%)  & 148    & 0.184   & 24 godz.\\
-		HOG        & 1398 (73\%)  & 964    & 0.133   & 19 godz.\\
-		HAAR       & 1860 (98\%)  & 185    & 0.165   & 100 godz.\\
+		LBP        & 1801 (95\%)  & 148    & 0,184   & 24 godz.\\
+		HOG        & 1398 (73\%)  & 964    & 0,133   & 19 godz.\\
+		HAAR       & 1860 (98\%)  & 185    & 0,165   & 100 godz.\\
 	\end{tabular} 
 	\label{tab:cpu_comparison}
 \end{table}
@@ -1137,7 +1145,8 @@ zostały na wykresie \ref{chart:scale_factor2hitratio}.
 		xlabel={$Wspolczynnik\ skalujacy$},
 		minor y tick num=1,
 		legend style={at={(0.54,0.94)},anchor=north west},
-		height=6cm
+		height=6cm,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot [only marks, color=blue] table {data/num/scalefactor/front2hitra.dat};
 		\addlegendentry{skuteczność}
@@ -1153,7 +1162,8 @@ zostały na wykresie \ref{chart:scale_factor2hitratio}.
 			xlabel={$Wspolczynnik\ skalujacy$},
 			minor y tick num=1,
 			legend style={at={(0.48,0.94)},anchor=north west},
-			height=6cm
+			height=6cm,
+			/pgf/number format/.cd, use comma, 1000 sep={}
 			]
 			\addplot [only marks, color=red] table {data/num/scalefactor/front2false.dat};
 			\addlegendentry{liczba błędów}
@@ -1161,7 +1171,7 @@ zostały na wykresie \ref{chart:scale_factor2hitratio}.
 			\end{tikzpicture}
 	\end{subfigure}
 	\caption{Skuteczność w procentach oraz liczba błędnych trafień 
-		w~zależności od współczynnika skalowania okna przesównego}
+		w~zależności od współczynnika skalowania okna przesuwnego}
 	\label{chart:scale_factor2hitratio}
 \end{figure}
 

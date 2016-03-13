@@ -71,7 +71,8 @@ zostały na wykresie \ref{chart:time_2_temp_2_fps}.
 		xlabel={$Liczba\ pobranych\ klatek$},
 		minor y tick num=1,
 		legend style={at={(0.05,0.30)},anchor=north west},
-		width=\textwidth*0.9, height=6cm
+		width=\textwidth*0.9, height=6cm,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot [only marks, color=blue] table {data/phone/raw1920x1440x01.dat};
 		\addlegendentry{pierwsza proba}
@@ -117,7 +118,8 @@ zbyt wielkiego skoku wydajnościowego.
 		xlabel={$Liczba\ pobranych\ klatek$},
 		minor y tick num=1,
 		legend style={at={(0.05,0.30)},anchor=north west},
-		width=\textwidth*0.9, height=6cm
+		width=\textwidth*0.9, height=6cm,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot [only marks, color=blue] table {data/phone/raw1920x1440x01.dat};
 		\addlegendentry{rozdzielczosc 1920x1440}
@@ -161,7 +163,8 @@ wyliczono następujące średnie:
 		xlabel={$Liczba\ pobranych\ klatek$},
 		minor y tick num=1,
 		legend style={at={(0.05,0.90)},anchor=north west},
-		width=\textwidth*0.9, height=6cm
+		width=\textwidth*0.9, height=6cm,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot[mark=none, green, line width=2pt] coordinates {(0,44) (1150,44)};
 		\addlegendentry{średni czas 44 ms}
@@ -220,7 +223,8 @@ wykonanie całego algorytmu częściej niż 20 razy na sekundę.
 		minor y tick num=1,
 		x tick label style={rotate=45},
 		legend style={at={(0.05,0.90)},anchor=north west},
-		width=\textwidth*0.9, height=6cm
+		width=\textwidth*0.9, height=6cm,
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot [only marks, color=blue] table {data/phone/digits01.dat};
 		%\addlegendentry{czas odczytu numeru linii}
@@ -273,7 +277,8 @@ ciepłe (przed przejściem w~tryb oszczędny), gorące (w~trybie oszczędnym).
 		enlarge x limits=false,
 		enlarge y limits=upper,
 		width=\textwidth*0.9, height=6cm,
-		legend style={at={(0.575,0.50)},anchor=north west}
+		legend style={at={(0.575,0.50)},anchor=north west},
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot+[y] table {data/phone/allxother.dat} \closedcycle;
 		\addlegendentry{pobranie obrazu z aparatu}
@@ -312,7 +317,8 @@ pobraniu obrazu z~aparatu: 50 ms (20 klatek na sekundę).
 		enlarge x limits=false,
 		enlarge y limits=upper,
 		width=\textwidth*0.9, height=6cm,
-		legend style={at={(0.575,0.50)},anchor=north west}
+		legend style={at={(0.575,0.50)},anchor=north west},
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot+[y] table {data/phone/allxother02.dat} \closedcycle;
 		\addlegendentry{pobranie obrazu z aparatu}
@@ -348,7 +354,8 @@ jeszcze w~tryb zmniejszonej częstotliwości procesora.
 		enlarge x limits=false,
 		enlarge y limits=upper,
 		width=\textwidth*0.9, height=6cm,
-		legend style={at={(0.575,0.50)},anchor=north west}
+		legend style={at={(0.575,0.50)},anchor=north west},
+		/pgf/number format/.cd, use comma, 1000 sep={}
 		]
 		\addplot+[y] table {data/phone/allxother03.dat} \closedcycle;
 		\addlegendentry{pobranie obrazu z aparatu}
